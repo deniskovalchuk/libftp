@@ -1,0 +1,35 @@
+name: macOS
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Get externals
+      run: brew install boost
+
+    - name: Build
+      run: |
+        mkdir -p build/release
+        cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release
+        cmake --build build/release
+
+    - name: Test libftp
+      env:
+        LIBFTP_TEST_SERVER_PATH: ${{github.workspace}}/test/server/server.py
+      working-directory: ${{github.workspace}}/build/release/test
+      run: ./ftp_tests
+
+    - name: Test cmdline
+      working-directory: ${{github.workspace}}/build/release/app/cmdline/test
+      run: ./cmdline_tests

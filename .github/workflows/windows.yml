@@ -1,0 +1,58 @@
+name: Windows
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Cache externals
+      id: cache-externals
+      uses: actions/cache@v3
+      with:
+        path: ${{runner.temp}}\boost_1_83_0
+        key: cache-externals
+
+    - name: Get externals
+      if: steps.cache-externals.outputs.cache-hit != 'true'
+      working-directory: ${{runner.temp}}
+      shell: powershell
+      run: |
+        # Download Boost.
+        Invoke-WebRequest `
+            -Uri "https://boostorg.jfrog.io/artifactory/main/release/1.83.0/source/boost_1_83_0.7z" `
+            -OutFile boost.7z
+        # Extract.
+        7z x boost.7z
+        # Build.
+        cd boost_1_83_0
+        .\bootstrap
+        .\b2 link=static
+
+    - name: Build
+      env:
+        BOOST_ROOT: ${{runner.temp}}\boost_1_83_0
+        Boost_INCLUDE_DIR: ${{runner.temp}}\boost_1_83_0\libs\headers
+      run: |
+        mkdir -p build
+        cmake -S . -B build -DBoost_USE_STATIC_LIBS=ON
+        cmake --build build --config Release
+
+    - name: Test libftp
+      env:
+        LIBFTP_TEST_SERVER_PATH: ${{github.workspace}}\test\server\server.py
+      working-directory: ${{github.workspace}}\build\test\Release
+      run: .\ftp_tests.exe
+
+    - name: Test cmdline
+      working-directory: ${{github.workspace}}\build\app\cmdline\test\Release
+      run: .\cmdline_tests.exe

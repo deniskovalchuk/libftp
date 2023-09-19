@@ -1,0 +1,2 @@
+# Exclude pyftpdlib module from language statistics.
+test/server/pyftpdlib/** linguist-vendored
