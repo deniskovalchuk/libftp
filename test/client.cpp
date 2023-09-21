@@ -676,6 +676,23 @@ TEST_F(client, rename_nonexistent_path)
     check_reply(client.disconnect(), "221 Goodbye.");
 }
 
+TEST_F(client, get_file_size_nonexistent_file)
+{
+    ftp::client client;
+
+    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+
+    check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
+                                                       "230 Login successful.",
+                                                       "200 Type set to: Binary."));
+
+    ftp::file_size_reply reply = client.get_file_size("nonexistent");
+    check_reply(reply, "550 /nonexistent is not retrievable.");
+    EXPECT_FALSE(reply.get_size().has_value());
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
 TEST_F(client, event_observer)
 {
     {
@@ -980,8 +997,11 @@ TEST_P(client_binary_transfer, upload_download_file)
     std::istringstream iss(data);
     check_last_reply(client.upload_file(ftp::istream_adapter(iss), "file"), "226 Transfer complete.");
 
-    std::string size = std::to_string(data.size());
-    check_reply(client.get_file_size("file"), "213 " + size);
+    std::uint64_t expected_size = data.size();
+    ftp::file_size_reply reply = client.get_file_size("file");
+    check_reply(reply, "213 " + std::to_string(expected_size));
+    EXPECT_TRUE(reply.get_size().has_value());
+    EXPECT_EQ(expected_size, reply.get_size().value());
 
     std::ostringstream oss;
     check_last_reply(client.download_file(ftp::ostream_adapter(oss), "file"), "226 Transfer complete.");

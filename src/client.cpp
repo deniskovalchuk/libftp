@@ -222,11 +222,38 @@ reply client::remove_directory(std::string_view path)
     return process_command(command);
 }
 
-reply client::get_file_size(std::string_view path)
+file_size_reply client::get_file_size(std::string_view path)
 {
     std::string command = make_command("SIZE", path);
+    reply reply = process_command(command);
 
-    return process_command(command);
+    std::uint64_t size;
+    if (try_parse_size_reply(reply, size))
+    {
+        return { reply, size };
+    }
+    else
+    {
+        return { reply, std::nullopt };
+    }
+}
+
+bool client::try_parse_size_reply(const reply & reply, std::uint64_t & size)
+{
+    /* 213 SIZE_IN_BYTES */
+    if (reply.get_code() != 213)
+    {
+        return false;
+    }
+
+    std::string_view status_string = reply.get_status_string();
+
+    if (status_string.size() < 5)
+    {
+        return false;
+    }
+
+    return utils::try_parse_uint64(status_string.substr(4), size);
 }
 
 reply client::get_status(const std::optional<std::string_view> & path)

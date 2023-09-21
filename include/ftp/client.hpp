@@ -26,6 +26,7 @@
 #define LIBFTP_CLIENT_HPP
 
 #include <ftp/observer.hpp>
+#include <ftp/file_size_reply.hpp>
 #include <ftp/replies.hpp>
 #include <ftp/reply.hpp>
 #include <ftp/transfer_callback.hpp>
@@ -92,7 +93,7 @@ public:
 
     reply remove_directory(std::string_view path);
 
-    reply get_file_size(std::string_view path);
+    file_size_reply get_file_size(std::string_view path);
 
     reply get_status(const std::optional<std::string_view> & path = std::nullopt);
 
@@ -150,6 +151,8 @@ private:
     detail::data_connection_ptr process_port_command(std::string_view command, replies & replies);
 
     static bool try_parse_pasv_reply(const reply & reply, std::string & ip, std::uint16_t & port);
+
+    static bool try_parse_size_reply(const reply & reply, std::uint64_t & size);
 
     static std::string make_command(std::string_view command, const std::optional<std::string_view> & argument = std::nullopt);
 

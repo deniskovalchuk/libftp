@@ -25,6 +25,7 @@ set(sources
         include/ftp/stream/ostream_adapter.hpp
         include/ftp/stream/output_stream.hpp
         include/ftp/client.hpp
+        include/ftp/file_size_reply.hpp
         include/ftp/ftp.hpp
         include/ftp/ftp_exception.hpp
         include/ftp/observer.hpp
@@ -40,6 +41,7 @@ set(sources
         src/client.cpp
         src/control_connection.cpp
         src/data_connection.cpp
+        src/file_size_reply.cpp
         src/istream_adapter.cpp
         src/ostream_adapter.cpp
         src/replies.cpp
