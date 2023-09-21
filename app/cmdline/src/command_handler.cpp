@@ -593,7 +593,12 @@ void command_handler::size(const std::vector<std::string> & args)
         throw cmdline_exception("usage: size remote-file");
     }
 
-    ftp_client_.get_file_size(remote_file);
+    ftp::file_size_reply reply = ftp_client_.get_file_size(remote_file);
+
+    if (reply.get_size())
+    {
+        std::cout << reply.get_size().value() << " bytes."<< std::endl;
+    }
 }
 
 void command_handler::stat(const std::vector<std::string> & args)
