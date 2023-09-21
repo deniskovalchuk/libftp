@@ -77,4 +77,26 @@ TEST(utils, try_parse_uint16)
     EXPECT_EQ(65535, result);
 }
 
+TEST(utils, try_parse_uint64)
+{
+    std::uint64_t result;
+
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint64("", result));
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint64("abc", result));
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint64("123abc", result));
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint64("-1", result));
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint64("18446744073709551616", result));
+
+    EXPECT_TRUE(ftp::detail::utils::try_parse_uint64("0", result));
+    EXPECT_EQ(0, result);
+    EXPECT_TRUE(ftp::detail::utils::try_parse_uint64("1", result));
+    EXPECT_EQ(1, result);
+    EXPECT_TRUE(ftp::detail::utils::try_parse_uint64("47", result));
+    EXPECT_EQ(47, result);
+    EXPECT_TRUE(ftp::detail::utils::try_parse_uint64("4294967295", result));
+    EXPECT_EQ(4294967295, result);
+    EXPECT_TRUE(ftp::detail::utils::try_parse_uint64("18446744073709551615", result));
+    EXPECT_EQ(18446744073709551615u, result);
+}
+
 } // namespace

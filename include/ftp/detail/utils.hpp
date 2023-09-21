@@ -45,5 +45,7 @@ std::vector<std::string> split_string(std::string_view str, char del);
 
 bool try_parse_uint16(std::string_view str, std::uint16_t & result);
 
+bool try_parse_uint64(std::string_view str, std::uint64_t & result);
+
 } // namespace ftp::detail::utils
 #endif //LIBFTP_UTILS_HPP

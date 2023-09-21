@@ -59,18 +59,32 @@ std::vector<std::string> split_string(std::string_view str, char del)
 
 bool try_parse_uint16(std::string_view str, std::uint16_t & result)
 {
+    std::uint64_t value;
+
+    if (!try_parse_uint64(str, value))
+        return false;
+
+    if (value > std::numeric_limits<std::uint16_t>::max())
+        return false;
+
+    result = value;
+    return true;
+}
+
+bool try_parse_uint64(std::string_view str, std::uint64_t & result)
+{
     if (str.empty())
         return false;
 
-    std::uint16_t max = std::numeric_limits<std::uint16_t>::max();
-    std::uint16_t value = 0;
+    std::uint64_t max = std::numeric_limits<std::uint64_t>::max();
+    std::uint64_t value = 0;
 
     for (char ch : str)
     {
         if (ch < '0' || ch > '9')
             return false;
 
-        std::uint16_t digit = ch - '0';
+        std::uint64_t digit = ch - '0';
 
         if (value > max / 10)
             return false;
