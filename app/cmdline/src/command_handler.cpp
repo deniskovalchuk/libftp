@@ -595,7 +595,7 @@ void command_handler::size(const std::vector<std::string> & args)
 
     ftp::file_size_reply reply = ftp_client_.get_file_size(remote_file);
 
-    const std::optional<std::uint64_t> size = reply.get_size();
+    const std::optional<std::uint64_t> & size = reply.get_size();
     if (size)
     {
         std::cout << size.value() << " bytes."<< std::endl;
