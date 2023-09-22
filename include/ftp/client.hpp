@@ -26,6 +26,7 @@
 #define LIBFTP_CLIENT_HPP
 
 #include <ftp/observer.hpp>
+#include <ftp/file_list_reply.hpp>
 #include <ftp/file_size_reply.hpp>
 #include <ftp/replies.hpp>
 #include <ftp/reply.hpp>
@@ -83,7 +84,7 @@ public:
 
     replies append_file(input_stream && src, std::string_view path, transfer_callback * transfer_cb = nullptr);
 
-    replies get_file_list(const std::optional<std::string_view> & path = std::nullopt, bool only_names = false);
+    file_list_reply get_file_list(const std::optional<std::string_view> & path = std::nullopt, bool only_names = false);
 
     replies rename(std::string_view from_path, std::string_view to_path);
 

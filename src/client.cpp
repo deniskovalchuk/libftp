@@ -154,7 +154,7 @@ replies client::append_file(input_stream && src, std::string_view path, transfer
     return process_upload("APPE", src, path, transfer_cb);
 }
 
-replies client::get_file_list(const std::optional<std::string_view> & path, bool only_names)
+file_list_reply client::get_file_list(const std::optional<std::string_view> & path, bool only_names)
 {
     std::string command;
 
@@ -168,6 +168,8 @@ replies client::get_file_list(const std::optional<std::string_view> & path, bool
     }
 
     replies replies;
+    std::string file_list;
+
     data_connection_ptr connection = create_data_connection(command, replies);
 
     if (connection)
@@ -176,13 +178,15 @@ replies client::get_file_list(const std::optional<std::string_view> & path, bool
         ostream_adapter adapter(oss);
         output_stream_ptr stream = create_output_stream(adapter);
         connection->recv(*stream, nullptr);
-        notify_file_list(oss.str());
-        connection->close();
 
+        file_list = oss.str();
+        notify_file_list(file_list);
+
+        connection->close();
         recv(replies);
     }
 
-    return replies;
+    return { replies, file_list };
 }
 
 replies client::rename(std::string_view from_path, std::string_view to_path)
