@@ -23,6 +23,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <boost/process.hpp>
 #include <filesystem>
 #include <memory>
@@ -37,6 +38,7 @@ namespace
 {
 
 using namespace ftp::test;
+using testing::ElementsAre;
 
 class test_observer : public ftp::observer
 {
@@ -66,37 +68,6 @@ public:
 private:
     std::string mark_;
     std::string status_strings_;
-};
-
-class test_file_list_observer : public ftp::observer
-{
-public:
-    [[nodiscard]] const std::string & get_file_list()
-    {
-        return file_list_;
-    }
-
-    [[nodiscard]] std::size_t get_file_count()
-    {
-        return file_count_;
-    }
-
-private:
-    void on_file_list(std::string_view file_list) override
-    {
-        file_list_ = file_list;
-        file_count_ = 0;
-
-        std::istringstream iss(file_list_);
-        std::string file;
-        while (std::getline(iss, file))
-        {
-            file_count_++;
-        }
-    }
-
-    std::string file_list_;
-    std::size_t file_count_;
 };
 
 class test_cancel_callback : public ftp::transfer_callback
@@ -795,10 +766,7 @@ TEST_F(client, append_file)
 
 TEST_F(client, get_file_list_only_names)
 {
-    std::shared_ptr<test_file_list_observer> observer = std::make_shared<test_file_list_observer>();
     ftp::client client;
-
-    client.add_observer(observer);
 
     check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
 
@@ -806,24 +774,25 @@ TEST_F(client, get_file_list_only_names)
                                                        "230 Login successful.",
                                                        "200 Type set to: Binary."));
 
-    check_last_reply(client.get_file_list(".", true), "226 Transfer complete.");
-    ASSERT_TRUE(observer->get_file_list().empty());
+    client.set_transfer_type(ftp::transfer_type::ascii);
+
+    ftp::file_list_reply reply = client.get_file_list(".", true);
+    check_last_reply(reply, "226 Transfer complete.");
+    ASSERT_THAT(reply.get_file_list(), ElementsAre());
 
     check_reply(client.create_directory("dir1"), R"(257 "/dir1" directory created.)");
     check_reply(client.create_directory("dir2"), R"(257 "/dir2" directory created.)");
 
-    check_last_reply(client.get_file_list(".", true), "226 Transfer complete.");
-    ASSERT_EQ(CRLF("dir1", "dir2", ""), observer->get_file_list());
+    reply = client.get_file_list(".", true);
+    check_last_reply(reply, "226 Transfer complete.");
+    ASSERT_THAT(reply.get_file_list(), ElementsAre("dir1", "dir2"));
 
     check_reply(client.disconnect(), "221 Goodbye.");
 }
 
 TEST_F(client, upload_unique_file)
 {
-    std::shared_ptr<test_file_list_observer> observer = std::make_shared<test_file_list_observer>();
     ftp::client client;
-
-    client.add_observer(observer);
 
     check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
 
@@ -836,16 +805,18 @@ TEST_F(client, upload_unique_file)
         check_last_reply(client.upload_file(ftp::istream_adapter(iss), "file", true), "226 Transfer complete.");
     }
 
-    check_last_reply(client.get_file_list(".", true), "226 Transfer complete.");
-    ASSERT_EQ(1, observer->get_file_count());
+    ftp::file_list_reply reply = client.get_file_list(".", true);
+    check_last_reply(reply, "226 Transfer complete.");
+    ASSERT_EQ(1, reply.get_file_list().size());
 
     {
         std::istringstream iss("content");
         check_last_reply(client.upload_file(ftp::istream_adapter(iss), "file", true), "226 Transfer complete.");
     }
 
-    check_last_reply(client.get_file_list(".", true), "226 Transfer complete.");
-    ASSERT_EQ(2, observer->get_file_count());
+    reply = client.get_file_list(".", true);
+    check_last_reply(reply, "226 Transfer complete.");
+    ASSERT_EQ(2, reply.get_file_list().size());
 
     check_reply(client.disconnect(), "221 Goodbye.");
 }

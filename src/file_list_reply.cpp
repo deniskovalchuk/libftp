@@ -23,6 +23,7 @@
  */
 
 #include <ftp/file_list_reply.hpp>
+#include <sstream>
 
 namespace ftp
 {
@@ -31,14 +32,35 @@ file_list_reply::file_list_reply()
     : ftp::replies()
 {}
 
-file_list_reply::file_list_reply(const replies & replies, const std::string & file_list)
+file_list_reply::file_list_reply(const replies & replies, const std::string & file_list_str)
     : ftp::replies(replies),
-      file_list_(file_list)
-{}
+      file_list_str_(file_list_str)
+{
+    file_list_ = parse_file_list(file_list_str);
+}
 
-const std::string & file_list_reply::get_file_list() const
+const std::string & file_list_reply::get_file_list_str() const
+{
+    return file_list_str_;
+}
+
+const std::vector<std::string> & file_list_reply::get_file_list() const
 {
     return file_list_;
+}
+
+std::vector<std::string> file_list_reply::parse_file_list(const std::string & file_list_str)
+{
+    std::vector<std::string> file_list;
+
+    std::istringstream iss(file_list_str);
+    std::string line;
+    while (std::getline(iss, line))
+    {
+        file_list.push_back(line);
+    }
+
+    return file_list;
 }
 
 } // namespace ftp

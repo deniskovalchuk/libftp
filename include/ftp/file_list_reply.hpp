@@ -27,6 +27,7 @@
 
 #include <ftp/replies.hpp>
 #include <string>
+#include <vector>
 
 namespace ftp
 {
@@ -36,12 +37,17 @@ class file_list_reply : public replies
 public:
     file_list_reply();
 
-    file_list_reply(const replies & replies, const std::string & file_list);
+    file_list_reply(const replies & replies, const std::string & file_list_str);
 
-    [[nodiscard]] const std::string & get_file_list() const;
+    [[nodiscard]] const std::string & get_file_list_str() const;
+
+    [[nodiscard]] const std::vector<std::string> & get_file_list() const;
 
 private:
-    std::string file_list_;
+    static std::vector<std::string> parse_file_list(const std::string & file_list_str);
+
+    std::string file_list_str_;
+    std::vector<std::string> file_list_;
 };
 
 } // namespace ftp
