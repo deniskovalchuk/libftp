@@ -57,6 +57,10 @@ std::vector<std::string> file_list_reply::parse_file_list(const std::string & fi
     std::string line;
     while (std::getline(iss, line))
     {
+        /* Handle CRLF. */
+        if (!line.empty() && line.back() == '\r')
+            line.pop_back();
+
         file_list.push_back(line);
     }
 

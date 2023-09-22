@@ -774,8 +774,6 @@ TEST_F(client, get_file_list_only_names)
                                                        "230 Login successful.",
                                                        "200 Type set to: Binary."));
 
-    client.set_transfer_type(ftp::transfer_type::ascii);
-
     ftp::file_list_reply reply = client.get_file_list(".", true);
     check_last_reply(reply, "226 Transfer complete.");
     ASSERT_THAT(reply.get_file_list(), ElementsAre());
