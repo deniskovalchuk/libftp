@@ -34,6 +34,7 @@ namespace
 
 /*
  * Save logs in the following format:
+ *   -- Connected to localhost on port 2121.
  *   <- 220 FTP server is ready.
  *   -> USER user
  *   <- 331 Username ok, send password.
@@ -56,6 +57,11 @@ public:
     }
 
 private:
+    void on_connected(std::string_view hostname, std::uint16_t port) override
+    {
+        log_file_ << "-- Connected to " << hostname << " on port " << port << "." << std::endl;
+    }
+
     void on_request(std::string_view command) override
     {
         log_file_ << "-> ";
