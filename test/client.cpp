@@ -49,36 +49,36 @@ public:
 
     void on_connected(std::string_view hostname, std::uint16_t port) override
     {
-        status_strings_.append(mark_);
-        status_strings_.append(": -- ");
-        status_strings_.append("Connected to ");
-        status_strings_.append(hostname);
-        status_strings_.append(" on port ");
-        status_strings_.append(std::to_string(port));
-        status_strings_.append(".");
+        data_.append(mark_);
+        data_.append(": -- ");
+        data_.append("Connected to ");
+        data_.append(hostname);
+        data_.append(" on port ");
+        data_.append(std::to_string(port));
+        data_.append(".");
     }
 
     void on_request(std::string_view command) override
     {
-        status_strings_.append(mark_);
-        status_strings_.append(": -> ");
-        status_strings_.append(command);
+        data_.append(mark_);
+        data_.append(": -> ");
+        data_.append(command);
     }
 
     void on_reply(const ftp::reply & reply) override
     {
-        status_strings_.append(mark_);
-        status_strings_.append(": <- ");
-        status_strings_.append(reply.get_status_string());
+        data_.append(mark_);
+        data_.append(": <- ");
+        data_.append(reply.get_status_string());
     }
 
-    [[nodiscard]] const std::string & get_status_strings() const
+    [[nodiscard]] const std::string & get_data() const
     {
-        return status_strings_;
+        return data_;
     }
 private:
     std::string mark_;
-    std::string status_strings_;
+    std::string data_;
 };
 
 class test_cancel_callback : public ftp::transfer_callback
@@ -688,7 +688,7 @@ TEST_F(client, event_observer)
         ASSERT_EQ("observer1: -- Connected to localhost on port 2121."
                   "observer1: <- 220 FTP server is ready."
                   "observer1: -> QUIT"
-                  "observer1: <- 221 Goodbye.", obs1->get_status_strings());
+                  "observer1: <- 221 Goodbye.", obs1->get_data());
 
         client.remove_observer(obs1);
 
@@ -697,7 +697,7 @@ TEST_F(client, event_observer)
         ASSERT_EQ("observer1: -- Connected to localhost on port 2121."
                   "observer1: <- 220 FTP server is ready."
                   "observer1: -> QUIT"
-                  "observer1: <- 221 Goodbye.", obs1->get_status_strings());
+                  "observer1: <- 221 Goodbye.", obs1->get_data());
     }
 
     {
@@ -713,11 +713,11 @@ TEST_F(client, event_observer)
         ASSERT_EQ("observer1: -- Connected to localhost on port 2121."
                   "observer1: <- 220 FTP server is ready."
                   "observer1: -> QUIT"
-                  "observer1: <- 221 Goodbye.", obs1->get_status_strings());
+                  "observer1: <- 221 Goodbye.", obs1->get_data());
         ASSERT_EQ("observer2: -- Connected to localhost on port 2121."
                   "observer2: <- 220 FTP server is ready."
                   "observer2: -> QUIT"
-                  "observer2: <- 221 Goodbye.", obs2->get_status_strings());
+                  "observer2: <- 221 Goodbye.", obs2->get_data());
 
         client.remove_observer(obs1);
 
@@ -726,7 +726,7 @@ TEST_F(client, event_observer)
         ASSERT_EQ("observer1: -- Connected to localhost on port 2121."
                   "observer1: <- 220 FTP server is ready."
                   "observer1: -> QUIT"
-                  "observer1: <- 221 Goodbye.", obs1->get_status_strings());
+                  "observer1: <- 221 Goodbye.", obs1->get_data());
         ASSERT_EQ("observer2: -- Connected to localhost on port 2121."
                   "observer2: <- 220 FTP server is ready."
                   "observer2: -> QUIT"
@@ -734,7 +734,7 @@ TEST_F(client, event_observer)
                   "observer2: -- Connected to localhost on port 2121."
                   "observer2: <- 220 FTP server is ready."
                   "observer2: -> QUIT"
-                  "observer2: <- 221 Goodbye.", obs2->get_status_strings());
+                  "observer2: <- 221 Goodbye.", obs2->get_data());
     }
 }
 
