@@ -50,5 +50,11 @@ std::string CRLF(const std::string & str, Strings && ...strs)
     return (str + ... + (std::string("\r\n") + std::forward<Strings>(strs)));
 }
 
+template<typename ...Strings>
+std::string LF(const std::string & str, Strings && ...strs)
+{
+    return (str + ... + (std::string("\n") + std::forward<Strings>(strs)));
+}
+
 } // namespace ftp::test
 #endif //LIBFTP_TEST_HELPERS_HPP

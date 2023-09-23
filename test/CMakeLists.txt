@@ -17,6 +17,7 @@ set(sources
         ascii_istream.cpp
         ascii_ostream.cpp
         client.cpp
+        file_list_reply.cpp
         file_size_reply.cpp
         replies.cpp
         reply.cpp
