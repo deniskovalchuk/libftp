@@ -24,7 +24,6 @@
 
 #include <gtest/gtest.h>
 #include "test_helpers.hpp"
-#include <list>
 
 namespace ftp::test
 {
