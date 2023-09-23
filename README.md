@@ -54,6 +54,7 @@ reverse conversion.
 - The main command set from [RFC 959](doc/RFC959.txt) is implemented.
 - Supports active and passive transfer modes.
 - Supports ASCII and binary transfer types.
+- IPv4 and IPv6 support.
 
 ## Examples
 
