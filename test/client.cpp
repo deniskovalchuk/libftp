@@ -47,6 +47,17 @@ public:
         : mark_(mark)
     {}
 
+    void on_connected(std::string_view hostname, std::uint16_t port) override
+    {
+        status_strings_.append(mark_);
+        status_strings_.append(": -- ");
+        status_strings_.append("Connected to ");
+        status_strings_.append(hostname);
+        status_strings_.append(" on port ");
+        status_strings_.append(std::to_string(port));
+        status_strings_.append(".");
+    }
+
     void on_request(std::string_view command) override
     {
         status_strings_.append(mark_);
@@ -674,7 +685,8 @@ TEST_F(client, event_observer)
 
         check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
         check_reply(client.disconnect(), "221 Goodbye.");
-        ASSERT_EQ("observer1: <- 220 FTP server is ready."
+        ASSERT_EQ("observer1: -- Connected to localhost on port 2121."
+                  "observer1: <- 220 FTP server is ready."
                   "observer1: -> QUIT"
                   "observer1: <- 221 Goodbye.", obs1->get_status_strings());
 
@@ -682,7 +694,8 @@ TEST_F(client, event_observer)
 
         check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
         check_reply(client.disconnect(), "221 Goodbye.");
-        ASSERT_EQ("observer1: <- 220 FTP server is ready."
+        ASSERT_EQ("observer1: -- Connected to localhost on port 2121."
+                  "observer1: <- 220 FTP server is ready."
                   "observer1: -> QUIT"
                   "observer1: <- 221 Goodbye.", obs1->get_status_strings());
     }
@@ -697,10 +710,12 @@ TEST_F(client, event_observer)
 
         check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
         check_reply(client.disconnect(), "221 Goodbye.");
-        ASSERT_EQ("observer1: <- 220 FTP server is ready."
+        ASSERT_EQ("observer1: -- Connected to localhost on port 2121."
+                  "observer1: <- 220 FTP server is ready."
                   "observer1: -> QUIT"
                   "observer1: <- 221 Goodbye.", obs1->get_status_strings());
-        ASSERT_EQ("observer2: <- 220 FTP server is ready."
+        ASSERT_EQ("observer2: -- Connected to localhost on port 2121."
+                  "observer2: <- 220 FTP server is ready."
                   "observer2: -> QUIT"
                   "observer2: <- 221 Goodbye.", obs2->get_status_strings());
 
@@ -708,12 +723,15 @@ TEST_F(client, event_observer)
 
         check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
         check_reply(client.disconnect(), "221 Goodbye.");
-        ASSERT_EQ("observer1: <- 220 FTP server is ready."
+        ASSERT_EQ("observer1: -- Connected to localhost on port 2121."
+                  "observer1: <- 220 FTP server is ready."
                   "observer1: -> QUIT"
                   "observer1: <- 221 Goodbye.", obs1->get_status_strings());
-        ASSERT_EQ("observer2: <- 220 FTP server is ready."
+        ASSERT_EQ("observer2: -- Connected to localhost on port 2121."
+                  "observer2: <- 220 FTP server is ready."
                   "observer2: -> QUIT"
                   "observer2: <- 221 Goodbye."
+                  "observer2: -- Connected to localhost on port 2121."
                   "observer2: <- 220 FTP server is ready."
                   "observer2: -> QUIT"
                   "observer2: <- 221 Goodbye.", obs2->get_status_strings());

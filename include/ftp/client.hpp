@@ -161,6 +161,8 @@ private:
 
     static std::string make_type_command(transfer_type type);
 
+    void notify_connected(std::string_view hostname, std::uint16_t port);
+
     void notify_request(std::string_view command);
 
     void notify_reply(const reply & reply);

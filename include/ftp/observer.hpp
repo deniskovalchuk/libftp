@@ -34,6 +34,8 @@ namespace ftp
 class observer
 {
 public:
+    virtual void on_connected(std::string_view hostname, std::uint16_t port) { };
+
     virtual void on_request(std::string_view command) { };
 
     virtual void on_reply(const reply & reply) { };

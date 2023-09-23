@@ -49,6 +49,8 @@ replies client::connect(std::string_view hostname,
 {
     control_connection_.open(hostname, port);
 
+    notify_connected(hostname, port);
+
     replies replies;
     reply reply = recv(replies);
 
@@ -723,6 +725,14 @@ std::string client::make_type_command(transfer_type type)
     {
         assert(false);
         return "";
+    }
+}
+
+void client::notify_connected(std::string_view hostname, std::uint16_t port)
+{
+    for (const std::shared_ptr<observer> & observer : observers_)
+    {
+        observer->on_connected(hostname, port);
     }
 }
 
