@@ -75,7 +75,7 @@ std::vector<reply>::const_iterator replies::end() const
     return replies_.cend();
 }
 
-const std::vector<reply> & replies::get_list() const
+const std::vector<reply> & replies::get_replies() const
 {
     return replies_;
 }

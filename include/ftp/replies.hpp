@@ -46,7 +46,7 @@ public:
 
     [[nodiscard]] std::vector<reply>::const_iterator end() const;
 
-    [[nodiscard]] const std::vector<reply> & get_list() const;
+    [[nodiscard]] const std::vector<reply> & get_replies() const;
 
 private:
     bool is_positive_;
