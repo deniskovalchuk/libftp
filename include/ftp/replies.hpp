@@ -26,7 +26,7 @@
 #define LIBFTP_REPLIES_HPP
 
 #include <ftp/reply.hpp>
-#include <list>
+#include <vector>
 
 namespace ftp
 {
@@ -42,16 +42,16 @@ public:
 
     [[nodiscard]] const std::string & get_status_string() const;
 
-    [[nodiscard]] std::list<reply>::const_iterator begin() const;
+    [[nodiscard]] std::vector<reply>::const_iterator begin() const;
 
-    [[nodiscard]] std::list<reply>::const_iterator end() const;
+    [[nodiscard]] std::vector<reply>::const_iterator end() const;
 
-    [[nodiscard]] const std::list<reply> & get_list() const;
+    [[nodiscard]] const std::vector<reply> & get_list() const;
 
 private:
     bool is_positive_;
     std::string status_string_;
-    std::list<reply> replies_;
+    std::vector<reply> replies_;
 };
 
 } // namespace ftp

@@ -65,17 +65,17 @@ const std::string & replies::get_status_string() const
     return status_string_;
 }
 
-std::list<reply>::const_iterator replies::begin() const
+std::vector<reply>::const_iterator replies::begin() const
 {
     return replies_.cbegin();
 }
 
-std::list<reply>::const_iterator replies::end() const
+std::vector<reply>::const_iterator replies::end() const
 {
     return replies_.cend();
 }
 
-const std::list<reply> & replies::get_list() const
+const std::vector<reply> & replies::get_list() const
 {
     return replies_;
 }

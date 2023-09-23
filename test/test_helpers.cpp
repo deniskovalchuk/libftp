@@ -52,7 +52,7 @@ void check_reply(const std::optional<ftp::reply> & reply, std::string_view expec
 
 void check_last_reply(const ftp::replies & replies, std::string_view expected)
 {
-    const std::list<ftp::reply> & reply_list = replies.get_list();
+    const std::vector<ftp::reply> & reply_list = replies.get_list();
 
     if (reply_list.empty())
     {
