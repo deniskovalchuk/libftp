@@ -110,7 +110,7 @@ protected:
         /* Run test server. Usage: python server.py port root_directory */
         boost::process::ipstream server_output;
         server_process_
-            = boost::process::child(python, server_path.value(), "2121", server_root_dir_,
+            = boost::process::child(python, server_path.value(), "127.0.0.1", "2121", server_root_dir_,
                                     boost::process::std_out > boost::process::null,
                                     boost::process::std_err > server_output);
 
