@@ -29,13 +29,12 @@ from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
 
 def main():
-    if len(sys.argv) != 4:
-        print("Usage: server.py ip port root_directory")
+    if len(sys.argv) != 3:
+        print("Usage: server.py port root_directory")
         return
 
-    ip = sys.argv[1]
-    port = sys.argv[2]
-    root_directory = sys.argv[3]
+    port = sys.argv[1]
+    root_directory = sys.argv[2]
 
     # Add user with the following permissions:
     #   e - change directory (CWD, CDUP commands)
@@ -63,7 +62,7 @@ def main():
                             logging.StreamHandler()],
                         level = logging.DEBUG)
 
-    address = (ip, port)
+    address = ("127.0.0.1", port)
     server = FTPServer(address, handler)
     server.serve_forever()
 
