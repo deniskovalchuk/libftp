@@ -1048,4 +1048,20 @@ TEST_P(client_ascii_transfer, upload_download_file)
     check_reply(client.disconnect(), "221 Goodbye.");
 }
 
+TEST_F(client, IPv6_open_connection)
+{
+    ftp::client client;
+
+    check_reply(client.connect("::1", 2121), "220 FTP server is ready.");
+
+    check_reply(client.get_status(), CRLF("211-FTP server status:",
+                                          " Connected to: ::1:2121",
+                                          " Waiting for username.",
+                                          " TYPE: ASCII; STRUcture: File; MODE: Stream",
+                                          " Data connection closed.",
+                                          "211 End of status."));
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
 } // namespace

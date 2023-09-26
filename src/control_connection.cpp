@@ -54,7 +54,7 @@ void control_connection::open(std::string_view hostname, std::uint16_t port)
     boost::system::error_code ec;
 
     boost::asio::ip::tcp::resolver::results_type endpoints =
-            resolver.resolve(boost::asio::ip::tcp::v4(), hostname, std::to_string(port), ec);
+            resolver.resolve(hostname, std::to_string(port), ec);
 
     if (ec)
     {
