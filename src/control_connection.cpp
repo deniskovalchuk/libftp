@@ -130,6 +130,27 @@ std::string control_connection::get_local_ip() const
     return ip;
 }
 
+std::string control_connection::get_remote_ip() const
+{
+    boost::system::error_code ec;
+
+    boost::asio::ip::tcp::endpoint remote_endpoint = socket_.remote_endpoint(ec);
+
+    if (ec)
+    {
+        throw ftp_exception(ec, "Cannot get IP address");
+    }
+
+    std::string ip = remote_endpoint.address().to_string(ec);
+
+    if (ec)
+    {
+        throw ftp_exception(ec, "Cannot get IP address");
+    }
+
+    return ip;
+}
+
 reply control_connection::recv()
 {
     std::string status_string;

@@ -148,9 +148,13 @@ private:
 
     detail::data_connection_ptr create_data_connection(std::string_view command, replies & replies);
 
+    detail::data_connection_ptr process_epsv_command(std::string_view command, replies & replies);
+
     detail::data_connection_ptr process_pasv_command(std::string_view command, replies & replies);
 
     detail::data_connection_ptr process_port_command(std::string_view command, replies & replies);
+
+    static bool try_parse_epsv_reply(const reply & reply, std::uint16_t & port);
 
     static bool try_parse_pasv_reply(const reply & reply, std::string & ip, std::uint16_t & port);
 
@@ -172,6 +176,7 @@ private:
 
     transfer_mode transfer_mode_;
     transfer_type transfer_type_;
+    bool rfc2428_support_;
     detail::control_connection control_connection_;
     std::list<std::shared_ptr<observer>> observers_;
 };

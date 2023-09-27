@@ -48,6 +48,8 @@ public:
 
     [[nodiscard]] std::string get_local_ip() const;
 
+    [[nodiscard]] std::string get_remote_ip() const;
+
     void send(std::string_view command);
 
     reply recv();

@@ -38,7 +38,8 @@ using namespace ftp::detail;
 
 client::client(transfer_mode mode, transfer_type type)
     : transfer_mode_(mode),
-      transfer_type_(type)
+      transfer_type_(type),
+      rfc2428_support_(true)
 {
 }
 
@@ -554,7 +555,14 @@ data_connection_ptr client::create_data_connection(std::string_view command, rep
 {
     if (transfer_mode_ == transfer_mode::passive)
     {
-        return process_pasv_command(command, replies);
+        if (rfc2428_support_)
+        {
+            return process_epsv_command(command, replies);
+        }
+        else
+        {
+            return process_pasv_command(command, replies);
+        }
     }
     else if (transfer_mode_ == transfer_mode::active)
     {
@@ -565,6 +573,78 @@ data_connection_ptr client::create_data_connection(std::string_view command, rep
         assert(false);
         return nullptr;
     }
+}
+
+data_connection_ptr client::process_epsv_command(std::string_view command, replies & replies)
+{
+    std::string epsv_command = make_command("EPSV");
+    reply reply = process_command(epsv_command, replies);
+
+    if (!reply.is_positive())
+    {
+        return nullptr;
+    }
+
+    std::uint16_t remote_port;
+
+    if (!try_parse_epsv_reply(reply, remote_port))
+    {
+        throw ftp_exception("Cannot parse a port number from the server reply: '%1%'.",
+                            reply.get_status_string());
+    }
+
+    data_connection_ptr connection = std::make_unique<data_connection>();
+    connection->open(control_connection_.get_remote_ip(), remote_port);
+
+    reply = process_command(command, replies);
+
+    if (!reply.is_positive())
+    {
+        connection->close();
+        return nullptr;
+    }
+
+    return connection;
+}
+
+/* The text returned in response to the EPSV command MUST be:
+ *   <text indicating server is entering extended passive mode>
+ *   (<d><d><d><tcp-port><d>)
+ *
+ *  229 Entering Extended Passive Mode (|||6446|)
+ */
+bool client::try_parse_epsv_reply(const reply & reply, std::uint16_t & port)
+{
+    std::string_view status_string = reply.get_status_string();
+
+    std::string_view::size_type begin = status_string.find('(');
+    if (begin == std::string_view::npos)
+    {
+        return false;
+    }
+
+    std::string_view::size_type end = status_string.rfind(')');
+    if (end == std::string_view::npos)
+    {
+        return false;
+    }
+
+    if (begin >= end)
+    {
+        return false;
+    }
+
+    /* Skip the "(|||" and ")" parts. */
+    begin += 4;
+    --end;
+
+    if (begin >= end)
+    {
+        return false;
+    }
+
+    std::string_view port_str = status_string.substr(begin, end - begin);
+    return utils::try_parse_uint16(port_str, port);
 }
 
 data_connection_ptr client::process_pasv_command(std::string_view command, replies & replies)
