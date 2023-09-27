@@ -1099,4 +1099,28 @@ TEST_F(client, configure_rfc2428_support)
     EXPECT_TRUE(client.get_rfc2428_support());
 }
 
+TEST_P(client_with_transfer_mode, disable_rfc2428_support)
+{
+    ftp::transfer_mode mode = GetParam();
+    ftp::client client(mode);
+
+    client.set_rfc2428_support(false);
+
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
+
+    check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
+                                                       "230 Login successful.",
+                                                       "200 Type set to: Binary."));
+
+    std::string data = "content";
+    std::istringstream iss(data);
+    check_last_reply(client.upload_file(ftp::istream_adapter(iss), "file"), "226 Transfer complete.");
+
+    std::ostringstream oss;
+    check_last_reply(client.download_file(ftp::ostream_adapter(oss), "file"), "226 Transfer complete.");
+    ASSERT_EQ(data, oss.str());
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
 } // namespace
