@@ -1064,4 +1064,26 @@ TEST_F(client, IPv6_open_connection)
     check_reply(client.disconnect(), "221 Goodbye.");
 }
 
+TEST_P(client_with_transfer_mode, IPv6_upload_download_file)
+{
+    ftp::transfer_mode mode = GetParam();
+    ftp::client client(mode);
+
+    check_reply(client.connect("::1", 2121), "220 FTP server is ready.");
+
+    check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
+                                                       "230 Login successful.",
+                                                       "200 Type set to: Binary."));
+
+    std::string data = "content";
+    std::istringstream iss(data);
+    check_last_reply(client.upload_file(ftp::istream_adapter(iss), "file"), "226 Transfer complete.");
+
+    std::ostringstream oss;
+    check_last_reply(client.download_file(ftp::ostream_adapter(oss), "file"), "226 Transfer complete.");
+    ASSERT_EQ(data, oss.str());
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
 } // namespace
