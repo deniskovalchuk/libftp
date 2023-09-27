@@ -1086,4 +1086,17 @@ TEST_P(client_with_transfer_mode, IPv6_upload_download_file)
     check_reply(client.disconnect(), "221 Goodbye.");
 }
 
+TEST_F(client, configure_rfc2428_support)
+{
+    ftp::client client;
+
+    EXPECT_TRUE(client.get_rfc2428_support());
+
+    client.set_rfc2428_support(false);
+    EXPECT_FALSE(client.get_rfc2428_support());
+
+    client.set_rfc2428_support(true);
+    EXPECT_TRUE(client.get_rfc2428_support());
+}
+
 } // namespace

@@ -36,10 +36,10 @@ namespace ftp
 
 using namespace ftp::detail;
 
-client::client(transfer_mode mode, transfer_type type)
+client::client(transfer_mode mode, transfer_type type, bool rfc2428_support)
     : transfer_mode_(mode),
       transfer_type_(type),
-      rfc2428_support_(true)
+      rfc2428_support_(rfc2428_support)
 {
 }
 
@@ -366,6 +366,16 @@ void client::add_observer(std::shared_ptr<observer> observer)
 void client::remove_observer(std::shared_ptr<observer> observer)
 {
     observers_.remove(observer);
+}
+
+void client::set_rfc2428_support(bool support)
+{
+    rfc2428_support_ = support;
+}
+
+bool client::get_rfc2428_support() const
+{
+    return rfc2428_support_;
 }
 
 void client::send(std::string_view command)

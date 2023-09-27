@@ -50,7 +50,8 @@ class client
 {
 public:
     explicit client(transfer_mode mode = transfer_mode::passive,
-                    transfer_type type = transfer_type::binary);
+                    transfer_type type = transfer_type::binary,
+                    bool rfc2428_support = true);
 
     client(const client &) = delete;
 
@@ -122,6 +123,10 @@ public:
     void add_observer(std::shared_ptr<observer> observer);
 
     void remove_observer(std::shared_ptr<observer> observer);
+
+    void set_rfc2428_support(bool support);
+
+    [[nodiscard]] bool get_rfc2428_support() const;
 
 private:
     void send(std::string_view command);
