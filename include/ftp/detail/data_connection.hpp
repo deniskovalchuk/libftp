@@ -46,11 +46,11 @@ public:
 
     void open(std::string_view ip, std::uint16_t port);
 
-    void listen(std::string_view ip, std::uint16_t port);
+    void listen(const boost::asio::ip::tcp::endpoint & endpoint);
 
     void accept();
 
-    std::uint16_t get_listen_port();
+    boost::asio::ip::tcp::endpoint get_listen_endpoint() const;
 
     void close(bool graceful = true);
 

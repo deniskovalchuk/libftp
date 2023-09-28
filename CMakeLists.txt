@@ -17,6 +17,7 @@ set(sources
         include/ftp/detail/ascii_ostream.hpp
         include/ftp/detail/binary_istream.hpp
         include/ftp/detail/binary_ostream.hpp
+        include/ftp/detail/boost_utils.hpp
         include/ftp/detail/control_connection.hpp
         include/ftp/detail/data_connection.hpp
         include/ftp/detail/utils.hpp
@@ -39,6 +40,7 @@ set(sources
         src/ascii_ostream.cpp
         src/binary_istream.cpp
         src/binary_ostream.cpp
+        src/boost_utils.cpp
         src/client.cpp
         src/control_connection.cpp
         src/data_connection.cpp
