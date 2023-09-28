@@ -50,7 +50,7 @@ public:
 
     void accept();
 
-    boost::asio::ip::tcp::endpoint get_listen_endpoint() const;
+    [[nodiscard]] boost::asio::ip::tcp::endpoint get_listen_endpoint() const;
 
     void close(bool graceful = true);
 
