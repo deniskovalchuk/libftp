@@ -604,8 +604,11 @@ data_connection_ptr client::process_epsv_command(std::string_view command, repli
                             reply.get_status_string());
     }
 
+    boost::asio::ip::tcp::endpoint remote_endpoint = control_connection_.get_remote_endpoint();
+    boost::asio::ip::tcp::endpoint endpoint(remote_endpoint.address(), remote_port);
+
     data_connection_ptr connection = std::make_unique<data_connection>();
-    connection->open(control_connection_.get_remote_ip(), remote_port);
+    connection->open(endpoint);
 
     reply = process_command(command, replies);
 
