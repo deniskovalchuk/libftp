@@ -30,6 +30,7 @@
 #include <ftp/detail/binary_ostream.hpp>
 #include <ftp/detail/boost_utils.hpp>
 #include <ftp/stream/ostream_adapter.hpp>
+#include <boost/asio/ip/basic_endpoint.hpp>
 #include <sstream>
 
 namespace ftp
