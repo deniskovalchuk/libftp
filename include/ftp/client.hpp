@@ -155,6 +155,8 @@ private:
 
     detail::data_connection_ptr process_epsv_command(std::string_view command, replies & replies);
 
+    detail::data_connection_ptr process_eprt_command(std::string_view command, replies & replies);
+
     detail::data_connection_ptr process_pasv_command(std::string_view command, replies & replies);
 
     detail::data_connection_ptr process_port_command(std::string_view command, replies & replies);
@@ -166,6 +168,8 @@ private:
     static bool try_parse_size_reply(const reply & reply, std::uint64_t & size);
 
     static std::string make_command(std::string_view command, const std::optional<std::string_view> & argument = std::nullopt);
+
+    static std::string make_eprt_command(const boost::asio::ip::tcp::endpoint & endpoint);
 
     static std::string make_port_command(const boost::asio::ip::tcp::endpoint & endpoint);
 
