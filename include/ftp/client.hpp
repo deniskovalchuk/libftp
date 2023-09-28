@@ -167,7 +167,7 @@ private:
 
     static std::string make_command(std::string_view command, const std::optional<std::string_view> & argument = std::nullopt);
 
-    static std::string make_port_command(std::string_view ip, std::uint16_t port);
+    static std::string make_port_command(const boost::asio::ip::tcp::endpoint & endpoint);
 
     static std::string make_type_command(transfer_type type);
 

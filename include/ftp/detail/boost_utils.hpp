@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019 Denis Kovalchuk
+ * Copyright (c) 2023 Denis Kovalchuk
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,47 +22,16 @@
  * SOFTWARE.
  */
 
-#ifndef LIBFTP_CONTROL_CONNECTION_HPP
-#define LIBFTP_CONTROL_CONNECTION_HPP
+#ifndef LIBFTP_BOOST_UTILS_HPP
+#define LIBFTP_BOOST_UTILS_HPP
 
-#include <ftp/reply.hpp>
-#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/ip/address.hpp>
+#include <string>
 
-namespace ftp::detail
+namespace ftp::detail::boost_utils
 {
 
-class control_connection
-{
-public:
-    control_connection();
+std::string address_to_string(const boost::asio::ip::address & address);
 
-    control_connection(const control_connection &) = delete;
-
-    control_connection & operator=(const control_connection &) = delete;
-
-    void open(std::string_view hostname, std::uint16_t port);
-
-    [[nodiscard]] bool is_open() const;
-
-    void close();
-
-    [[nodiscard]] boost::asio::ip::tcp::endpoint get_local_endpoint() const;
-
-    [[nodiscard]] std::string get_remote_ip() const;
-
-    void send(std::string_view command);
-
-    reply recv();
-
-private:
-    std::string read_line();
-
-    static bool is_last_line(std::string_view line, std::uint16_t status_code);
-
-    std::string buffer_;
-    boost::asio::io_context io_context_;
-    boost::asio::ip::tcp::socket socket_;
-};
-
-} // namespace ftp::detail
-#endif //LIBFTP_CONTROL_CONNECTION_HPP
+} // namespace ftp::detail::boost_utils
+#endif //LIBFTP_BOOST_UTILS_HPP

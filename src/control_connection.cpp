@@ -109,7 +109,7 @@ void control_connection::close()
     }
 }
 
-std::string control_connection::get_local_ip() const
+boost::asio::ip::tcp::endpoint control_connection::get_local_endpoint() const
 {
     boost::system::error_code ec;
 
@@ -117,17 +117,10 @@ std::string control_connection::get_local_ip() const
 
     if (ec)
     {
-        throw ftp_exception(ec, "Cannot get IP address");
+        throw ftp_exception(ec, "Cannot get local endpoint");
     }
 
-    std::string ip = local_endpoint.address().to_string(ec);
-
-    if (ec)
-    {
-        throw ftp_exception(ec, "Cannot get IP address");
-    }
-
-    return ip;
+    return local_endpoint;
 }
 
 std::string control_connection::get_remote_ip() const

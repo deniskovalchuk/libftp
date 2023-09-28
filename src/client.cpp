@@ -28,6 +28,7 @@
 #include <ftp/detail/ascii_ostream.hpp>
 #include <ftp/detail/binary_istream.hpp>
 #include <ftp/detail/binary_ostream.hpp>
+#include <ftp/detail/boost_utils.hpp>
 #include <ftp/stream/ostream_adapter.hpp>
 #include <sstream>
 
@@ -692,13 +693,14 @@ data_connection_ptr client::process_pasv_command(std::string_view command, repli
 
 data_connection_ptr client::process_port_command(std::string_view command, replies & replies)
 {
+    boost::asio::ip::tcp::endpoint local_endpoint = control_connection_.get_local_endpoint();
+    boost::asio::ip::tcp::endpoint listen_endpoint(local_endpoint.address(), 0);
+
     data_connection_ptr connection = std::make_unique<data_connection>();
+    connection->listen(listen_endpoint);
+    listen_endpoint = connection->get_listen_endpoint();
 
-    std::string local_ip = control_connection_.get_local_ip();
-    connection->listen(local_ip, 0);
-    std::uint16_t local_port = connection->get_listen_port();
-
-    std::string port_command = make_port_command(local_ip, local_port);
+    std::string port_command = make_port_command(listen_endpoint);
     reply reply = process_command(port_command, replies);
 
     if (!reply.is_positive())
@@ -781,18 +783,22 @@ std::string client::make_command(std::string_view command, const std::optional<s
     return result;
 }
 
-std::string client::make_port_command(std::string_view ip, std::uint16_t port)
+std::string client::make_port_command(const boost::asio::ip::tcp::endpoint & endpoint)
 {
     std::string command = "PORT";
     command.append(" ");
 
-    for (char ch : ip)
+    std::string address_string = boost_utils::address_to_string(endpoint.address());
+
+    for (char ch : address_string)
     {
         if (ch == '.')
             command.push_back(',');
         else
             command.push_back(ch);
     }
+
+    boost::asio::ip::port_type port = endpoint.port();
 
     command.append(",");
     command.append(std::to_string(port / 256));

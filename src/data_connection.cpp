@@ -67,18 +67,9 @@ void data_connection::open(std::string_view ip, std::uint16_t port)
     }
 }
 
-void data_connection::listen(std::string_view ip, std::uint16_t port)
+void data_connection::listen(const boost::asio::ip::tcp::endpoint & endpoint)
 {
     boost::system::error_code ec;
-
-    boost::asio::ip::address address = boost::asio::ip::make_address(ip, ec);
-
-    if (ec)
-    {
-        throw ftp_exception(ec, "Cannot get IP address");
-    }
-
-    boost::asio::ip::tcp::endpoint endpoint(address, port);
 
     acceptor_.open(endpoint.protocol(), ec);
 
@@ -114,7 +105,7 @@ void data_connection::accept()
     }
 }
 
-std::uint16_t data_connection::get_listen_port()
+boost::asio::ip::tcp::endpoint data_connection::get_listen_endpoint() const
 {
     boost::system::error_code ec;
 
@@ -122,10 +113,10 @@ std::uint16_t data_connection::get_listen_port()
 
     if (ec)
     {
-        throw ftp_exception(ec, "Cannot get listen port");
+        throw ftp_exception(ec, "Cannot get listen endpoint");
     }
 
-    return endpoint.port();
+    return endpoint;
 }
 
 void data_connection::close(bool graceful)
