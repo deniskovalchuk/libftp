@@ -19,6 +19,7 @@ set(sources
         client.cpp
         file_list_reply.cpp
         file_size_reply.cpp
+        net_utils.cpp
         replies.cpp
         reply.cpp
         test_helpers.cpp
