@@ -30,7 +30,6 @@
 #include <ftp/detail/binary_ostream.hpp>
 #include <ftp/detail/boost_utils.hpp>
 #include <ftp/stream/ostream_adapter.hpp>
-#include <boost/asio/ip/basic_endpoint.hpp>
 #include <sstream>
 
 namespace ftp
@@ -864,7 +863,7 @@ std::string client::make_port_command(const boost::asio::ip::tcp::endpoint & end
             command.push_back(ch);
     }
 
-    boost::asio::ip::port_type port = endpoint.port();
+    std::uint16_t port = endpoint.port();
 
     command.append(",");
     command.append(std::to_string(port / 256));
