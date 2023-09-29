@@ -195,7 +195,7 @@ TEST_F(client, open_connection)
 
     for (int i = 0; i < 5; i++)
     {
-        check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+        check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
         ASSERT_TRUE(client.is_connected());
 
         check_reply(client.disconnect(), "221 Goodbye.");
@@ -204,7 +204,7 @@ TEST_F(client, open_connection)
 
     for (int i = 0; i < 5; i++)
     {
-        check_reply(client.connect("localhost", 2121, "alice", "password"), CRLF("220 FTP server is ready.",
+        check_reply(client.connect("127.0.0.1", 2121, "alice", "password"), CRLF("220 FTP server is ready.",
                                                                                  "331 Username ok, send password.",
                                                                                  "230 Login successful.",
                                                                                  "200 Type set to: Binary."));
@@ -244,7 +244,7 @@ TEST_F(client, login)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -257,7 +257,7 @@ TEST_F(client, login_nonexistent_user)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("nonexistent", "password"), CRLF("331 Username ok, send password.",
                                                               "530 Authentication failed."));
@@ -269,7 +269,7 @@ TEST_F(client, login_wrong_password)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "wrong_password"), CRLF("331 Username ok, send password.",
                                                              "530 Authentication failed."));
@@ -281,7 +281,7 @@ TEST_F(client, logout)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -300,7 +300,7 @@ TEST_F(client, send_noop)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -315,7 +315,7 @@ TEST_F(client, get_site_commands)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -333,7 +333,7 @@ TEST_F(client, send_site_command)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -355,7 +355,7 @@ TEST_F(client, get_current_directory)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -370,7 +370,7 @@ TEST_F(client, create_directory)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -385,7 +385,7 @@ TEST_F(client, create_directory_already_exists)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -402,7 +402,7 @@ TEST_F(client, remove_directory)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -419,7 +419,7 @@ TEST_F(client, remove_nonexistent_directory)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -434,7 +434,7 @@ TEST_F(client, remove_file)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -452,7 +452,7 @@ TEST_F(client, remove_nonexistent_file)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -467,7 +467,7 @@ TEST_F(client, change_current_directory)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -486,7 +486,7 @@ TEST_F(client, change_current_directory_nonexistent_dir)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -501,7 +501,7 @@ TEST_F(client, change_current_directory_up)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -520,7 +520,7 @@ TEST_F(client, set_transfer_type)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -543,7 +543,7 @@ TEST_F(client, get_status)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.get_status(), CRLF("211-FTP server status:",
                                           " Connected to: 127.0.0.1:2121",
@@ -559,7 +559,7 @@ TEST_F(client, get_status_directory)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -575,7 +575,7 @@ TEST_F(client, get_status_nonexistent_file)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -590,7 +590,7 @@ TEST_F(client, get_system_type)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     /* pyftpdlib responds '215 UNIX Type: L8' regardless of the system type. */
     check_reply(client.get_system_type(), "215 UNIX Type: L8");
@@ -602,7 +602,7 @@ TEST_F(client, get_help)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.get_help(),
                 CRLF("214-The following commands are recognized:",
@@ -623,7 +623,7 @@ TEST_F(client, rename)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -647,7 +647,7 @@ TEST_F(client, rename_nonexistent_path)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -662,7 +662,7 @@ TEST_F(client, get_file_size_nonexistent_file)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -683,18 +683,18 @@ TEST_F(client, event_observer)
 
         client.add_observer(obs1);
 
-        check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+        check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
         check_reply(client.disconnect(), "221 Goodbye.");
-        ASSERT_EQ("observer1: -- Connected to localhost on port 2121."
+        ASSERT_EQ("observer1: -- Connected to 127.0.0.1 on port 2121."
                   "observer1: <- 220 FTP server is ready."
                   "observer1: -> QUIT"
                   "observer1: <- 221 Goodbye.", obs1->get_data());
 
         client.remove_observer(obs1);
 
-        check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+        check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
         check_reply(client.disconnect(), "221 Goodbye.");
-        ASSERT_EQ("observer1: -- Connected to localhost on port 2121."
+        ASSERT_EQ("observer1: -- Connected to 127.0.0.1 on port 2121."
                   "observer1: <- 220 FTP server is ready."
                   "observer1: -> QUIT"
                   "observer1: <- 221 Goodbye.", obs1->get_data());
@@ -708,30 +708,30 @@ TEST_F(client, event_observer)
         client.add_observer(obs1);
         client.add_observer(obs2);
 
-        check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+        check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
         check_reply(client.disconnect(), "221 Goodbye.");
-        ASSERT_EQ("observer1: -- Connected to localhost on port 2121."
+        ASSERT_EQ("observer1: -- Connected to 127.0.0.1 on port 2121."
                   "observer1: <- 220 FTP server is ready."
                   "observer1: -> QUIT"
                   "observer1: <- 221 Goodbye.", obs1->get_data());
-        ASSERT_EQ("observer2: -- Connected to localhost on port 2121."
+        ASSERT_EQ("observer2: -- Connected to 127.0.0.1 on port 2121."
                   "observer2: <- 220 FTP server is ready."
                   "observer2: -> QUIT"
                   "observer2: <- 221 Goodbye.", obs2->get_data());
 
         client.remove_observer(obs1);
 
-        check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+        check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
         check_reply(client.disconnect(), "221 Goodbye.");
-        ASSERT_EQ("observer1: -- Connected to localhost on port 2121."
+        ASSERT_EQ("observer1: -- Connected to 127.0.0.1 on port 2121."
                   "observer1: <- 220 FTP server is ready."
                   "observer1: -> QUIT"
                   "observer1: <- 221 Goodbye.", obs1->get_data());
-        ASSERT_EQ("observer2: -- Connected to localhost on port 2121."
+        ASSERT_EQ("observer2: -- Connected to 127.0.0.1 on port 2121."
                   "observer2: <- 220 FTP server is ready."
                   "observer2: -> QUIT"
                   "observer2: <- 221 Goodbye."
-                  "observer2: -- Connected to localhost on port 2121."
+                  "observer2: -- Connected to 127.0.0.1 on port 2121."
                   "observer2: <- 220 FTP server is ready."
                   "observer2: -> QUIT"
                   "observer2: <- 221 Goodbye.", obs2->get_data());
@@ -753,7 +753,7 @@ TEST_F(client, append_file)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -786,7 +786,7 @@ TEST_F(client, get_file_list_only_names)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -810,7 +810,7 @@ TEST_F(client, upload_unique_file)
 {
     ftp::client client;
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -850,7 +850,7 @@ TEST_P(client_with_transfer_mode, get_file_list)
     ftp::transfer_mode mode = GetParam();
     ftp::client client(mode);
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -870,7 +870,7 @@ TEST_P(client_with_transfer_mode, get_file_list_nonexistent_dir)
     ftp::transfer_mode mode = GetParam();
     ftp::client client(mode);
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -886,7 +886,7 @@ TEST_P(client_with_transfer_mode, upload_file_nonexistent_path)
     ftp::transfer_mode mode = GetParam();
     ftp::client client(mode);
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -903,7 +903,7 @@ TEST_P(client_with_transfer_mode, download_nonexistent_file)
     ftp::transfer_mode mode = GetParam();
     ftp::client client(mode);
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -921,7 +921,7 @@ TEST_P(client_with_transfer_mode, cancel_upload_file)
     ftp::transfer_mode mode = GetParam();
     ftp::client client(mode);
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -938,7 +938,7 @@ TEST_P(client_with_transfer_mode, cancel_append_file)
     ftp::transfer_mode mode = GetParam();
     ftp::client client(mode);
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -975,7 +975,7 @@ TEST_P(client_binary_transfer, upload_download_file)
     auto [mode, data] = GetParam();
     ftp::client client(mode, ftp::transfer_type::binary);
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -1024,7 +1024,7 @@ TEST_P(client_ascii_transfer, upload_download_file)
     auto [content, expected] = data;
     ftp::client client(mode, ftp::transfer_type::ascii);
 
-    check_reply(client.connect("localhost", 2121), "220 FTP server is ready.");
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
@@ -1044,6 +1044,81 @@ TEST_P(client_ascii_transfer, upload_download_file)
     {
         ASSERT_EQ(expected, oss.str());
     }
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
+TEST_F(client, IPv6_open_connection)
+{
+    ftp::client client;
+
+    check_reply(client.connect("::1", 2121), "220 FTP server is ready.");
+
+    check_reply(client.get_status(), CRLF("211-FTP server status:",
+                                          " Connected to: ::1:2121",
+                                          " Waiting for username.",
+                                          " TYPE: ASCII; STRUcture: File; MODE: Stream",
+                                          " Data connection closed.",
+                                          "211 End of status."));
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
+TEST_P(client_with_transfer_mode, IPv6_upload_download_file)
+{
+    ftp::transfer_mode mode = GetParam();
+    ftp::client client(mode);
+
+    check_reply(client.connect("::1", 2121), "220 FTP server is ready.");
+
+    check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
+                                                       "230 Login successful.",
+                                                       "200 Type set to: Binary."));
+
+    std::string data = "content";
+    std::istringstream iss(data);
+    check_last_reply(client.upload_file(ftp::istream_adapter(iss), "file"), "226 Transfer complete.");
+
+    std::ostringstream oss;
+    check_last_reply(client.download_file(ftp::ostream_adapter(oss), "file"), "226 Transfer complete.");
+    ASSERT_EQ(data, oss.str());
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
+TEST_F(client, configure_rfc2428_support)
+{
+    ftp::client client;
+
+    EXPECT_TRUE(client.get_rfc2428_support());
+
+    client.set_rfc2428_support(false);
+    EXPECT_FALSE(client.get_rfc2428_support());
+
+    client.set_rfc2428_support(true);
+    EXPECT_TRUE(client.get_rfc2428_support());
+}
+
+TEST_P(client_with_transfer_mode, disable_rfc2428_support)
+{
+    ftp::transfer_mode mode = GetParam();
+    ftp::client client(mode);
+
+    client.set_rfc2428_support(false);
+
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
+
+    check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
+                                                       "230 Login successful.",
+                                                       "200 Type set to: Binary."));
+
+    std::string data = "content";
+    std::istringstream iss(data);
+    check_last_reply(client.upload_file(ftp::istream_adapter(iss), "file"), "226 Transfer complete.");
+
+    std::ostringstream oss;
+    check_last_reply(client.download_file(ftp::ostream_adapter(oss), "file"), "226 Transfer complete.");
+    ASSERT_EQ(data, oss.str());
 
     check_reply(client.disconnect(), "221 Goodbye.");
 }

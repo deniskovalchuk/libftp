@@ -54,6 +54,7 @@ reverse conversion.
 - The main command set from [RFC 959](doc/RFC959.txt) is implemented.
 - Supports active and passive transfer modes.
 - Supports ASCII and binary transfer types.
+- IPv4 and IPv6 support.
 
 ## Examples
 
@@ -165,4 +166,5 @@ ctest -V
 ## References
 
 - [RFC 959](doc/RFC959.txt) File Transfer Protocol (FTP). J. Postel, J. Reynolds. October 1985.
+- [RFC 2428](doc/RFC2428.txt) Extensions for IPv6, NAT, and Extended passive mode. September 1998.
 - [RFC 3659](doc/RFC3659.txt) Extensions to FTP. P. Hethmon. March 2007.

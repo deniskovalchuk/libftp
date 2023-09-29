@@ -67,6 +67,27 @@ void data_connection::open(std::string_view ip, std::uint16_t port)
     }
 }
 
+void data_connection::open(const boost::asio::ip::tcp::endpoint & remote_endpoint)
+{
+    boost::system::error_code ec;
+
+    socket_.connect(remote_endpoint, ec);
+
+    if (ec)
+    {
+        boost::system::error_code ignored;
+
+        /* If the connect fails, and the socket was automatically opened,
+         * the socket is not returned to the closed state.
+         *
+         * https://www.boost.org/doc/libs/1_70_0/doc/html/boost_asio/reference/basic_stream_socket/connect/overload2.html
+         */
+        socket_.close(ignored);
+
+        throw ftp_exception(ec, "Cannot open data connection");
+    }
+}
+
 void data_connection::listen(const boost::asio::ip::tcp::endpoint & endpoint)
 {
     boost::system::error_code ec;

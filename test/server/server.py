@@ -62,8 +62,8 @@ def main():
                             logging.StreamHandler()],
                         level = logging.DEBUG)
 
-    address = ("127.0.0.1", port)
-    server = FTPServer(address, handler)
+    server = FTPServer(("127.0.0.1", port), handler)
+    server = FTPServer(("::1", port), handler)
     server.serve_forever()
 
 if __name__ == "__main__":

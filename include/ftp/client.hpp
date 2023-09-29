@@ -50,7 +50,8 @@ class client
 {
 public:
     explicit client(transfer_mode mode = transfer_mode::passive,
-                    transfer_type type = transfer_type::binary);
+                    transfer_type type = transfer_type::binary,
+                    bool rfc2428_support = true);
 
     client(const client &) = delete;
 
@@ -123,6 +124,10 @@ public:
 
     void remove_observer(std::shared_ptr<observer> observer);
 
+    void set_rfc2428_support(bool support);
+
+    [[nodiscard]] bool get_rfc2428_support() const;
+
 private:
     void send(std::string_view command);
 
@@ -148,15 +153,23 @@ private:
 
     detail::data_connection_ptr create_data_connection(std::string_view command, replies & replies);
 
+    detail::data_connection_ptr process_epsv_command(std::string_view command, replies & replies);
+
+    detail::data_connection_ptr process_eprt_command(std::string_view command, replies & replies);
+
     detail::data_connection_ptr process_pasv_command(std::string_view command, replies & replies);
 
     detail::data_connection_ptr process_port_command(std::string_view command, replies & replies);
+
+    static bool try_parse_epsv_reply(const reply & reply, std::uint16_t & port);
 
     static bool try_parse_pasv_reply(const reply & reply, std::string & ip, std::uint16_t & port);
 
     static bool try_parse_size_reply(const reply & reply, std::uint64_t & size);
 
     static std::string make_command(std::string_view command, const std::optional<std::string_view> & argument = std::nullopt);
+
+    static std::string make_eprt_command(const boost::asio::ip::tcp::endpoint & endpoint);
 
     static std::string make_port_command(const boost::asio::ip::tcp::endpoint & endpoint);
 
@@ -172,6 +185,7 @@ private:
 
     transfer_mode transfer_mode_;
     transfer_type transfer_type_;
+    bool rfc2428_support_;
     detail::control_connection control_connection_;
     std::list<std::shared_ptr<observer>> observers_;
 };

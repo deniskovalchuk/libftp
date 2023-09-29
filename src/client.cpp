@@ -37,9 +37,10 @@ namespace ftp
 
 using namespace ftp::detail;
 
-client::client(transfer_mode mode, transfer_type type)
+client::client(transfer_mode mode, transfer_type type, bool rfc2428_support)
     : transfer_mode_(mode),
-      transfer_type_(type)
+      transfer_type_(type),
+      rfc2428_support_(rfc2428_support)
 {
 }
 
@@ -368,6 +369,16 @@ void client::remove_observer(std::shared_ptr<observer> observer)
     observers_.remove(observer);
 }
 
+void client::set_rfc2428_support(bool support)
+{
+    rfc2428_support_ = support;
+}
+
+bool client::get_rfc2428_support() const
+{
+    return rfc2428_support_;
+}
+
 void client::send(std::string_view command)
 {
     notify_request(command);
@@ -555,17 +566,134 @@ data_connection_ptr client::create_data_connection(std::string_view command, rep
 {
     if (transfer_mode_ == transfer_mode::passive)
     {
-        return process_pasv_command(command, replies);
+        if (rfc2428_support_)
+        {
+            return process_epsv_command(command, replies);
+        }
+        else
+        {
+            return process_pasv_command(command, replies);
+        }
     }
     else if (transfer_mode_ == transfer_mode::active)
     {
-        return process_port_command(command, replies);
+        if (rfc2428_support_)
+        {
+            return process_eprt_command(command, replies);
+        }
+        else
+        {
+            return process_port_command(command, replies);
+        }
     }
     else
     {
         assert(false);
         return nullptr;
     }
+}
+
+data_connection_ptr client::process_epsv_command(std::string_view command, replies & replies)
+{
+    std::string epsv_command = make_command("EPSV");
+    reply reply = process_command(epsv_command, replies);
+
+    if (!reply.is_positive())
+    {
+        return nullptr;
+    }
+
+    std::uint16_t remote_port;
+
+    if (!try_parse_epsv_reply(reply, remote_port))
+    {
+        throw ftp_exception("Cannot parse a port number from the server reply: '%1%'.",
+                            reply.get_status_string());
+    }
+
+    boost::asio::ip::tcp::endpoint remote_endpoint = control_connection_.get_remote_endpoint();
+    boost::asio::ip::tcp::endpoint endpoint(remote_endpoint.address(), remote_port);
+
+    data_connection_ptr connection = std::make_unique<data_connection>();
+    connection->open(endpoint);
+
+    reply = process_command(command, replies);
+
+    if (!reply.is_positive())
+    {
+        connection->close();
+        return nullptr;
+    }
+
+    return connection;
+}
+
+/* The text returned in response to the EPSV command MUST be:
+ *   <text indicating server is entering extended passive mode>
+ *   (<d><d><d><tcp-port><d>)
+ *
+ *  229 Entering Extended Passive Mode (|||6446|)
+ */
+bool client::try_parse_epsv_reply(const reply & reply, std::uint16_t & port)
+{
+    std::string_view status_string = reply.get_status_string();
+
+    std::string_view::size_type begin = status_string.find('(');
+    if (begin == std::string_view::npos)
+    {
+        return false;
+    }
+
+    std::string_view::size_type end = status_string.rfind(')');
+    if (end == std::string_view::npos)
+    {
+        return false;
+    }
+
+    if (begin >= end)
+    {
+        return false;
+    }
+
+    /* Skip the "(|||" and ")" parts. */
+    begin += 4;
+    --end;
+
+    if (begin >= end)
+    {
+        return false;
+    }
+
+    std::string_view port_str = status_string.substr(begin, end - begin);
+    return utils::try_parse_uint16(port_str, port);
+}
+
+data_connection_ptr client::process_eprt_command(std::string_view command, replies & replies)
+{
+    boost::asio::ip::tcp::endpoint local_endpoint = control_connection_.get_local_endpoint();
+    boost::asio::ip::tcp::endpoint listen_endpoint(local_endpoint.address(), 0);
+
+    data_connection_ptr connection = std::make_unique<data_connection>();
+    connection->listen(listen_endpoint);
+    listen_endpoint = connection->get_listen_endpoint();
+
+    std::string eprt_command = make_eprt_command(listen_endpoint);
+    reply reply = process_command(eprt_command, replies);
+
+    if (!reply.is_positive())
+    {
+        return nullptr;
+    }
+
+    reply = process_command(command, replies);
+
+    if (!reply.is_positive())
+    {
+        return nullptr;
+    }
+
+    connection->accept();
+    return connection;
 }
 
 data_connection_ptr client::process_pasv_command(std::string_view command, replies & replies)
@@ -693,6 +821,33 @@ std::string client::make_command(std::string_view command, const std::optional<s
     return result;
 }
 
+std::string client::make_eprt_command(const boost::asio::ip::tcp::endpoint & endpoint)
+{
+    std::string command = "EPRT";
+    command.append(" ");
+    command.append("|");
+
+    if (endpoint.address().is_v4())
+    {
+        command.append("1");
+    }
+    else if (endpoint.address().is_v6())
+    {
+        command.append("2");
+    }
+    else
+    {
+        throw ftp_exception("Cannot make the EPRT command. The address type is invalid.");
+    }
+
+    command.append("|");
+    command.append(boost_utils::address_to_string(endpoint.address()));
+    command.append("|");
+    command.append(std::to_string(endpoint.port()));
+    command.append("|");
+    return command;
+}
+
 std::string client::make_port_command(const boost::asio::ip::tcp::endpoint & endpoint)
 {
     std::string command = "PORT";
@@ -708,7 +863,7 @@ std::string client::make_port_command(const boost::asio::ip::tcp::endpoint & end
             command.push_back(ch);
     }
 
-    boost::asio::ip::port_type port = endpoint.port();
+    std::uint16_t port = endpoint.port();
 
     command.append(",");
     command.append(std::to_string(port / 256));

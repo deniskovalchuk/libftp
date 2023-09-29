@@ -48,6 +48,8 @@ public:
 
     [[nodiscard]] boost::asio::ip::tcp::endpoint get_local_endpoint() const;
 
+    [[nodiscard]] boost::asio::ip::tcp::endpoint get_remote_endpoint() const;
+
     void send(std::string_view command);
 
     reply recv();
