@@ -35,6 +35,7 @@ TEST(reply, construct)
         EXPECT_EQ(ftp::reply::unspecified, reply.get_code());
         EXPECT_EQ("", reply.get_status_string());
         EXPECT_FALSE(reply.is_positive());
+        EXPECT_FALSE(reply.is_negative());
     }
 
     {
@@ -42,6 +43,7 @@ TEST(reply, construct)
         EXPECT_EQ(120, reply.get_code());
         EXPECT_EQ("120 Service ready in 2 minutes.", reply.get_status_string());
         EXPECT_TRUE(reply.is_positive());
+        EXPECT_FALSE(reply.is_negative());
     }
 
     {
@@ -49,6 +51,7 @@ TEST(reply, construct)
         EXPECT_EQ(200, reply.get_code());
         EXPECT_EQ("220 FTP server is ready.", reply.get_status_string());
         EXPECT_TRUE(reply.is_positive());
+        EXPECT_FALSE(reply.is_negative());
     }
 
     {
@@ -56,6 +59,7 @@ TEST(reply, construct)
         EXPECT_EQ(331, reply.get_code());
         EXPECT_EQ("331 Username ok, send password.", reply.get_status_string());
         EXPECT_TRUE(reply.is_positive());
+        EXPECT_FALSE(reply.is_negative());
     }
 
     {
@@ -63,6 +67,7 @@ TEST(reply, construct)
         EXPECT_EQ(425, reply.get_code());
         EXPECT_EQ("425 Can't open data connection.", reply.get_status_string());
         EXPECT_FALSE(reply.is_positive());
+        EXPECT_TRUE(reply.is_negative());
     }
 
     {
@@ -70,6 +75,7 @@ TEST(reply, construct)
         EXPECT_EQ(532, reply.get_code());
         EXPECT_EQ("532 Need account for storing files.", reply.get_status_string());
         EXPECT_FALSE(reply.is_positive());
+        EXPECT_TRUE(reply.is_negative());
     }
 }
 
