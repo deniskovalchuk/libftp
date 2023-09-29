@@ -76,6 +76,7 @@ public:
     {
         return data_;
     }
+
 private:
     std::string mark_;
     std::string data_;
