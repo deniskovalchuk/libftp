@@ -34,6 +34,8 @@ namespace ftp
 class reply
 {
 public:
+    reply();
+
     reply(std::uint16_t code, std::string_view status_string);
 
     [[nodiscard]] bool is_positive() const;
@@ -41,6 +43,8 @@ public:
     [[nodiscard]] std::uint16_t get_code() const;
 
     [[nodiscard]] const std::string & get_status_string() const;
+
+    static constexpr std::uint16_t unspecified = std::numeric_limits<std::uint16_t>::max();
 
 private:
     std::uint16_t code_;

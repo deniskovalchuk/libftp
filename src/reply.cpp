@@ -27,6 +27,11 @@
 namespace ftp
 {
 
+reply::reply()
+    : code_(unspecified)
+{
+}
+
 reply::reply(std::uint16_t code, std::string_view status_string)
     : code_(code),
       status_string_(status_string)
@@ -35,7 +40,7 @@ reply::reply(std::uint16_t code, std::string_view status_string)
 
 bool reply::is_positive() const
 {
-    return code_ < 400;
+    return code_ != unspecified && code_ < 400;
 }
 
 std::uint16_t reply::get_code() const
