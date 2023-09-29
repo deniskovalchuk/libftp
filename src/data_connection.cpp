@@ -67,11 +67,11 @@ void data_connection::open(std::string_view ip, std::uint16_t port)
     }
 }
 
-void data_connection::open(const boost::asio::ip::tcp::endpoint & remote_endpoint)
+void data_connection::open(const boost::asio::ip::tcp::endpoint & endpoint)
 {
     boost::system::error_code ec;
 
-    socket_.connect(remote_endpoint, ec);
+    socket_.connect(endpoint, ec);
 
     if (ec)
     {

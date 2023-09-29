@@ -46,7 +46,7 @@ public:
 
     void open(std::string_view ip, std::uint16_t port);
 
-    void open(const boost::asio::ip::tcp::endpoint & remote_endpoint);
+    void open(const boost::asio::ip::tcp::endpoint & endpoint);
 
     void listen(const boost::asio::ip::tcp::endpoint & endpoint);
 
