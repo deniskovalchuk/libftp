@@ -37,7 +37,9 @@ namespace ftp
 
 using namespace ftp::detail;
 
-client::client(transfer_mode mode, transfer_type type, bool rfc2428_support)
+client::client(transfer_mode mode,
+               transfer_type type,
+               bool rfc2428_support)
     : transfer_mode_(mode),
       transfer_type_(type),
       rfc2428_support_(rfc2428_support)
