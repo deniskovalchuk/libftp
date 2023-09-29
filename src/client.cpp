@@ -772,7 +772,7 @@ bool client::try_parse_pasv_reply(const reply & reply, std::string & ip, uint16_
     std::string_view::size_type begin = status_string.find('(');
     std::string_view::size_type end = status_string.rfind(')');
 
-    if (begin == status_string.npos || end == status_string.npos || end <= begin)
+    if (begin == std::string_view::npos || end == std::string_view::npos || end <= begin)
     {
         return false;
     }
