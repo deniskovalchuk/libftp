@@ -148,19 +148,19 @@ tool/unix/clean.sh
 Build:
 
 ```bash
-mkdir -p build
-cd build
-cmake ..
-cmake --build .
+$ mkdir -p build
+$ cd build
+$ cmake ..
+$ cmake --build .
 ```
 
 To run tests, set the `LIBFTP_TEST_SERVER_PATH` environment variable to the path to the
 [server.py](test/server/server.py) file:
 
 ```bash
-export LIBFTP_TEST_SERVER_PATH="/path/to/server.py"
-cd test
-ctest -V
+$ export LIBFTP_TEST_SERVER_PATH="/path/to/server.py"
+$ cd test
+$ ctest -V
 ```
 
 ## References
