@@ -769,15 +769,33 @@ data_connection_ptr client::process_port_command(std::string_view command, repli
 bool client::try_parse_pasv_reply(const reply & reply, std::string & ip, uint16_t & port)
 {
     std::string_view status_string = reply.get_status_string();
-    std::string_view::size_type begin = status_string.find('(');
-    std::string_view::size_type end = status_string.rfind(')');
 
-    if (begin == std::string_view::npos || end == std::string_view::npos || end <= begin)
+    std::string_view::size_type begin = status_string.find('(');
+    if (begin == std::string_view::npos)
     {
         return false;
     }
 
-    std::string_view data = status_string.substr(begin + 1, end - begin - 1);
+    std::string_view::size_type end = status_string.rfind(')');
+    if (end == std::string_view::npos)
+    {
+        return false;
+    }
+
+    if (begin >= end)
+    {
+        return false;
+    }
+
+    // Skip the "(" part.
+    begin++;
+
+    if (begin >= end)
+    {
+        return false;
+    }
+
+    std::string_view data = status_string.substr(begin, end - begin);
     std::vector<std::string> tokens = utils::split_string(data, ',');
 
     if (tokens.size() != 6)
