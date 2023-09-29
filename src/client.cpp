@@ -795,31 +795,31 @@ bool client::try_parse_pasv_reply(const reply & reply, std::string & ip, uint16_
         return false;
     }
 
-    std::string_view data = status_string.substr(begin, end - begin);
-    std::vector<std::string> tokens = utils::split_string(data, ',');
+    std::string_view address_string = status_string.substr(begin, end - begin);
+    std::vector<std::string> address_tokens = utils::split_string(address_string, ',');
 
-    if (tokens.size() != 6)
+    if (address_tokens.size() != 6)
     {
         return false;
     }
 
     ip.clear();
-    ip.append(tokens[0]);
+    ip.append(address_tokens[0]);
     ip.append(".");
-    ip.append(tokens[1]);
+    ip.append(address_tokens[1]);
     ip.append(".");
-    ip.append(tokens[2]);
+    ip.append(address_tokens[2]);
     ip.append(".");
-    ip.append(tokens[3]);
+    ip.append(address_tokens[3]);
 
     std::uint16_t port_high;
-    if (!utils::try_parse_uint16(tokens[4], port_high))
+    if (!utils::try_parse_uint16(address_tokens[4], port_high))
     {
         return false;
     }
 
     std::uint16_t port_low;
-    if (!utils::try_parse_uint16(tokens[5], port_low))
+    if (!utils::try_parse_uint16(address_tokens[5], port_low))
     {
         return false;
     }
