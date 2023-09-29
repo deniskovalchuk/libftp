@@ -51,7 +51,7 @@ replies client::connect(std::string_view hostname,
                         const std::optional<std::string_view> & username,
                         std::string_view password)
 {
-    control_connection_.open(hostname, port);
+    control_connection_.connect(hostname, port);
 
     notify_connected(hostname, port);
 
@@ -68,7 +68,7 @@ replies client::connect(std::string_view hostname,
 
 bool client::is_connected()
 {
-    return control_connection_.is_open();
+    return control_connection_.is_connected();
 }
 
 replies client::login(std::string_view username, std::string_view password)
@@ -188,7 +188,7 @@ file_list_reply client::get_file_list(const std::optional<std::string_view> & pa
         file_list = oss.str();
         notify_file_list(file_list);
 
-        connection->close();
+        connection->disconnect();
         recv(replies);
     }
 
@@ -325,9 +325,9 @@ std::optional<reply> client::disconnect(bool graceful)
     /* The control connection may have been closed while processing the QUIT
      * command.
      */
-    if (control_connection_.is_open())
+    if (control_connection_.is_connected())
     {
-        control_connection_.close();
+        control_connection_.disconnect();
     }
 
     return reply;
@@ -459,11 +459,11 @@ replies client::process_download(output_stream & dst, std::string_view path, tra
             process_abort(replies);
 
             /* Close the connection not gracefully in the case of abort. */
-            connection->close(false);
+            connection->disconnect(false);
         }
         else
         {
-            connection->close();
+            connection->disconnect();
             recv(replies);
         }
     }
@@ -487,11 +487,11 @@ replies client::process_upload(std::string_view remote_command, input_stream & s
             process_abort(replies);
 
             /* Close the connection not gracefully in the case of abort. */
-            connection->close(false);
+            connection->disconnect(false);
         }
         else
         {
-            connection->close();
+            connection->disconnect();
             recv(replies);
         }
     }
@@ -617,13 +617,13 @@ data_connection_ptr client::process_epsv_command(std::string_view command, repli
     boost::asio::ip::tcp::endpoint endpoint(remote_endpoint.address(), remote_port);
 
     data_connection_ptr connection = std::make_unique<data_connection>();
-    connection->open(endpoint);
+    connection->connect(endpoint);
 
     reply = process_command(command, replies);
 
     if (!reply.is_positive())
     {
-        connection->close();
+        connection->disconnect();
         return nullptr;
     }
 
@@ -718,13 +718,13 @@ data_connection_ptr client::process_pasv_command(std::string_view command, repli
     }
 
     data_connection_ptr connection = std::make_unique<data_connection>();
-    connection->open(remote_ip, remote_port);
+    connection->connect(remote_ip, remote_port);
 
     reply = process_command(command, replies);
 
     if (!reply.is_positive())
     {
-        connection->close();
+        connection->disconnect();
         return nullptr;
     }
 

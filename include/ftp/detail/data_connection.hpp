@@ -44,9 +44,9 @@ public:
 
     data_connection & operator=(const data_connection &) = delete;
 
-    void open(std::string_view ip, std::uint16_t port);
+    void connect(std::string_view ip, std::uint16_t port);
 
-    void open(const boost::asio::ip::tcp::endpoint & endpoint);
+    void connect(const boost::asio::ip::tcp::endpoint & endpoint);
 
     void listen(const boost::asio::ip::tcp::endpoint & endpoint);
 
@@ -54,7 +54,7 @@ public:
 
     [[nodiscard]] boost::asio::ip::tcp::endpoint get_listen_endpoint() const;
 
-    void close(bool graceful = true);
+    void disconnect(bool graceful = true);
 
     void send(input_stream & stream, transfer_callback * transfer_cb);
 

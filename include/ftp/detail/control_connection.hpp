@@ -40,11 +40,11 @@ public:
 
     control_connection & operator=(const control_connection &) = delete;
 
-    void open(std::string_view hostname, std::uint16_t port);
+    void connect(std::string_view hostname, std::uint16_t port);
 
-    [[nodiscard]] bool is_open() const;
+    [[nodiscard]] bool is_connected() const;
 
-    void close();
+    void disconnect();
 
     [[nodiscard]] boost::asio::ip::tcp::endpoint get_local_endpoint() const;
 

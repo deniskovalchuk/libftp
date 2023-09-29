@@ -48,7 +48,7 @@ control_connection::control_connection()
 {
 }
 
-void control_connection::open(std::string_view hostname, std::uint16_t port)
+void control_connection::connect(std::string_view hostname, std::uint16_t port)
 {
     boost::asio::ip::tcp::resolver resolver(io_context_);
     boost::system::error_code ec;
@@ -78,12 +78,12 @@ void control_connection::open(std::string_view hostname, std::uint16_t port)
     }
 }
 
-bool control_connection::is_open() const
+bool control_connection::is_connected() const
 {
     return socket_.is_open();
 }
 
-void control_connection::close()
+void control_connection::disconnect()
 {
     boost::system::error_code ec;
 

@@ -38,7 +38,7 @@ data_connection::data_connection()
 {
 }
 
-void data_connection::open(std::string_view ip, std::uint16_t port)
+void data_connection::connect(std::string_view ip, std::uint16_t port)
 {
     boost::system::error_code ec;
 
@@ -67,7 +67,7 @@ void data_connection::open(std::string_view ip, std::uint16_t port)
     }
 }
 
-void data_connection::open(const boost::asio::ip::tcp::endpoint & endpoint)
+void data_connection::connect(const boost::asio::ip::tcp::endpoint & endpoint)
 {
     boost::system::error_code ec;
 
@@ -140,7 +140,7 @@ boost::asio::ip::tcp::endpoint data_connection::get_listen_endpoint() const
     return endpoint;
 }
 
-void data_connection::close(bool graceful)
+void data_connection::disconnect(bool graceful)
 {
     boost::system::error_code ec;
 
