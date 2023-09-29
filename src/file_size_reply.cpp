@@ -23,18 +23,48 @@
  */
 
 #include <ftp/file_size_reply.hpp>
+#include <ftp/detail/utils.hpp>
 
 namespace ftp
 {
 
-file_size_reply::file_size_reply(const reply & reply, const std::optional<std::uint64_t> & size)
-    : ftp::reply(reply),
-      size_(size)
-{}
+using namespace ftp::detail;
+
+file_size_reply::file_size_reply(const reply & reply)
+    : ftp::reply(reply)
+{
+    size_ = parse_size(reply);
+}
 
 const std::optional<std::uint64_t> & file_size_reply::get_size() const
 {
     return size_;
+}
+
+std::optional<std::uint64_t> file_size_reply::parse_size(const reply & reply)
+{
+    /* 213 SIZE_IN_BYTES */
+    if (reply.get_code() != 213)
+    {
+        return std::nullopt;
+    }
+
+    std::string_view status_string = reply.get_status_string();
+
+    if (status_string.size() < 5)
+    {
+        return std::nullopt;
+    }
+
+    std::uint64_t size;
+    if (utils::try_parse_uint64(status_string.substr(4), size))
+    {
+        return size;
+    }
+    else
+    {
+        return std::nullopt;
+    }
 }
 
 } // namespace ftp

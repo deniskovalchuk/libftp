@@ -31,25 +31,25 @@ namespace
 TEST(file_size_reply, construct)
 {
     {
-        ftp::file_size_reply reply({230, "230 0"}, 0);
-        EXPECT_EQ(230, reply.get_code());
-        EXPECT_EQ("230 0", reply.get_status_string());
+        ftp::file_size_reply reply({213, "213 0"});
+        EXPECT_EQ(213, reply.get_code());
+        EXPECT_EQ("213 0", reply.get_status_string());
         EXPECT_TRUE(reply.is_positive());
         EXPECT_TRUE(reply.get_size().has_value());
         EXPECT_EQ(0, reply.get_size().value());
     }
 
     {
-        ftp::file_size_reply reply({230, "230 4267539"}, 4267539);
-        EXPECT_EQ(230, reply.get_code());
-        EXPECT_EQ("230 4267539", reply.get_status_string());
+        ftp::file_size_reply reply({213, "213 4267539"});
+        EXPECT_EQ(213, reply.get_code());
+        EXPECT_EQ("213 4267539", reply.get_status_string());
         EXPECT_TRUE(reply.is_positive());
         EXPECT_TRUE(reply.get_size().has_value());
         EXPECT_EQ(4267539, reply.get_size().value());
     }
 
     {
-        ftp::file_size_reply reply({550, "550 /file is not retrievable."}, std::nullopt);
+        ftp::file_size_reply reply({550, "550 /file is not retrievable."});
         EXPECT_EQ(550, reply.get_code());
         EXPECT_EQ("550 /file is not retrievable.", reply.get_status_string());
         EXPECT_FALSE(reply.is_positive());

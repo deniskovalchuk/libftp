@@ -165,8 +165,6 @@ private:
 
     static bool try_parse_pasv_reply(const reply & reply, std::string & ip, std::uint16_t & port);
 
-    static bool try_parse_size_reply(const reply & reply, std::uint64_t & size);
-
     static std::string make_command(std::string_view command, const std::optional<std::string_view> & argument = std::nullopt);
 
     static std::string make_eprt_command(const boost::asio::ip::tcp::endpoint & endpoint);

@@ -34,12 +34,14 @@ namespace ftp
 class file_size_reply : public reply
 {
 public:
-    file_size_reply(const reply & reply, const std::optional<std::uint64_t> & size);
+    explicit file_size_reply(const reply & reply);
 
     /* Return size in bytes. */
     [[nodiscard]] const std::optional<std::uint64_t> & get_size() const;
 
 private:
+    static std::optional<std::uint64_t> parse_size(const reply & reply);
+
     std::optional<std::uint64_t> size_;
 };
 
