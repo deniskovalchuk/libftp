@@ -857,7 +857,7 @@ std::string client::make_eprt_command(const boost::asio::ip::tcp::endpoint & end
     }
     else
     {
-        throw ftp_exception("Cannot make the EPRT command. The address type is invalid.");
+        throw ftp_exception("Cannot make the EPRT command. The IP address type is invalid.");
     }
 
     command.append("|");
