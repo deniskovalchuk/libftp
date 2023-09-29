@@ -44,15 +44,15 @@ public:
 
     [[nodiscard]] bool is_connected() const;
 
+    void send(std::string_view command);
+
+    reply recv();
+
     void disconnect();
 
     [[nodiscard]] boost::asio::ip::tcp::endpoint get_local_endpoint() const;
 
     [[nodiscard]] boost::asio::ip::tcp::endpoint get_remote_endpoint() const;
-
-    void send(std::string_view command);
-
-    reply recv();
 
 private:
     std::string read_line();

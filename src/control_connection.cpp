@@ -83,60 +83,6 @@ bool control_connection::is_connected() const
     return socket_.is_open();
 }
 
-void control_connection::disconnect()
-{
-    boost::system::error_code ec;
-
-    socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-
-    if (ec == boost::asio::error::not_connected)
-    {
-        /* Ignore 'not_connected' error. We could get ENOTCONN if a server side
-         * has already closed the control connection. This suits us, just close
-         * the socket.
-         */
-    }
-    else if (ec)
-    {
-        throw ftp_exception(ec, "Cannot close control connection");
-    }
-
-    socket_.close(ec);
-
-    if (ec)
-    {
-        throw ftp_exception(ec, "Cannot close control connection");
-    }
-}
-
-boost::asio::ip::tcp::endpoint control_connection::get_local_endpoint() const
-{
-    boost::system::error_code ec;
-
-    boost::asio::ip::tcp::endpoint local_endpoint = socket_.local_endpoint(ec);
-
-    if (ec)
-    {
-        throw ftp_exception(ec, "Cannot get local endpoint");
-    }
-
-    return local_endpoint;
-}
-
-boost::asio::ip::tcp::endpoint control_connection::get_remote_endpoint() const
-{
-    boost::system::error_code ec;
-
-    boost::asio::ip::tcp::endpoint remote_endpoint = socket_.remote_endpoint(ec);
-
-    if (ec)
-    {
-        throw ftp_exception(ec, "Cannot get remote endpoint");
-    }
-
-    return remote_endpoint;
-}
-
 reply control_connection::recv()
 {
     std::string status_string;
@@ -300,6 +246,60 @@ std::string control_connection::read_line()
     buffer_.erase(0, len);
 
     return line;
+}
+
+void control_connection::disconnect()
+{
+    boost::system::error_code ec;
+
+    socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+
+    if (ec == boost::asio::error::not_connected)
+    {
+        /* Ignore 'not_connected' error. We could get ENOTCONN if a server side
+         * has already closed the control connection. This suits us, just close
+         * the socket.
+         */
+    }
+    else if (ec)
+    {
+        throw ftp_exception(ec, "Cannot close control connection");
+    }
+
+    socket_.close(ec);
+
+    if (ec)
+    {
+        throw ftp_exception(ec, "Cannot close control connection");
+    }
+}
+
+boost::asio::ip::tcp::endpoint control_connection::get_local_endpoint() const
+{
+    boost::system::error_code ec;
+
+    boost::asio::ip::tcp::endpoint local_endpoint = socket_.local_endpoint(ec);
+
+    if (ec)
+    {
+        throw ftp_exception(ec, "Cannot get local endpoint");
+    }
+
+    return local_endpoint;
+}
+
+boost::asio::ip::tcp::endpoint control_connection::get_remote_endpoint() const
+{
+    boost::system::error_code ec;
+
+    boost::asio::ip::tcp::endpoint remote_endpoint = socket_.remote_endpoint(ec);
+
+    if (ec)
+    {
+        throw ftp_exception(ec, "Cannot get remote endpoint");
+    }
+
+    return remote_endpoint;
 }
 
 } // namespace ftp::detail
