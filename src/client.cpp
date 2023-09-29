@@ -183,6 +183,7 @@ file_list_reply client::get_file_list(const std::optional<std::string_view> & pa
         std::ostringstream oss;
         ostream_adapter adapter(oss);
         output_stream_ptr stream = create_output_stream(adapter);
+
         connection->recv(*stream, nullptr);
 
         file_list = oss.str();
@@ -426,6 +427,7 @@ replies client::process_download(output_stream & dst, std::string_view path, tra
     if (connection)
     {
         output_stream_ptr stream = create_output_stream(dst);
+
         connection->recv(*stream, transfer_cb);
 
         if (transfer_cb && transfer_cb->is_cancelled())
@@ -454,6 +456,7 @@ replies client::process_upload(std::string_view remote_command, input_stream & s
     if (connection)
     {
         input_stream_ptr stream = create_input_stream(src);
+
         connection->send(*stream, transfer_cb);
 
         if (transfer_cb && transfer_cb->is_cancelled())
