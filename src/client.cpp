@@ -28,8 +28,8 @@
 #include <ftp/detail/ascii_ostream.hpp>
 #include <ftp/detail/binary_istream.hpp>
 #include <ftp/detail/binary_ostream.hpp>
-#include <ftp/detail/net_utils.hpp>
 #include <ftp/stream/ostream_adapter.hpp>
+#include <ftp/detail/net_utils.hpp>
 #include <sstream>
 
 namespace ftp
