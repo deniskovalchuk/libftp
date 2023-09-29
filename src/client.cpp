@@ -769,8 +769,8 @@ data_connection_ptr client::process_port_command(std::string_view command, repli
 bool client::try_parse_pasv_reply(const reply & reply, std::string & ip, uint16_t & port)
 {
     std::string_view status_string = reply.get_status_string();
-    std::string::size_type begin = status_string.find('(');
-    std::string::size_type end = status_string.rfind(')');
+    std::string_view::size_type begin = status_string.find('(');
+    std::string_view::size_type end = status_string.rfind(')');
 
     if (begin == status_string.npos || end == status_string.npos || end <= begin)
     {
