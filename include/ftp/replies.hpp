@@ -38,6 +38,7 @@ public:
 
     void append(const reply & reply);
 
+    /* Return true if all replies are positive. */
     [[nodiscard]] bool is_positive() const;
 
     [[nodiscard]] const std::string & get_status_string() const;
