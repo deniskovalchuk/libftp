@@ -31,6 +31,13 @@ namespace
 TEST(reply, construct)
 {
     {
+        ftp::reply reply;
+        EXPECT_EQ(ftp::reply::unspecified, reply.get_code());
+        EXPECT_EQ("", reply.get_status_string());
+        EXPECT_FALSE(reply.is_positive());
+    }
+
+    {
         ftp::reply reply(120, "120 Service ready in 2 minutes.");
         EXPECT_EQ(120, reply.get_code());
         EXPECT_EQ("120 Service ready in 2 minutes.", reply.get_status_string());
