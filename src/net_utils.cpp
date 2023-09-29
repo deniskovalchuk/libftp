@@ -22,16 +22,24 @@
  * SOFTWARE.
  */
 
-#ifndef LIBFTP_BOOST_UTILS_HPP
-#define LIBFTP_BOOST_UTILS_HPP
+#include <ftp/detail/net_utils.hpp>
+#include <ftp/ftp_exception.hpp>
 
-#include <boost/asio/ip/address.hpp>
-#include <string>
-
-namespace ftp::detail::boost_utils
+namespace ftp::detail::net_utils
 {
 
-std::string address_to_string(const boost::asio::ip::address & address);
+std::string address_to_string(const boost::asio::ip::address & address)
+{
+    boost::system::error_code ec;
 
-} // namespace ftp::detail::boost_utils
-#endif //LIBFTP_BOOST_UTILS_HPP
+    std::string string = address.to_string(ec);
+
+    if (ec)
+    {
+        throw ftp_exception(ec, "Cannot get address string");
+    }
+
+    return string;
+}
+
+} // namespace ftp::detail::net_utils

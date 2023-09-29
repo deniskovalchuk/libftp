@@ -28,7 +28,7 @@
 #include <ftp/detail/ascii_ostream.hpp>
 #include <ftp/detail/binary_istream.hpp>
 #include <ftp/detail/binary_ostream.hpp>
-#include <ftp/detail/boost_utils.hpp>
+#include <ftp/detail/net_utils.hpp>
 #include <ftp/stream/ostream_adapter.hpp>
 #include <sstream>
 
@@ -861,7 +861,7 @@ std::string client::make_eprt_command(const boost::asio::ip::tcp::endpoint & end
     }
 
     command.append("|");
-    command.append(boost_utils::address_to_string(endpoint.address()));
+    command.append(net_utils::address_to_string(endpoint.address()));
     command.append("|");
     command.append(std::to_string(endpoint.port()));
     command.append("|");
@@ -873,7 +873,7 @@ std::string client::make_port_command(const boost::asio::ip::tcp::endpoint & end
     std::string command = "PORT";
     command.append(" ");
 
-    std::string address_string = boost_utils::address_to_string(endpoint.address());
+    std::string address_string = net_utils::address_to_string(endpoint.address());
 
     for (char ch : address_string)
     {
