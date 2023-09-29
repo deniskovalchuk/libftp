@@ -52,13 +52,13 @@ public:
 
     void accept();
 
-    [[nodiscard]] boost::asio::ip::tcp::endpoint get_listen_endpoint() const;
-
-    void disconnect(bool graceful = true);
-
     void send(input_stream & stream, transfer_callback * transfer_cb);
 
     void recv(output_stream & stream, transfer_callback * transfer_cb);
+
+    void disconnect(bool graceful = true);
+
+    [[nodiscard]] boost::asio::ip::tcp::endpoint get_listen_endpoint() const;
 
 private:
     boost::asio::io_context io_context_;

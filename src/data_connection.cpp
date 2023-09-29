@@ -126,59 +126,6 @@ void data_connection::accept()
     }
 }
 
-boost::asio::ip::tcp::endpoint data_connection::get_listen_endpoint() const
-{
-    boost::system::error_code ec;
-
-    boost::asio::ip::tcp::endpoint endpoint = acceptor_.local_endpoint(ec);
-
-    if (ec)
-    {
-        throw ftp_exception(ec, "Cannot get listen endpoint");
-    }
-
-    return endpoint;
-}
-
-void data_connection::disconnect(bool graceful)
-{
-    boost::system::error_code ec;
-
-    if (graceful)
-    {
-        socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-
-        if (ec == boost::asio::error::not_connected)
-        {
-            /* Ignore 'not_connected' error. We could get ENOTCONN if a server side
-             * has already closed the data connection. This suits us, just close
-             * the socket.
-             */
-        }
-        else if (ec)
-        {
-            throw ftp_exception(ec, "Cannot close data connection");
-        }
-    }
-
-    socket_.close(ec);
-
-    if (ec)
-    {
-        throw ftp_exception(ec, "Cannot close data connection");
-    }
-
-    if (acceptor_.is_open())
-    {
-        acceptor_.close(ec);
-
-        if (ec)
-        {
-            throw ftp_exception(ec, "Cannot close data connection");
-        }
-    }
-}
-
 void data_connection::send(input_stream & stream, transfer_callback * transfer_cb)
 {
     if (transfer_cb)
@@ -268,6 +215,59 @@ void data_connection::recv(output_stream & stream, transfer_callback * transfer_
     {
         transfer_cb->end();
     }
+}
+
+void data_connection::disconnect(bool graceful)
+{
+    boost::system::error_code ec;
+
+    if (graceful)
+    {
+        socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+
+        if (ec == boost::asio::error::not_connected)
+        {
+            /* Ignore 'not_connected' error. We could get ENOTCONN if a server side
+             * has already closed the data connection. This suits us, just close
+             * the socket.
+             */
+        }
+        else if (ec)
+        {
+            throw ftp_exception(ec, "Cannot close data connection");
+        }
+    }
+
+    socket_.close(ec);
+
+    if (ec)
+    {
+        throw ftp_exception(ec, "Cannot close data connection");
+    }
+
+    if (acceptor_.is_open())
+    {
+        acceptor_.close(ec);
+
+        if (ec)
+        {
+            throw ftp_exception(ec, "Cannot close data connection");
+        }
+    }
+}
+
+boost::asio::ip::tcp::endpoint data_connection::get_listen_endpoint() const
+{
+    boost::system::error_code ec;
+
+    boost::asio::ip::tcp::endpoint endpoint = acceptor_.local_endpoint(ec);
+
+    if (ec)
+    {
+        throw ftp_exception(ec, "Cannot get listen endpoint");
+    }
+
+    return endpoint;
 }
 
 } // namespace ftp::detail
