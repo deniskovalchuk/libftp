@@ -34,6 +34,8 @@ namespace ftp
 class file_size_reply : public reply
 {
 public:
+    file_size_reply();
+
     explicit file_size_reply(const reply & reply);
 
     /* Return size in bytes. */

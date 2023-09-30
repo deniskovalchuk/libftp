@@ -30,6 +30,10 @@ namespace ftp
 
 using namespace ftp::detail;
 
+file_size_reply::file_size_reply()
+    : ftp::reply()
+{}
+
 file_size_reply::file_size_reply(const reply & reply)
     : ftp::reply(reply)
 {
