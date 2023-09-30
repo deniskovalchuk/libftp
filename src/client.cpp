@@ -415,6 +415,7 @@ reply client::process_login(std::string_view username, std::string_view password
         reply = process_command(command, replies);
     }
 
+    /* Set the configured transfer type. */
     if (reply.is_positive())
     {
         command = make_type_command(transfer_type_);
