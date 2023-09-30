@@ -587,7 +587,7 @@ data_connection_ptr client::process_epsv_command(std::string_view command, repli
     std::string epsv_command = make_command("EPSV");
     reply reply = process_command(epsv_command, replies);
 
-    if (!reply.is_positive())
+    if (reply.is_negative())
     {
         return nullptr;
     }
@@ -608,7 +608,7 @@ data_connection_ptr client::process_epsv_command(std::string_view command, repli
 
     reply = process_command(command, replies);
 
-    if (!reply.is_positive())
+    if (reply.is_negative())
     {
         connection->disconnect();
         return nullptr;
@@ -669,14 +669,14 @@ data_connection_ptr client::process_eprt_command(std::string_view command, repli
     std::string eprt_command = make_eprt_command(listen_endpoint);
     reply reply = process_command(eprt_command, replies);
 
-    if (!reply.is_positive())
+    if (reply.is_negative())
     {
         return nullptr;
     }
 
     reply = process_command(command, replies);
 
-    if (!reply.is_positive())
+    if (reply.is_negative())
     {
         return nullptr;
     }
@@ -690,7 +690,7 @@ data_connection_ptr client::process_pasv_command(std::string_view command, repli
     std::string pasv_command = make_command("PASV");
     reply reply = process_command(pasv_command, replies);
 
-    if (!reply.is_positive())
+    if (reply.is_negative())
     {
         return nullptr;
     }
@@ -709,7 +709,7 @@ data_connection_ptr client::process_pasv_command(std::string_view command, repli
 
     reply = process_command(command, replies);
 
-    if (!reply.is_positive())
+    if (reply.is_negative())
     {
         connection->disconnect();
         return nullptr;
@@ -730,14 +730,14 @@ data_connection_ptr client::process_port_command(std::string_view command, repli
     std::string port_command = make_port_command(listen_endpoint);
     reply reply = process_command(port_command, replies);
 
-    if (!reply.is_positive())
+    if (reply.is_negative())
     {
         return nullptr;
     }
 
     reply = process_command(command, replies);
 
-    if (!reply.is_positive())
+    if (reply.is_negative())
     {
         return nullptr;
     }
