@@ -43,6 +43,8 @@ public:
 
     [[nodiscard]] bool is_negative() const;
 
+    [[nodiscard]] bool is_intermediate() const;
+
     [[nodiscard]] std::uint16_t get_code() const;
 
     [[nodiscard]] const std::string & get_status_string() const;

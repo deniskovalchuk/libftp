@@ -48,6 +48,11 @@ bool reply::is_negative() const
     return code_ != unspecified && code_ >= 400;
 }
 
+bool reply::is_intermediate() const
+{
+    return code_ != unspecified && code_ >= 300 && code_ < 400;
+}
+
 std::uint16_t reply::get_code() const
 {
     return code_;
