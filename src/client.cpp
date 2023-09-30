@@ -55,6 +55,7 @@ replies client::connect(std::string_view hostname,
 
     notify_connected(hostname, port);
 
+    /* Receive a greeting message. */
     replies replies;
     reply reply = recv(replies);
 
