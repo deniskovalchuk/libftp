@@ -593,7 +593,6 @@ data_connection_ptr client::process_epsv_command(std::string_view command, repli
     }
 
     std::uint16_t remote_port;
-
     if (!try_parse_epsv_reply(reply, remote_port))
     {
         throw ftp_exception("Cannot parse a port number from the server reply: '%1%'.",
@@ -697,7 +696,6 @@ data_connection_ptr client::process_pasv_command(std::string_view command, repli
 
     std::string remote_ip;
     std::uint16_t remote_port;
-
     if (!try_parse_pasv_reply(reply, remote_ip, remote_port))
     {
         throw ftp_exception("Cannot parse IP address and port number from the server reply: '%1%'.",
