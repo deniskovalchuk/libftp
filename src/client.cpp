@@ -178,7 +178,6 @@ file_list_reply client::get_file_list(const std::optional<std::string_view> & pa
     std::string file_list;
 
     data_connection_ptr connection = create_data_connection(command, replies);
-
     if (connection)
     {
         std::ostringstream oss;
@@ -431,11 +430,11 @@ reply client::process_login(std::string_view username, std::string_view password
 
 replies client::process_download(output_stream & dst, std::string_view path, transfer_callback * transfer_cb)
 {
+    replies replies;
+
     std::string command = make_command("RETR", path);
 
-    replies replies;
     data_connection_ptr connection = create_data_connection(command, replies);
-
     if (connection)
     {
         output_stream_ptr stream = create_output_stream(dst);
@@ -461,11 +460,11 @@ replies client::process_download(output_stream & dst, std::string_view path, tra
 
 replies client::process_upload(std::string_view remote_command, input_stream & src, std::string_view path, transfer_callback * transfer_cb)
 {
+    replies replies;
+
     std::string command = make_command(remote_command, path);
 
-    replies replies;
     data_connection_ptr connection = create_data_connection(command, replies);
-
     if (connection)
     {
         input_stream_ptr stream = create_input_stream(src);
