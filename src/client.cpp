@@ -199,6 +199,7 @@ file_list_reply client::get_file_list(const std::optional<std::string_view> & pa
 replies client::rename(std::string_view from_path, std::string_view to_path)
 {
     std::string command = make_command("RNFR", from_path);
+
     replies replies;
     reply reply = process_command(command, replies);
 
@@ -236,6 +237,7 @@ reply client::remove_directory(std::string_view path)
 file_size_reply client::get_file_size(std::string_view path)
 {
     std::string command = make_command("SIZE", path);
+
     reply reply = process_command(command);
 
     return file_size_reply(reply);
@@ -290,6 +292,7 @@ std::optional<reply> client::disconnect(bool graceful)
     if (graceful)
     {
         std::string command = make_command("QUIT");
+
         reply = process_command(command);
     }
     else
@@ -321,6 +324,7 @@ transfer_mode client::get_transfer_mode() const
 reply client::set_transfer_type(transfer_type type)
 {
     std::string command = make_type_command(type);
+
     reply reply = process_command(command);
 
     if (reply.is_positive())
@@ -400,18 +404,21 @@ reply client::process_command(std::string_view command, replies & replies)
 reply client::process_login(std::string_view username, std::string_view password, replies & replies)
 {
     std::string command = make_command("USER", username);
+
     reply reply = process_command(command, replies);
 
     /* 331 Username okay, need password. */
     if (reply.get_code() == 331)
     {
         command = make_command("PASS", password);
+
         reply = process_command(command, replies);
     }
 
     if (reply.is_positive())
     {
         command = make_type_command(transfer_type_);
+
         process_command(command, replies);
     }
 
@@ -421,6 +428,7 @@ reply client::process_login(std::string_view username, std::string_view password
 replies client::process_download(output_stream & dst, std::string_view path, transfer_callback * transfer_cb)
 {
     std::string command = make_command("RETR", path);
+
     replies replies;
     data_connection_ptr connection = create_data_connection(command, replies);
 
@@ -450,6 +458,7 @@ replies client::process_download(output_stream & dst, std::string_view path, tra
 replies client::process_upload(std::string_view remote_command, input_stream & src, std::string_view path, transfer_callback * transfer_cb)
 {
     std::string command = make_command(remote_command, path);
+
     replies replies;
     data_connection_ptr connection = create_data_connection(command, replies);
 
@@ -484,6 +493,7 @@ reply client::process_abort(replies & replies)
      */
 
     std::string command = make_command("ABOR");
+
     reply reply = process_command(command, replies);
 
     /* 426 Connection closed; transfer aborted. */
