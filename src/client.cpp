@@ -588,6 +588,7 @@ data_connection_ptr client::create_data_connection(std::string_view command, rep
 data_connection_ptr client::process_epsv_command(std::string_view command, replies & replies)
 {
     std::string epsv_command = make_command("EPSV");
+
     reply reply = process_command(epsv_command, replies);
 
     if (reply.is_negative())
@@ -669,6 +670,7 @@ data_connection_ptr client::process_eprt_command(std::string_view command, repli
     listen_endpoint = connection->get_listen_endpoint();
 
     std::string eprt_command = make_eprt_command(listen_endpoint);
+
     reply reply = process_command(eprt_command, replies);
 
     if (reply.is_negative())
@@ -690,6 +692,7 @@ data_connection_ptr client::process_eprt_command(std::string_view command, repli
 data_connection_ptr client::process_pasv_command(std::string_view command, replies & replies)
 {
     std::string pasv_command = make_command("PASV");
+
     reply reply = process_command(pasv_command, replies);
 
     if (reply.is_negative())
@@ -729,6 +732,7 @@ data_connection_ptr client::process_port_command(std::string_view command, repli
     listen_endpoint = connection->get_listen_endpoint();
 
     std::string port_command = make_port_command(listen_endpoint);
+
     reply reply = process_command(port_command, replies);
 
     if (reply.is_negative())
