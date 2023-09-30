@@ -199,15 +199,17 @@ file_list_reply client::get_file_list(const std::optional<std::string_view> & pa
 
 replies client::rename(std::string_view from_path, std::string_view to_path)
 {
+    replies replies;
+
     std::string command = make_command("RNFR", from_path);
 
-    replies replies;
     reply reply = process_command(command, replies);
 
     /* 350 Ready for destination name. */
     if (reply.get_code() == 350)
     {
         command = make_command("RNTO", to_path);
+
         process_command(command, replies);
     }
 
