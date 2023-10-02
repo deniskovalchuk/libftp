@@ -337,6 +337,23 @@ reply client::set_transfer_type(transfer_type type)
     return reply;
 }
 
+std::string client::make_type_command(transfer_type type)
+{
+    if (type == transfer_type::binary)
+    {
+        return make_command("TYPE", "I");
+    }
+    else if (type == transfer_type::ascii)
+    {
+        return make_command("TYPE", "A");
+    }
+    else
+    {
+        assert(false);
+        return "";
+    }
+}
+
 transfer_type client::get_transfer_type() const
 {
     return transfer_type_;
@@ -882,23 +899,6 @@ std::string client::make_command(std::string_view command, const std::optional<s
     }
 
     return result;
-}
-
-std::string client::make_type_command(transfer_type type)
-{
-    if (type == transfer_type::binary)
-    {
-        return make_command("TYPE", "I");
-    }
-    else if (type == transfer_type::ascii)
-    {
-        return make_command("TYPE", "A");
-    }
-    else
-    {
-        assert(false);
-        return "";
-    }
 }
 
 void client::notify_connected(std::string_view hostname, std::uint16_t port)
