@@ -689,6 +689,33 @@ data_connection_ptr client::process_eprt_command(std::string_view command, repli
     return connection;
 }
 
+std::string client::make_eprt_command(const boost::asio::ip::tcp::endpoint & endpoint)
+{
+    std::string command = "EPRT";
+    command.append(" ");
+    command.append("|");
+
+    if (endpoint.address().is_v4())
+    {
+        command.append("1");
+    }
+    else if (endpoint.address().is_v6())
+    {
+        command.append("2");
+    }
+    else
+    {
+        throw ftp_exception("Cannot make the EPRT command. The IP address type is invalid.");
+    }
+
+    command.append("|");
+    command.append(net_utils::address_to_string(endpoint.address()));
+    command.append("|");
+    command.append(std::to_string(endpoint.port()));
+    command.append("|");
+    return command;
+}
+
 data_connection_ptr client::process_pasv_command(std::string_view command, replies & replies)
 {
     std::string pasv_command = make_command("PASV");
@@ -820,46 +847,6 @@ data_connection_ptr client::process_port_command(std::string_view command, repli
     return connection;
 }
 
-std::string client::make_command(std::string_view command, const std::optional<std::string_view> & argument)
-{
-    std::string result(command);
-
-    if (argument)
-    {
-        result.append(" ");
-        result.append(argument.value());
-    }
-
-    return result;
-}
-
-std::string client::make_eprt_command(const boost::asio::ip::tcp::endpoint & endpoint)
-{
-    std::string command = "EPRT";
-    command.append(" ");
-    command.append("|");
-
-    if (endpoint.address().is_v4())
-    {
-        command.append("1");
-    }
-    else if (endpoint.address().is_v6())
-    {
-        command.append("2");
-    }
-    else
-    {
-        throw ftp_exception("Cannot make the EPRT command. The IP address type is invalid.");
-    }
-
-    command.append("|");
-    command.append(net_utils::address_to_string(endpoint.address()));
-    command.append("|");
-    command.append(std::to_string(endpoint.port()));
-    command.append("|");
-    return command;
-}
-
 std::string client::make_port_command(const boost::asio::ip::tcp::endpoint & endpoint)
 {
     std::string command = "PORT";
@@ -882,6 +869,19 @@ std::string client::make_port_command(const boost::asio::ip::tcp::endpoint & end
     command.append(",");
     command.append(std::to_string(port % 256));
     return command;
+}
+
+std::string client::make_command(std::string_view command, const std::optional<std::string_view> & argument)
+{
+    std::string result(command);
+
+    if (argument)
+    {
+        result.append(" ");
+        result.append(argument.value());
+    }
+
+    return result;
 }
 
 std::string client::make_type_command(transfer_type type)
