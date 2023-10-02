@@ -722,35 +722,6 @@ data_connection_ptr client::process_pasv_command(std::string_view command, repli
     return connection;
 }
 
-data_connection_ptr client::process_port_command(std::string_view command, replies & replies)
-{
-    boost::asio::ip::tcp::endpoint local_endpoint = control_connection_.get_local_endpoint();
-    boost::asio::ip::tcp::endpoint listen_endpoint(local_endpoint.address(), 0);
-
-    data_connection_ptr connection = std::make_unique<data_connection>();
-    connection->listen(listen_endpoint);
-    listen_endpoint = connection->get_listen_endpoint();
-
-    std::string port_command = make_port_command(listen_endpoint);
-
-    reply reply = process_command(port_command, replies);
-
-    if (reply.is_negative())
-    {
-        return nullptr;
-    }
-
-    reply = process_command(command, replies);
-
-    if (reply.is_negative())
-    {
-        return nullptr;
-    }
-
-    connection->accept();
-    return connection;
-}
-
 /* This address information is broken into 8-bit fields and the
  * value of each field is transmitted as a decimal number (in
  * character string representation). The fields are separated
@@ -818,6 +789,35 @@ bool client::try_parse_pasv_reply(const reply & reply, std::string & ip, uint16_
 
     port = port_high * 256 + port_low;
     return true;
+}
+
+data_connection_ptr client::process_port_command(std::string_view command, replies & replies)
+{
+    boost::asio::ip::tcp::endpoint local_endpoint = control_connection_.get_local_endpoint();
+    boost::asio::ip::tcp::endpoint listen_endpoint(local_endpoint.address(), 0);
+
+    data_connection_ptr connection = std::make_unique<data_connection>();
+    connection->listen(listen_endpoint);
+    listen_endpoint = connection->get_listen_endpoint();
+
+    std::string port_command = make_port_command(listen_endpoint);
+
+    reply reply = process_command(port_command, replies);
+
+    if (reply.is_negative())
+    {
+        return nullptr;
+    }
+
+    reply = process_command(command, replies);
+
+    if (reply.is_negative())
+    {
+        return nullptr;
+    }
+
+    connection->accept();
+    return connection;
 }
 
 std::string client::make_command(std::string_view command, const std::optional<std::string_view> & argument)
