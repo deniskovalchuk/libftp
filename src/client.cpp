@@ -604,6 +604,7 @@ data_connection_ptr client::create_data_connection(std::string_view command, rep
 
 data_connection_ptr client::process_epsv_command(std::string_view command, replies & replies)
 {
+    /* Process the EPSV command. */
     std::string epsv_command = make_command("EPSV");
 
     reply reply = process_command(epsv_command, replies);
@@ -613,6 +614,7 @@ data_connection_ptr client::process_epsv_command(std::string_view command, repli
         return nullptr;
     }
 
+    /* Parse the port number on which the server is listening for a data connection. */
     std::uint16_t remote_port;
     if (!try_parse_epsv_reply(reply, remote_port))
     {
@@ -620,12 +622,14 @@ data_connection_ptr client::process_epsv_command(std::string_view command, repli
                             reply.get_status_string());
     }
 
+    /* Open the data connection. */
     boost::asio::ip::tcp::endpoint remote_endpoint = control_connection_.get_remote_endpoint();
     boost::asio::ip::tcp::endpoint endpoint(remote_endpoint.address(), remote_port);
 
     data_connection_ptr connection = std::make_unique<data_connection>();
     connection->connect(endpoint);
 
+    /* Process the main command. */
     reply = process_command(command, replies);
 
     if (reply.is_negative())
@@ -634,6 +638,7 @@ data_connection_ptr client::process_epsv_command(std::string_view command, repli
         return nullptr;
     }
 
+    /* The data connection is ready for data transfer. */
     return connection;
 }
 
@@ -735,6 +740,7 @@ std::string client::make_eprt_command(const boost::asio::ip::tcp::endpoint & end
 
 data_connection_ptr client::process_pasv_command(std::string_view command, replies & replies)
 {
+    /* Process the PASV command. */
     std::string pasv_command = make_command("PASV");
 
     reply reply = process_command(pasv_command, replies);
@@ -744,6 +750,7 @@ data_connection_ptr client::process_pasv_command(std::string_view command, repli
         return nullptr;
     }
 
+    /* Parse the IP address and port number on which the server is listening for a data connection. */
     std::string remote_ip;
     std::uint16_t remote_port;
     if (!try_parse_pasv_reply(reply, remote_ip, remote_port))
@@ -752,9 +759,11 @@ data_connection_ptr client::process_pasv_command(std::string_view command, repli
                             reply.get_status_string());
     }
 
+    /* Open the data connection. */
     data_connection_ptr connection = std::make_unique<data_connection>();
     connection->connect(remote_ip, remote_port);
 
+    /* Process the main command. */
     reply = process_command(command, replies);
 
     if (reply.is_negative())
@@ -763,6 +772,7 @@ data_connection_ptr client::process_pasv_command(std::string_view command, repli
         return nullptr;
     }
 
+    /* The data connection is ready for data transfer. */
     return connection;
 }
 
