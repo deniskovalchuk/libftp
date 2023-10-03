@@ -684,6 +684,7 @@ bool client::try_parse_epsv_reply(const reply & reply, std::uint16_t & port)
 
 data_connection_ptr client::process_eprt_command(std::string_view command, replies & replies)
 {
+    /* Start to listen. */
     boost::asio::ip::tcp::endpoint local_endpoint = control_connection_.get_local_endpoint();
     boost::asio::ip::tcp::endpoint listen_endpoint(local_endpoint.address(), 0);
 
@@ -691,6 +692,7 @@ data_connection_ptr client::process_eprt_command(std::string_view command, repli
     connection->listen(listen_endpoint);
     listen_endpoint = connection->get_listen_endpoint();
 
+    /* Process the EPRT command. */
     std::string eprt_command = make_eprt_command(listen_endpoint);
 
     reply reply = process_command(eprt_command, replies);
@@ -700,6 +702,7 @@ data_connection_ptr client::process_eprt_command(std::string_view command, repli
         return nullptr;
     }
 
+    /* Process the main command. */
     reply = process_command(command, replies);
 
     if (reply.is_negative())
@@ -707,7 +710,10 @@ data_connection_ptr client::process_eprt_command(std::string_view command, repli
         return nullptr;
     }
 
+    /* Accept an incoming data connection. */
     connection->accept();
+
+    /* The data connection is ready for data transfer. */
     return connection;
 }
 
@@ -847,6 +853,7 @@ bool client::try_parse_pasv_reply(const reply & reply, std::string & ip, uint16_
 
 data_connection_ptr client::process_port_command(std::string_view command, replies & replies)
 {
+    /* Start to listen. */
     boost::asio::ip::tcp::endpoint local_endpoint = control_connection_.get_local_endpoint();
     boost::asio::ip::tcp::endpoint listen_endpoint(local_endpoint.address(), 0);
 
@@ -854,6 +861,7 @@ data_connection_ptr client::process_port_command(std::string_view command, repli
     connection->listen(listen_endpoint);
     listen_endpoint = connection->get_listen_endpoint();
 
+    /* Process the PORT command. */
     std::string port_command = make_port_command(listen_endpoint);
 
     reply reply = process_command(port_command, replies);
@@ -863,6 +871,7 @@ data_connection_ptr client::process_port_command(std::string_view command, repli
         return nullptr;
     }
 
+    /* Process the main command. */
     reply = process_command(command, replies);
 
     if (reply.is_negative())
@@ -870,7 +879,10 @@ data_connection_ptr client::process_port_command(std::string_view command, repli
         return nullptr;
     }
 
+    /* Accept an incoming data connection. */
     connection->accept();
+
+    /* The data connection is ready for data transfer. */
     return connection;
 }
 
