@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.1
+
+### Fixed
+
+- Added missing includes in `<ftp/ftp.hpp>`:
+  - `#include <ftp/file_list_reply.hpp>`
+  - `#include <ftp/file_size_reply.hpp>`
+
 ## v0.3.0
 
 ### New
