@@ -26,6 +26,8 @@
 #define LIBFTP_FTP_HPP
 
 #include <ftp/client.hpp>
+#include <ftp/file_list_reply.hpp>
+#include <ftp/file_size_reply.hpp>
 #include <ftp/ftp_exception.hpp>
 #include <ftp/observer.hpp>
 #include <ftp/replies.hpp>
