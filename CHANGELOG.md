@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.2
+
+### New
+
+- `ftp::client`:
+  - Deleted move constructors.
+  - Internal improvements.
+
 ## v0.3.1
 
 ### Fixed
