@@ -42,15 +42,14 @@ static bool try_parse_status_code(std::string_view line, std::uint16_t & status_
     return utils::try_parse_uint16(line.substr(0, 3), status_code);
 }
 
-control_connection::control_connection()
-    : io_context_(),
-      socket_(io_context_)
+control_connection::control_connection(net_context & net_context)
+    : socket_(net_context.get_io_context())
 {
 }
 
 void control_connection::connect(std::string_view hostname, std::uint16_t port)
 {
-    boost::asio::ip::tcp::resolver resolver(io_context_);
+    boost::asio::ip::tcp::resolver resolver(socket_.get_executor());
     boost::system::error_code ec;
 
     boost::asio::ip::tcp::resolver::results_type endpoints =

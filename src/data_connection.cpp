@@ -31,10 +31,9 @@
 namespace ftp::detail
 {
 
-data_connection::data_connection()
-    : io_context_(),
-      socket_(io_context_),
-      acceptor_(io_context_)
+data_connection::data_connection(net_context & net_context)
+    : socket_(net_context.get_io_context()),
+      acceptor_(net_context.get_io_context())
 {
 }
 

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019 Denis Kovalchuk
+ * Copyright (c) 2024 Denis Kovalchuk
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,51 +22,14 @@
  * SOFTWARE.
  */
 
-#ifndef LIBFTP_DATA_CONNECTION_HPP
-#define LIBFTP_DATA_CONNECTION_HPP
-
-#include <ftp/stream/input_stream.hpp>
-#include <ftp/stream/output_stream.hpp>
-#include <ftp/transfer_callback.hpp>
 #include <ftp/detail/net_context.hpp>
-#include <boost/asio/ip/tcp.hpp>
-#include <memory>
-#include <string_view>
 
 namespace ftp::detail
 {
 
-class data_connection
+boost::asio::io_context & net_context::get_io_context()
 {
-public:
-    explicit data_connection(net_context & net_context);
-
-    data_connection(const data_connection &) = delete;
-
-    data_connection & operator=(const data_connection &) = delete;
-
-    void connect(std::string_view ip, std::uint16_t port);
-
-    void connect(const boost::asio::ip::tcp::endpoint & endpoint);
-
-    void listen(const boost::asio::ip::tcp::endpoint & endpoint);
-
-    void accept();
-
-    void send(input_stream & stream, transfer_callback * transfer_cb);
-
-    void recv(output_stream & stream, transfer_callback * transfer_cb);
-
-    void disconnect(bool graceful = true);
-
-    [[nodiscard]] boost::asio::ip::tcp::endpoint get_listen_endpoint() const;
-
-private:
-    boost::asio::ip::tcp::socket socket_;
-    boost::asio::ip::tcp::acceptor acceptor_;
-};
-
-using data_connection_ptr = std::unique_ptr<data_connection>;
+    return io_context_;
+}
 
 } // namespace ftp::detail
-#endif //LIBFTP_DATA_CONNECTION_HPP

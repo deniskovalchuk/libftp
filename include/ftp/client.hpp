@@ -37,6 +37,7 @@
 #include <ftp/stream/output_stream.hpp>
 #include <ftp/detail/control_connection.hpp>
 #include <ftp/detail/data_connection.hpp>
+#include <ftp/detail/net_context.hpp>
 #include <string>
 #include <string_view>
 #include <optional>
@@ -184,6 +185,7 @@ private:
     transfer_mode transfer_mode_;
     transfer_type transfer_type_;
     bool rfc2428_support_;
+    detail::net_context net_context_;
     detail::control_connection control_connection_;
     std::list<std::shared_ptr<observer>> observers_;
 };

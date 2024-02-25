@@ -42,7 +42,9 @@ client::client(transfer_mode mode,
                bool rfc2428_support)
     : transfer_mode_(mode),
       transfer_type_(type),
-      rfc2428_support_(rfc2428_support)
+      rfc2428_support_(rfc2428_support),
+      net_context_(),
+      control_connection_(net_context_)
 {
 }
 
@@ -626,7 +628,7 @@ data_connection_ptr client::process_epsv_command(std::string_view command, repli
     boost::asio::ip::tcp::endpoint remote_endpoint = control_connection_.get_remote_endpoint();
     boost::asio::ip::tcp::endpoint endpoint(remote_endpoint.address(), remote_port);
 
-    data_connection_ptr connection = std::make_unique<data_connection>();
+    data_connection_ptr connection = std::make_unique<data_connection>(net_context_);
     connection->connect(endpoint);
 
     /* Process the main command. */
@@ -688,7 +690,7 @@ data_connection_ptr client::process_eprt_command(std::string_view command, repli
     boost::asio::ip::tcp::endpoint local_endpoint = control_connection_.get_local_endpoint();
     boost::asio::ip::tcp::endpoint listen_endpoint(local_endpoint.address(), 0);
 
-    data_connection_ptr connection = std::make_unique<data_connection>();
+    data_connection_ptr connection = std::make_unique<data_connection>(net_context_);
     connection->listen(listen_endpoint);
     listen_endpoint = connection->get_listen_endpoint();
 
@@ -766,7 +768,7 @@ data_connection_ptr client::process_pasv_command(std::string_view command, repli
     }
 
     /* Open the data connection. */
-    data_connection_ptr connection = std::make_unique<data_connection>();
+    data_connection_ptr connection = std::make_unique<data_connection>(net_context_);
     connection->connect(remote_ip, remote_port);
 
     /* Process the main command. */
@@ -857,7 +859,7 @@ data_connection_ptr client::process_port_command(std::string_view command, repli
     boost::asio::ip::tcp::endpoint local_endpoint = control_connection_.get_local_endpoint();
     boost::asio::ip::tcp::endpoint listen_endpoint(local_endpoint.address(), 0);
 
-    data_connection_ptr connection = std::make_unique<data_connection>();
+    data_connection_ptr connection = std::make_unique<data_connection>(net_context_);
     connection->listen(listen_endpoint);
     listen_endpoint = connection->get_listen_endpoint();
 

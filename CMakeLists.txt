@@ -19,6 +19,7 @@ set(sources
         include/ftp/detail/binary_ostream.hpp
         include/ftp/detail/control_connection.hpp
         include/ftp/detail/data_connection.hpp
+        include/ftp/detail/net_context.hpp
         include/ftp/detail/net_utils.hpp
         include/ftp/detail/utils.hpp
         include/ftp/stream/input_stream.hpp
@@ -46,6 +47,7 @@ set(sources
         src/file_list_reply.cpp
         src/file_size_reply.cpp
         src/istream_adapter.cpp
+        src/net_context.cpp
         src/net_utils.cpp
         src/ostream_adapter.cpp
         src/replies.cpp
