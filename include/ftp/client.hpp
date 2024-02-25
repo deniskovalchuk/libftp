@@ -58,6 +58,10 @@ public:
 
     client & operator=(const client &) = delete;
 
+    client(client &&) noexcept = delete;
+
+    client & operator=(client &&) noexcept = delete;
+
     replies connect(std::string_view hostname,
                     std::uint16_t port = 21,
                     const std::optional<std::string_view> & username = std::nullopt,
