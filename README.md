@@ -98,7 +98,7 @@ include(FetchContent)
 FetchContent_Declare(
         libftp
         GIT_REPOSITORY https://github.com/deniskovalchuk/libftp.git
-        GIT_TAG        v0.3.1
+        GIT_TAG        v0.3.2
 )
 FetchContent_MakeAvailable(libftp)
 
