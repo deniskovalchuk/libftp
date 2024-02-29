@@ -6,7 +6,7 @@
 [![Actions Workflow Linux](https://github.com/deniskovalchuk/ftp-client/actions/workflows/linux.yml/badge.svg)](https://github.com/deniskovalchuk/ftp-client/actions/workflows/linux.yml)
 [![Actions Workflow macOS](https://github.com/deniskovalchuk/ftp-client/actions/workflows/macos.yml/badge.svg)](https://github.com/deniskovalchuk/ftp-client/actions/workflows/macos.yml)
 
-A cross-platform FTP client library based on [Boost.Asio](https://www.boost.org/doc/libs/1_83_0/doc/html/boost_asio.html).
+A cross-platform FTP client library based on [Boost.Asio](https://www.boost.org/doc/libs/1_84_0/doc/html/boost_asio.html).
 
 ## Table of contents
 
