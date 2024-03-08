@@ -11,6 +11,7 @@ option(LIBFTP_BUILD_EXAMPLE "Build examples" ${is_top_level})
 option(LIBFTP_BUILD_CMDLINE_CLIENT "Build the command-line FTP client application" ${is_top_level})
 
 find_package(Boost 1.67.0 REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 set(sources
         include/ftp/detail/ascii_istream.hpp
@@ -60,6 +61,7 @@ add_library(ftp ${sources})
 add_library(ftp::ftp ALIAS ftp)
 
 target_link_libraries(ftp PUBLIC Boost::boost)
+target_link_libraries(ftp PUBLIC OpenSSL::SSL)
 target_include_directories(ftp PUBLIC include)
 target_compile_features(ftp PUBLIC cxx_std_17)
 
