@@ -43,4 +43,11 @@ TEST(net_utils, address_to_string)
               ftp::detail::net_utils::address_to_string(make_address("2345:425:2CA1::567:5673:23B5")));
 }
 
+/* TODO: This is a temporary test to check compilation with the OpenSSL library. */
+#include <boost/asio/ssl/context.hpp>
+TEST(net_utils, compile_with_OpenSSL)
+{
+    boost::asio::ssl::context context(boost::asio::ssl::context::method::tls_client);
+}
+
 } // namespace
