@@ -24,6 +24,8 @@
 
 #include <gtest/gtest.h>
 #include <ftp/detail/net_utils.hpp>
+/* TODO: Remove. */
+#include <boost/asio/ssl/context.hpp>
 
 namespace
 {
@@ -44,7 +46,6 @@ TEST(net_utils, address_to_string)
 }
 
 /* TODO: This is a temporary test to check compilation with the OpenSSL library. */
-#include <boost/asio/ssl/context.hpp>
 TEST(net_utils, compile_with_OpenSSL)
 {
     boost::asio::ssl::context context(boost::asio::ssl::context::method::tls_client);
