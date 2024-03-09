@@ -9,6 +9,8 @@ import os
 import sys
 import time
 from binascii import hexlify
+
+
 try:
     import multiprocessing
 except ImportError:
@@ -40,9 +42,10 @@ def _reseed_random():
     if 'random' not in sys.modules:
         return
     import random
+
     # If os.urandom is available, this method does the same thing as
-    # random.seed (at least as of python 2.6).  If os.urandom is not
-    # available, we mix in the pid in addition to a timestamp.
+    # random.seed.  If os.urandom is not available, we mix in the pid in
+    # addition to a timestamp.
     try:
         seed = long(hexlify(os.urandom(16)), 16)
     except NotImplementedError:

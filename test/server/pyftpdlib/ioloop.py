@@ -56,8 +56,6 @@ server = Server('localhost', 8021)
 IOLoop.instance().loop()
 """
 
-import asynchat
-import asyncore
 import errno
 import heapq
 import os
@@ -66,6 +64,8 @@ import socket
 import sys
 import time
 import traceback
+
+
 try:
     import threading
 except ImportError:
@@ -76,6 +76,14 @@ from .log import config_logging
 from .log import debug
 from .log import is_logging_configured
 from .log import logger
+
+
+if sys.version_info[:2] >= (3, 12):
+    from . import _asynchat as asynchat
+    from . import _asyncore as asyncore
+else:
+    import asynchat
+    import asyncore
 
 
 timer = getattr(time, 'monotonic', time.time)
@@ -106,7 +114,7 @@ class RetryError(Exception):
 # --- scheduler
 # ===================================================================
 
-class _Scheduler(object):
+class _Scheduler:
     """Run the scheduled functions due to expire soonest (if any)."""
 
     def __init__(self):
@@ -142,8 +150,8 @@ class _Scheduler(object):
         # remove cancelled tasks and re-heapify the queue if the
         # number of cancelled tasks is more than the half of the
         # entire queue
-        if (self._cancellations > 512 and
-                self._cancellations > (len(self._tasks) >> 1)):
+        if self._cancellations > 512 and \
+                self._cancellations > (len(self._tasks) >> 1):
             debug("re-heapifying %s cancelled tasks" % self._cancellations)
             self.reheapify()
 
@@ -169,7 +177,7 @@ class _Scheduler(object):
         heapq.heapify(self._tasks)
 
 
-class _CallLater(object):
+class _CallLater:
     """Container object which instance is returned by ioloop.call_later()."""
 
     __slots__ = ('_delay', '_target', '_args', '_kwargs', '_errback', '_sched',
@@ -257,7 +265,7 @@ class _CallEvery(_CallLater):
                 self._sched.register(self)
 
 
-class _IOLoop(object):
+class _IOLoop:
     """Base class which will later be referred as IOLoop."""
 
     READ = 1
@@ -292,6 +300,11 @@ class _IOLoop(object):
                 if cls._instance is None:
                     cls._instance = cls()
         return cls._instance
+
+    @classmethod
+    def factory(cls):
+        """Constructs a new IOLoop instance."""
+        return cls()
 
     def register(self, fd, instance, events):
         """Register a fd, handled by instance for the given events."""
@@ -427,9 +440,9 @@ class Select(_IOLoop):
             del self.socket_map[fd]
         except KeyError:
             debug("call: unregister(); fd was no longer in socket_map", self)
-        for l in (self._r, self._w):
+        for ls in (self._r, self._w):
             try:
-                l.remove(fd)
+                ls.remove(fd)
             except ValueError:
                 pass
 
@@ -443,7 +456,7 @@ class Select(_IOLoop):
 
     def poll(self, timeout):
         try:
-            r, w, e = select.select(self._r, self._w, [], timeout)
+            r, w, _ = select.select(self._r, self._w, [], timeout)
         except select.error as err:
             if getattr(err, "errno", None) == errno.EINTR:
                 return
@@ -515,8 +528,10 @@ class _BasePollEpoll(_IOLoop):
                 raise
 
     def poll(self, timeout):
+        if timeout is None:
+            timeout = -1  # -1 waits indefinitely
         try:
-            events = self._poller.poll(timeout or -1)  # -1 waits indefinitely
+            events = self._poller.poll(timeout)
         except (IOError, select.error) as err:
             # for epoll() and poll() respectively
             if err.errno == errno.EINTR:
@@ -531,12 +546,10 @@ class _BasePollEpoll(_IOLoop):
             if event & self._ERROR and not event & self.READ:
                 inst.handle_close()
             else:
-                if event & self.READ:
-                    if inst.readable():
-                        _read(inst)
-                if event & self.WRITE:
-                    if inst.writable():
-                        _write(inst)
+                if event & self.READ and inst.readable():
+                    _read(inst)
+                if event & self.WRITE and inst.writable():
+                    _write(inst)
 
 
 # ===================================================================
@@ -715,9 +728,8 @@ if hasattr(select, 'kqueue'):  # pragma: no cover
                 inst = self.socket_map.get(kevent.ident)
                 if inst is None:
                     continue
-                if kevent.filter == _READ:
-                    if inst.readable():
-                        _read(inst)
+                if kevent.filter == _READ and inst.readable():
+                    _read(inst)
                 if kevent.filter == _WRITE:
                     if kevent.flags & _EOF:
                         # If an asynchronous connection is refused,
@@ -926,7 +938,7 @@ class AsyncChat(asynchat.async_chat):
         asynchat.async_chat.initiate_send(self)
         if not self._closed:
             # if there's still data to send we want to be ready
-            # for writing, else we're only intereseted in reading
+            # for writing, else we're only interested in reading
             if not self.producer_fifo:
                 wanted = self.ioloop.READ
             else:

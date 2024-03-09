@@ -6,22 +6,17 @@ import os
 import stat
 import tempfile
 import time
+
+
 try:
     from stat import filemode as _filemode  # PY 3.3
 except ImportError:
     from tarfile import filemode as _filemode
 try:
-    import pwd
     import grp
+    import pwd
 except ImportError:
     pwd = grp = None
-try:
-    from os import scandir  # py 3.5
-except ImportError:
-    try:
-        from scandir import scandir  # requires "pip install scandir"
-    except ImportError:
-        scandir = None
 
 from ._compat import PY3
 from ._compat import u
@@ -66,7 +61,7 @@ class FilesystemError(Exception):
 # --- base class
 # ===================================================================
 
-class AbstractedFS(object):
+class AbstractedFS:
     """A class used to interact with the file system, providing a
     cross-platform interface compatible with both Windows and
     UNIX style filesystems where all paths use "/" separator.
@@ -88,7 +83,7 @@ class AbstractedFS(object):
     def __init__(self, root, cmd_channel):
         """
          - (str) root: the user "real" home directory (e.g. '/home/user')
-         - (instance) cmd_channel: the FTPHandler class instance
+         - (instance) cmd_channel: the FTPHandler class instance.
         """
         assert isinstance(root, unicode)
         # Set initial current working directory.
@@ -306,7 +301,7 @@ class AbstractedFS(object):
         return os.stat(path)
 
     def utime(self, path, timeval):
-        """Perform a utime() call on the given path"""
+        """Perform a utime() call on the given path."""
         # utime expects a int/float (atime, mtime) in seconds
         # thus, setting both access and modify time to timeval
         return os.utime(path, (timeval, timeval))
@@ -387,7 +382,7 @@ class AbstractedFS(object):
 
     if grp is not None:
         def get_group_by_gid(self, gid):
-            """Return the groupname associated with group id.
+            """Return the group name associated with group id.
             If this can't be determined return raw gid instead.
             On Windows just return "group".
             """
@@ -471,10 +466,7 @@ class AbstractedFS(object):
             # if modification time > 6 months shows "month year"
             # else "month hh:mm";  this matches proftpd format, see:
             # https://github.com/giampaolo/pyftpdlib/issues/187
-            if (now - st.st_mtime) > SIX_MONTHS:
-                fmtstr = "%d  %Y"
-            else:
-                fmtstr = "%d %H:%M"
+            fmtstr = '%d  %Y' if now - st.st_mtime > SIX_MONTHS else '%d %H:%M'
             try:
                 mtimestr = "%s %s" % (_months_map[mtime.tm_mon],
                                       time.strftime(fmtstr, mtime))
@@ -549,7 +541,7 @@ class AbstractedFS(object):
         show_gid = 'unix.gid' in facts
         show_unique = 'unique' in facts
         for basename in listing:
-            retfacts = dict()
+            retfacts = {}
             if not PY3:
                 try:
                     file = os.path.join(basedir, basename)

@@ -2,7 +2,6 @@
 # Use of this source code is governed by MIT license that can be
 # found in the LICENSE file.
 
-import asynchat
 import contextlib
 import errno
 import glob
@@ -16,9 +15,10 @@ import traceback
 import warnings
 from datetime import datetime
 
+
 try:
-    import pwd
     import grp
+    import pwd
 except ImportError:
     pwd = grp = None
 
@@ -33,9 +33,10 @@ except ImportError:
     OrderedDict = dict
 
 from . import __ver__
+from ._compat import PY3
 from ._compat import b
 from ._compat import getcwdu
-from ._compat import PY3
+from ._compat import super
 from ._compat import u
 from ._compat import unicode
 from ._compat import xrange
@@ -55,6 +56,12 @@ from .log import debug
 from .log import logger
 
 
+if sys.version_info[:2] >= (3, 12):
+    from . import _asynchat as asynchat
+else:
+    import asynchat
+
+
 CR_BYTE = ord('\r')
 
 
@@ -69,6 +76,7 @@ def _import_sendfile():
         except AttributeError:
             try:
                 import sendfile as sf
+
                 # dirty hack to detect whether old 1.2.4 version is installed
                 if hasattr(sf, 'has_sf_hdtr'):
                     raise ImportError
@@ -294,7 +302,7 @@ class PassiveDTP(Acceptor):
         """Initialize the passive data server.
 
          - (instance) cmd_channel: the command channel class instance.
-         - (bool) extmode: wheter use extended passive mode response type.
+         - (bool) extmode: whether use extended passive mode response type.
         """
         self.cmd_channel = cmd_channel
         self.log = cmd_channel.log
@@ -313,6 +321,7 @@ class PassiveDTP(Acceptor):
             # dual stack IPv4/IPv6 support
             af = self.bind_af_unspecified((local_ip, 0))
             self.socket.close()
+            self.del_channel()
         else:
             af = self.cmd_channel.socket.family
 
@@ -393,14 +402,14 @@ class PassiveDTP(Acceptor):
                 except socket.error:
                     pass
                 msg = '425 Rejected data connection from foreign address ' \
-                      '%s:%s.' % (addr[0], addr[1])
+                    + '%s:%s.' % (addr[0], addr[1])
                 self.cmd_channel.respond_w_warning(msg)
                 # do not close listening socket: it couldn't be client's blame
                 return
             else:
                 # site-to-site FTP allowed
                 msg = 'Established data connection with foreign address ' \
-                      '%s:%s.' % (addr[0], addr[1])
+                    + '%s:%s.' % (addr[0], addr[1])
                 self.cmd_channel.log(msg, logfun=logger.warning)
         # Immediately close the current channel (we accept only one
         # connection at time) and avoid running out of max connections
@@ -445,7 +454,7 @@ class ActiveDTP(Connector):
     timeout = 30
 
     def __init__(self, ip, port, cmd_channel):
-        """Initialize the active data channel attemping to connect
+        """Initialize the active data channel attempting to connect
         to remote data socket.
 
          - (str) ip: the remote IP address.
@@ -462,7 +471,7 @@ class ActiveDTP(Connector):
                                                  self.handle_timeout,
                                                  _errback=self.handle_error)
 
-        if ip.count('.') == 4:
+        if ip.count('.') == 3:
             self._cmd = "PORT"
             self._normalized_addr = "%s:%s" % (ip, port)
         else:
@@ -478,11 +487,6 @@ class ActiveDTP(Connector):
 
     def readable(self):
         return False
-
-    def handle_write(self):
-        # overridden to prevent unhandled read/write event messages to
-        # be printed by asyncore on Python < 2.6
-        pass
 
     def handle_connect(self):
         """Called when connection is established."""
@@ -632,6 +636,14 @@ class DTPHandler(AsyncChat):
             return False
         if self.file_obj is None or not hasattr(self.file_obj, "fileno"):
             # directory listing or unusual file obj
+            return False
+        try:
+            # io.IOBase default implementation raises io.UnsupportedOperation
+            # UnsupportedOperation inherits ValueError
+            # also may raise ValueError if stream is closed
+            # https://docs.python.org/3/library/io.html#io.IOBase
+            self.file_obj.fileno()
+        except (OSError, ValueError):
             return False
         if self.cmd_channel._current_type != 'i':
             # text file transfer (need to transform file content on the fly)
@@ -822,7 +834,7 @@ class DTPHandler(AsyncChat):
         return not self.receive and asynchat.async_chat.writable(self)
 
     def handle_timeout(self):
-        """Called cyclically to check if data trasfer is stalling with
+        """Called cyclically to check if data transfer is stalling with
         no progress in which case the client is kicked off.
         """
         if self.get_transmitted_bytes() > self._lastdata:
@@ -921,7 +933,7 @@ if PY3:
     class _AsyncChatNewStyle(AsyncChat):
         pass
 else:
-    class _AsyncChatNewStyle(object, AsyncChat):
+    class _AsyncChatNewStyle(object, AsyncChat):  # noqa
 
         def __init__(self, *args, **kwargs):
             super(object, self).__init__(*args, **kwargs)  # bypass object
@@ -949,7 +961,7 @@ class ThrottledDTPHandler(_AsyncChatNewStyle, DTPHandler):
     auto_sized_buffers = True
 
     def __init__(self, sock, cmd_channel):
-        super(ThrottledDTPHandler, self).__init__(sock, cmd_channel)
+        super().__init__(sock, cmd_channel)
         self._timenext = 0
         self._datacount = 0
         self.sleeping = False
@@ -971,13 +983,13 @@ class ThrottledDTPHandler(_AsyncChatNewStyle, DTPHandler):
         return False
 
     def recv(self, buffer_size):
-        chunk = super(ThrottledDTPHandler, self).recv(buffer_size)
+        chunk = super().recv(buffer_size)
         if self.read_limit:
             self._throttle_bandwidth(len(chunk), self.read_limit)
         return chunk
 
     def send(self, data):
-        num_sent = super(ThrottledDTPHandler, self).send(data)
+        num_sent = super().send(data)
         if self.write_limit:
             self._throttle_bandwidth(num_sent, self.write_limit)
         return num_sent
@@ -1012,13 +1024,13 @@ class ThrottledDTPHandler(_AsyncChatNewStyle, DTPHandler):
 
     def close(self):
         self._cancel_throttler()
-        super(ThrottledDTPHandler, self).close()
+        super().close()
 
 
 # --- producers
 
 
-class FileProducer(object):
+class FileProducer:
     """Producer wrapper for file[-like] objects."""
 
     buffer_size = 65536
@@ -1069,7 +1081,7 @@ class FileProducer(object):
             return data
 
 
-class BufferedIteratorProducer(object):
+class BufferedIteratorProducer:
     """Producer for iterator objects with buffer capabilities."""
     # how many times iterator.next() will be called before
     # returning some data
@@ -1083,7 +1095,7 @@ class BufferedIteratorProducer(object):
         its next() method different times.
         """
         buffer = []
-        for x in xrange(self.loops):
+        for _ in xrange(self.loops):
             try:
                 buffer.append(next(self.iterator))
             except StopIteration:
@@ -1315,7 +1327,9 @@ class FTPHandler(AsyncChat):
             self._idler = self.ioloop.call_later(
                 self.timeout, self.handle_timeout, _errback=self.handle_error)
 
-    def get_repr_info(self, as_str=False, extra_info={}):
+    def get_repr_info(self, as_str=False, extra_info=None):
+        if extra_info is None:
+            extra_info = {}
         info = OrderedDict()
         info['id'] = id(self)
         info['addr'] = "%s:%s" % (self.remote_ip, self.remote_port)
@@ -1466,12 +1480,12 @@ class FTPHandler(AsyncChat):
                     self.log_cmd(cmd, arg, 500, msg)
                 return
 
-        if not arg and self.proto_cmds[cmd]['arg'] == True:  # NOQA
+        if not arg and self.proto_cmds[cmd]['arg'] is True:  # NOQA
             msg = "Syntax error: command needs an argument."
             self.respond("501 " + msg)
             self.log_cmd(cmd, "", 501, msg)
             return
-        if arg and self.proto_cmds[cmd]['arg'] == False:  # NOQA
+        if arg and self.proto_cmds[cmd]['arg'] is False:  # NOQA
             msg = "Syntax error: command does not accept arguments."
             self.respond("501 " + msg)
             self.log_cmd(cmd, arg, 501, msg)
@@ -1536,8 +1550,8 @@ class FTPHandler(AsyncChat):
 
                 if not self.fs.validpath(arg):
                     line = self.fs.fs2ftp(arg)
-                    msg = '"%s" points to a path which is outside ' \
-                          "the user's root directory" % line
+                    msg = "%r points to a path which is outside " % line
+                    msg += "the user's root directory"
                     self.respond("550 %s." % msg)
                     self.log_cmd(cmd, arg, 550, msg)
                     return
@@ -1660,12 +1674,12 @@ class FTPHandler(AsyncChat):
         """
 
     def on_file_sent(self, file):
-        """Called every time a file has been succesfully sent.
+        """Called every time a file has been successfully sent.
         "file" is the absolute name of the file just being sent.
         """
 
     def on_file_received(self, file):
-        """Called every time a file has been succesfully received.
+        """Called every time a file has been successfully received.
         "file" is the absolute name of the file just being received.
         """
 
@@ -1742,8 +1756,8 @@ class FTPHandler(AsyncChat):
 
     # --- utility
 
-    def push(self, s):
-        asynchat.async_chat.push(self, s.encode('utf8'))
+    def push(self, data):
+        asynchat.async_chat.push(self, data.encode('utf8'))
 
     def respond(self, resp, logfun=logger.debug):
         """Send a response to the client using the command channel."""
@@ -1837,7 +1851,7 @@ class FTPHandler(AsyncChat):
         logfun("%s %s" % (prefix, msg))
 
     def logline(self, msg, logfun=logger.debug):
-        """Log a line including additional indentifying session data.
+        """Log a line including additional identifying session data.
         By default this is disabled unless logging level == DEBUG.
         """
         if self._log_debug:
@@ -1845,7 +1859,7 @@ class FTPHandler(AsyncChat):
             logfun("%s %s" % (prefix, msg))
 
     def logerror(self, msg):
-        """Log an error including additional indentifying session data."""
+        """Log an error including additional identifying session data."""
         prefix = self.log_prefix % self.__dict__
         logger.error("%s %s" % (prefix, msg))
 
@@ -1899,7 +1913,7 @@ class FTPHandler(AsyncChat):
         """Log all file transfers in a standardized format.
 
          - (str) cmd:
-            the original command who caused the tranfer.
+            the original command who caused the transfer.
 
          - (str) filename:
             the absolutized name of the file on disk.
@@ -2085,7 +2099,7 @@ class FTPHandler(AsyncChat):
         # and choose to use IPv6 for the data channel.
         # But how could we use IPv6 on the data channel without knowing
         # which IPv6 address to use for binding the socket?
-        # Unfortunately RFC-2428 does not provide satisfing information
+        # Unfortunately RFC-2428 does not provide satisfying information
         # on how to do that.  The assumption is that we don't have any way
         # to know wich address to use, hence we just use the same address
         # family used on the control connection.
@@ -2290,12 +2304,14 @@ class FTPHandler(AsyncChat):
                 # the REST.
                 ok = 0
                 try:
-                    if rest_pos > self.fs.getsize(file):
+                    fsize = self.fs.getsize(file)
+                    if rest_pos > fsize:
                         raise ValueError
                     fd.seek(rest_pos)
                     ok = 1
                 except ValueError:
-                    why = "Invalid REST parameter"
+                    why = "REST position (%s) > file size (%s)" % (
+                        rest_pos, fsize)
                 except (EnvironmentError, FilesystemError) as err:
                     why = _strerror(err)
                 if not ok:
@@ -2318,10 +2334,7 @@ class FTPHandler(AsyncChat):
         # STOR: mode = 'w'
         # APPE: mode = 'a'
         # REST: mode = 'r+' (to permit seeking on file object)
-        if 'a' in mode:
-            cmd = 'APPE'
-        else:
-            cmd = 'STOR'
+        cmd = 'APPE' if 'a' in mode else 'STOR'
         rest_pos = self._restart_position
         self._restart_position = 0
         if rest_pos:
@@ -2342,12 +2355,14 @@ class FTPHandler(AsyncChat):
                 # specified in the REST.
                 ok = 0
                 try:
-                    if rest_pos > self.fs.getsize(file):
+                    fsize = self.fs.getsize(file)
+                    if rest_pos > fsize:
                         raise ValueError
                     fd.seek(rest_pos)
                     ok = 1
                 except ValueError:
-                    why = "Invalid REST parameter"
+                    why = "REST position (%s) > file size (%s)" % (
+                        rest_pos, fsize)
                 except (EnvironmentError, FilesystemError) as err:
                     why = _strerror(err)
                 if not ok:
@@ -2460,15 +2475,15 @@ class FTPHandler(AsyncChat):
     def ftp_ABOR(self, line):
         """Abort the current data transfer."""
         # ABOR received while no data channel exists
-        if (self._dtp_acceptor is None and
-                self._dtp_connector is None and
-                self.data_channel is None):
+        if self._dtp_acceptor is None and \
+                self._dtp_connector is None and \
+                self.data_channel is None:
             self.respond("225 No transfer to abort.")
             return
         else:
             # a PASV or PORT was received but connection wasn't made yet
-            if (self._dtp_acceptor is not None or
-                    self._dtp_connector is not None):
+            if self._dtp_acceptor is not None or \
+                    self._dtp_connector is not None:
                 self._shutdown_connecting_dtp()
                 resp = "225 ABOR command successful; data channel closed."
 
@@ -2551,7 +2566,7 @@ class FTPHandler(AsyncChat):
                     '%s.get_home_dir returned a non-unicode string; now '
                     'casting to unicode' % (
                         self.authorizer.__class__.__name__),
-                    RuntimeWarning)
+                    RuntimeWarning, stacklevel=2)
                 home = home.decode('utf8')
 
         if len(msg_login) <= 75:
@@ -2685,10 +2700,7 @@ class FTPHandler(AsyncChat):
         if not self.fs.isfile(self.fs.realpath(path)):
             self.respond("550 %s is not retrievable" % line)
             return
-        if self.use_gmt_times:
-            timefunc = time.gmtime
-        else:
-            timefunc = time.localtime
+        timefunc = time.gmtime if self.use_gmt_times else time.localtime
         try:
             secs = self.run_as_current_user(self.fs.getmtime, path)
             lmt = time.strftime("%Y%m%d%H%M%S", timefunc(secs))
@@ -2723,10 +2735,7 @@ class FTPHandler(AsyncChat):
         if not self.fs.isfile(self.fs.realpath(path)):
             self.respond("550 %s is not retrievable" % line)
             return
-        if self.use_gmt_times:
-            timefunc = time.gmtime
-        else:
-            timefunc = time.localtime
+        timefunc = time.gmtime if self.use_gmt_times else time.localtime
         try:
             # convert timeval string to epoch seconds
             epoch = datetime.utcfromtimestamp(0)
@@ -2803,7 +2812,7 @@ class FTPHandler(AsyncChat):
 
     def ftp_RNFR(self, path):
         """Rename the specified (only the source name is specified
-        here, see RNTO command)"""
+        here, see RNTO command)."""
         if not self.fs.lexists(path):
             self.respond("550 No such file or directory.")
         elif self.fs.realpath(path) == self.fs.realpath(self.fs.root):
@@ -2833,7 +2842,7 @@ class FTPHandler(AsyncChat):
 
         # --- others
     def ftp_TYPE(self, line):
-        """Set current type data type to binary/ascii"""
+        """Set current type data type to binary/ascii."""
         type = line.upper().replace(' ', '')
         if type in ("A", "L7"):
             self.respond("200 Type set to: ASCII.")
@@ -2901,10 +2910,7 @@ class FTPHandler(AsyncChat):
                     s.append("Waiting for username.")
                 else:
                     s.append("Waiting for password.")
-            if self._current_type == 'a':
-                type = 'ASCII'
-            else:
-                type = 'Binary'
+            type = 'ASCII' if self._current_type == 'a' else 'Binary'
             s.append("TYPE: %s; STRUcture: File; MODE: Stream" % type)
             if self._dtp_acceptor is not None:
                 s.append('Passive data channel waiting for connection.')
@@ -3001,7 +3007,7 @@ class FTPHandler(AsyncChat):
 
     def ftp_NOOP(self, line):
         """Do nothing."""
-        self.respond("200 I successfully done nothin'.")
+        self.respond("200 I successfully did nothing'.")
 
     def ftp_SYST(self, line):
         """Return system type (always returns UNIX type: L8)."""
@@ -3029,10 +3035,10 @@ class FTPHandler(AsyncChat):
             # provide a compact list of recognized commands
             def formatted_help():
                 cmds = []
-                keys = sorted([x for x in self.proto_cmds.keys()
+                keys = sorted([x for x in self.proto_cmds
                                if not x.startswith('SITE ')])
                 while keys:
-                    elems = tuple((keys[0:8]))
+                    elems = tuple(keys[0:8])
                     cmds.append(' %-6s' * len(elems) % elems + '\r\n')
                     del keys[0:8]
                 return ''.join(cmds)
@@ -3095,23 +3101,25 @@ class FTPHandler(AsyncChat):
     # ftp.exe) still use them.
 
     def ftp_XCUP(self, line):
-        "Change to the parent directory. Synonym for CDUP. Deprecated."
+        """Change to the parent directory. Synonym for CDUP. Deprecated."""
         return self.ftp_CDUP(line)
 
     def ftp_XCWD(self, line):
-        "Change the current working directory. Synonym for CWD. Deprecated."
+        """Change the current working directory. Synonym for CWD.
+        Deprecated."""
         return self.ftp_CWD(line)
 
     def ftp_XMKD(self, line):
-        "Create the specified directory. Synonym for MKD. Deprecated."
+        """Create the specified directory. Synonym for MKD. Deprecated."""
         return self.ftp_MKD(line)
 
     def ftp_XPWD(self, line):
-        "Return the current working directory. Synonym for PWD. Deprecated."
+        """Return the current working directory. Synonym for PWD.
+        Deprecated."""
         return self.ftp_PWD(line)
 
     def ftp_XRMD(self, line):
-        "Remove the specified directory. Synonym for RMD. Deprecated."
+        """Remove the specified directory. Synonym for RMD. Deprecated."""
         return self.ftp_RMD(line)
 
 
@@ -3131,18 +3139,18 @@ if SSL is not None:
         _ssl_requested = False
 
         def __init__(self, *args, **kwargs):
-            super(SSLConnection, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
             self._error = False
             self._ssl_want_read = False
             self._ssl_want_write = False
 
         def readable(self):
-            return self._ssl_want_read or \
-                super(SSLConnection, self).readable()
+            return self._ssl_accepting or \
+                self._ssl_want_read or \
+                super().readable()
 
         def writable(self):
-            return self._ssl_want_write or \
-                super(SSLConnection, self).writable()
+            return self._ssl_want_write or super().writable()
 
         def secure_connection(self, ssl_context):
             """Secure the connection switching from plain-text to
@@ -3210,11 +3218,19 @@ if SSL is not None:
                 debug("call: _do_ssl_handshake, err: %r" % err, inst=self)
                 retval, desc = err.args
                 if (retval == -1 and desc == 'Unexpected EOF') or retval > 0:
-                    return self.handle_close()
-                raise
+                    # Happens when the other side closes the socket before
+                    # completing the SSL handshake, e.g.:
+                    # client.sock.sendall(b"PORT ...\r\n")
+                    # client.getresp()
+                    # sock, _ = sock.accept()
+                    # sock.close()
+                    self.log("Unexpected SSL EOF.")
+                    self.close()
+                else:
+                    raise
             except SSL.Error as err:
                 debug("call: _do_ssl_handshake, err: %r" % err, inst=self)
-                return self.handle_failed_ssl_handshake()
+                self.handle_failed_ssl_handshake()
             else:
                 debug("SSL connection established", self)
                 self._ssl_accepting = False
@@ -3223,18 +3239,17 @@ if SSL is not None:
 
         def handle_ssl_established(self):
             """Called when SSL handshake has completed."""
-            pass
 
         def handle_ssl_shutdown(self):
             """Called when SSL shutdown() has completed."""
-            super(SSLConnection, self).close()
+            super().close()
 
         def handle_failed_ssl_handshake(self):
             raise NotImplementedError("must be implemented in subclass")
 
         def handle_read_event(self):
             if not self._ssl_requested:
-                super(SSLConnection, self).handle_read_event()
+                super().handle_read_event()
             else:
                 with self._handle_ssl_want_rw():
                     self._ssl_want_read = False
@@ -3243,11 +3258,11 @@ if SSL is not None:
                     elif self._ssl_closing:
                         self._do_ssl_shutdown()
                     else:
-                        super(SSLConnection, self).handle_read_event()
+                        super().handle_read_event()
 
         def handle_write_event(self):
             if not self._ssl_requested:
-                super(SSLConnection, self).handle_write_event()
+                super().handle_write_event()
             else:
                 with self._handle_ssl_want_rw():
                     self._ssl_want_write = False
@@ -3256,7 +3271,7 @@ if SSL is not None:
                     elif self._ssl_closing:
                         self._do_ssl_shutdown()
                     else:
-                        super(SSLConnection, self).handle_write_event()
+                        super().handle_write_event()
 
         def handle_error(self):
             self._error = True
@@ -3268,7 +3283,7 @@ if SSL is not None:
             # to rely on base class (FTPHandler or DTPHandler)
             # close() method as it does not imply SSL shutdown logic
             try:
-                super(SSLConnection, self).close()
+                super().close()
             except Exception:
                 logger.critical(traceback.format_exc())
 
@@ -3276,7 +3291,7 @@ if SSL is not None:
             if not isinstance(data, bytes):
                 data = bytes(data)
             try:
-                return super(SSLConnection, self).send(data)
+                return super().send(data)
             except SSL.WantReadError:
                 debug("call: send(), err: ssl-want-read", inst=self)
                 self._ssl_want_read = True
@@ -3285,26 +3300,26 @@ if SSL is not None:
                 debug("call: send(), err: ssl-want-write", inst=self)
                 self._ssl_want_write = True
                 return 0
-            except SSL.ZeroReturnError as err:
+            except SSL.ZeroReturnError:
                 debug(
                     "call: send() -> shutdown(), err: zero-return", inst=self)
-                super(SSLConnection, self).handle_close()
+                super().handle_close()
                 return 0
             except SSL.SysCallError as err:
                 debug("call: send(), err: %r" % err, inst=self)
                 errnum, errstr = err.args
                 if errnum == errno.EWOULDBLOCK:
                     return 0
-                elif (errnum in _ERRNOS_DISCONNECTED or
-                        errstr == 'Unexpected EOF'):
-                    super(SSLConnection, self).handle_close()
+                elif errnum in _ERRNOS_DISCONNECTED or \
+                        errstr == 'Unexpected EOF':
+                    super().handle_close()
                     return 0
                 else:
                     raise
 
         def recv(self, buffer_size):
             try:
-                return super(SSLConnection, self).recv(buffer_size)
+                return super().recv(buffer_size)
             except SSL.WantReadError:
                 debug("call: recv(), err: ssl-want-read", inst=self)
                 self._ssl_want_read = True
@@ -3313,17 +3328,17 @@ if SSL is not None:
                 debug("call: recv(), err: ssl-want-write", inst=self)
                 self._ssl_want_write = True
                 raise RetryError
-            except SSL.ZeroReturnError as err:
+            except SSL.ZeroReturnError:
                 debug("call: recv() -> shutdown(), err: zero-return",
                       inst=self)
-                super(SSLConnection, self).handle_close()
+                super().handle_close()
                 return b''
             except SSL.SysCallError as err:
                 debug("call: recv(), err: %r" % err, inst=self)
                 errnum, errstr = err.args
-                if (errnum in _ERRNOS_DISCONNECTED or
-                        errstr == 'Unexpected EOF'):
-                    super(SSLConnection, self).handle_close()
+                if errnum in _ERRNOS_DISCONNECTED or \
+                        errstr == 'Unexpected EOF':
+                    super().handle_close()
                     return b''
                 else:
                     raise
@@ -3348,7 +3363,7 @@ if SSL is not None:
                                      errno.ENOBUFS):
                         return
                     elif err.errno in _ERRNOS_DISCONNECTED:
-                        return super(SSLConnection, self).close()
+                        return super().close()
                     else:
                         raise
             # Ok, this a mess, but the underlying OpenSSL API simply
@@ -3372,7 +3387,7 @@ if SSL is not None:
                 laststate = self.socket.get_shutdown()
                 self.socket.set_shutdown(laststate | SSL.RECEIVED_SHUTDOWN)
                 done = self.socket.shutdown()
-                if not (laststate & SSL.RECEIVED_SHUTDOWN):
+                if not laststate & SSL.RECEIVED_SHUTDOWN:
                     self.socket.set_shutdown(SSL.SENT_SHUTDOWN)
             except SSL.WantReadError:
                 self._ssl_want_read = True
@@ -3380,18 +3395,18 @@ if SSL is not None:
             except SSL.WantWriteError:
                 self._ssl_want_write = True
                 debug("call: _do_ssl_shutdown, err: ssl-want-write", inst=self)
-            except SSL.ZeroReturnError as err:
+            except SSL.ZeroReturnError:
                 debug(
                     "call: _do_ssl_shutdown() -> shutdown(), err: zero-return",
                     inst=self)
-                super(SSLConnection, self).close()
+                super().close()
             except SSL.SysCallError as err:
                 debug("call: _do_ssl_shutdown() -> shutdown(), err: %r" % err,
                       inst=self)
                 errnum, errstr = err.args
-                if (errnum in _ERRNOS_DISCONNECTED or
-                        errstr == 'Unexpected EOF'):
-                    super(SSLConnection, self).close()
+                if errnum in _ERRNOS_DISCONNECTED or \
+                        errstr == 'Unexpected EOF':
+                    super().close()
                 else:
                     raise
             except SSL.Error as err:
@@ -3408,7 +3423,7 @@ if SSL is not None:
                 debug("call: _do_ssl_shutdown() -> shutdown(), err: %r" % err,
                       inst=self)
                 if err.errno in _ERRNOS_DISCONNECTED:
-                    super(SSLConnection, self).close()
+                    super().close()
                 else:
                     raise
             else:
@@ -3430,13 +3445,13 @@ if SSL is not None:
                 self._ssl_accepting = False
                 self._ssl_established = False
                 self._ssl_closing = False
-                super(SSLConnection, self).close()
+                super().close()
 
     class TLS_DTPHandler(SSLConnection, DTPHandler):
         """A DTPHandler subclass supporting TLS/SSL."""
 
         def __init__(self, sock, cmd_channel):
-            super(TLS_DTPHandler, self).__init__(sock, cmd_channel)
+            super().__init__(sock, cmd_channel)
             if self.cmd_channel._prot:
                 self.secure_connection(self.cmd_channel.ssl_context)
 
@@ -3447,7 +3462,7 @@ if SSL is not None:
             if isinstance(self.socket, SSL.Connection):
                 return False
             else:
-                return super(TLS_DTPHandler, self).use_sendfile()
+                return super().use_sendfile()
 
         def handle_failed_ssl_handshake(self):
             # TLS/SSL handshake failure, probably client's fault which
@@ -3497,7 +3512,7 @@ if SSL is not None:
             specific OpenSSL options. These default to:
             SSL.OP_NO_SSLv2 | SSL.OP_NO_SSLv3| SSL.OP_NO_COMPRESSION
             which are all considered insecure features.
-            Can be set to None in order to improve compatibilty with
+            Can be set to None in order to improve compatibility with
             older (insecure) FTP clients.
 
           - (instance) ssl_context:
@@ -3539,7 +3554,7 @@ if SSL is not None:
         })
 
         def __init__(self, conn, server, ioloop=None):
-            super(TLS_FTPHandler, self).__init__(conn, server, ioloop)
+            super().__init__(conn, server, ioloop)
             if not self.connected:
                 return
             self._extra_feats = ['AUTH TLS', 'AUTH SSL', 'PBSZ', 'PROT']
@@ -3556,10 +3571,6 @@ if SSL is not None:
                 if cls.certfile is None:
                     raise ValueError("at least certfile must be specified")
                 cls.ssl_context = SSL.Context(cls.ssl_protocol)
-                if cls.ssl_protocol != SSL.SSLv2_METHOD:
-                    cls.ssl_context.set_options(SSL.OP_NO_SSLv2)
-                else:
-                    warnings.warn("SSLv2 protocol is insecure", RuntimeWarning)
                 cls.ssl_context.use_certificate_chain_file(cls.certfile)
                 if not cls.keyfile:
                     cls.keyfile = cls.certfile
@@ -3590,6 +3601,10 @@ if SSL is not None:
                     return
             FTPHandler.process_command(self, cmd, *args, **kwargs)
 
+        def close(self):
+            SSLConnection.close(self)
+            FTPHandler.close(self)
+        
         # --- new methods
 
         def handle_failed_ssl_handshake(self):

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright (C) 2007 Giampaolo Rodola' <g.rodola@gmail.com>.
 # Use of this source code is governed by MIT license that can be
 # found in the LICENSE file.
@@ -9,19 +7,20 @@ import ftplib
 import inspect
 import socket
 import sys
+import unittest
 
 from pyftpdlib import handlers
 from pyftpdlib import servers
-from pyftpdlib.test import close_client
-from pyftpdlib.test import configure_logging
+from pyftpdlib._compat import super
+from pyftpdlib.test import GLOBAL_TIMEOUT
 from pyftpdlib.test import HOST
 from pyftpdlib.test import PASSWD
-from pyftpdlib.test import remove_test_files
-from pyftpdlib.test import ThreadedTestFTPd
-from pyftpdlib.test import TIMEOUT
-from pyftpdlib.test import unittest
 from pyftpdlib.test import USER
 from pyftpdlib.test import VERBOSITY
+from pyftpdlib.test import WINDOWS
+from pyftpdlib.test import PyftpdlibTestCase
+from pyftpdlib.test import ThreadedTestFTPd
+from pyftpdlib.test import close_client
 from pyftpdlib.test.test_functional import TestCornerCases
 from pyftpdlib.test.test_functional import TestFtpAbort
 from pyftpdlib.test.test_functional import TestFtpAuthentication
@@ -38,12 +37,13 @@ from pyftpdlib.test.test_functional import TestIPv6Environment
 MPROCESS_SUPPORT = hasattr(servers, 'MultiprocessFTPServer')
 
 
-class TestFTPServer(unittest.TestCase):
+class TestFTPServer(PyftpdlibTestCase):
     """Tests for *FTPServer classes."""
     server_class = ThreadedTestFTPd
     client_class = ftplib.FTP
 
     def setUp(self):
+        super().setUp()
         self.server = None
         self.client = None
 
@@ -52,7 +52,9 @@ class TestFTPServer(unittest.TestCase):
             close_client(self.client)
         if self.server is not None:
             self.server.stop()
+        super().tearDown()
 
+    @unittest.skipIf(WINDOWS, "POSIX only")
     def test_sock_instead_of_addr(self):
         # pass a socket object instead of an address tuple to FTPServer
         # constructor
@@ -62,7 +64,7 @@ class TestFTPServer(unittest.TestCase):
             ip, port = sock.getsockname()[:2]
             self.server = self.server_class(sock)
             self.server.start()
-            self.client = self.client_class(timeout=TIMEOUT)
+            self.client = self.client_class(timeout=GLOBAL_TIMEOUT)
             self.client.connect(ip, port)
             self.client.login(USER, PASSWD)
 
@@ -221,10 +223,6 @@ class TestCornerCasesMProcMixin(MProcFTPTestMixin, TestCornerCases):
 
 # class TestFTPServerMProcMixin(MProcFTPTestMixin, TestFTPServer):
 #     pass
-
-
-configure_logging()
-remove_test_files()
 
 
 def main():

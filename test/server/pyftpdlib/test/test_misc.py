@@ -1,35 +1,36 @@
-#!/usr/bin/env python
-
 # Copyright (C) 2007 Giampaolo Rodola' <g.rodola@gmail.com>.
 # Use of this source code is governed by MIT license that can be
 # found in the LICENSE file.
 
 import logging
+import os
 import sys
 import warnings
+
+
 try:
     from StringIO import StringIO as BytesIO
 except ImportError:
     from io import BytesIO
 
-from pyftpdlib._compat import PY3
-from pyftpdlib.servers import FTPServer
-from pyftpdlib.test import mock
-from pyftpdlib.test import safe_mkdir
-from pyftpdlib.test import safe_rmdir
-from pyftpdlib.test import TESTFN
-from pyftpdlib.test import unittest
-from pyftpdlib.test import VERBOSITY
 import pyftpdlib
 import pyftpdlib.__main__
+from pyftpdlib._compat import PY3
+from pyftpdlib._compat import super
+from pyftpdlib.servers import FTPServer
+from pyftpdlib.test import PyftpdlibTestCase
+from pyftpdlib.test import mock
+from pyftpdlib.test import safe_rmpath
 
 
-class TestCommandLineParser(unittest.TestCase):
+class TestCommandLineParser(PyftpdlibTestCase):
     """Test command line parser."""
     SYSARGV = sys.argv
     STDERR = sys.stderr
 
     def setUp(self):
+        super().setUp()
+
         class DummyFTPServer(FTPServer):
             """An overridden version of FTPServer class which forces
             serve_forever() to return immediately.
@@ -53,7 +54,7 @@ class TestCommandLineParser(unittest.TestCase):
         sys.argv = self.SYSARGV[:]
         sys.stderr = self.STDERR
         pyftpdlib.servers.FTPServer = self.original_ftpserver_class
-        safe_rmdir(TESTFN)
+        super().tearDown()
 
     def test_a_option(self):
         sys.argv += ["-i", "localhost", "-p", "0"]
@@ -92,8 +93,9 @@ class TestCommandLineParser(unittest.TestCase):
         self.assertRaises(SystemExit, pyftpdlib.__main__.main)
 
     def test_d_option(self):
-        sys.argv += ["-d", TESTFN, "-p", "0"]
-        safe_mkdir(TESTFN)
+        dirname = self.get_testfn()
+        os.mkdir(dirname)
+        sys.argv += ["-d", dirname, "-p", "0"]
         pyftpdlib.__main__.main()
 
         # without argument
@@ -104,8 +106,8 @@ class TestCommandLineParser(unittest.TestCase):
 
         # no such directory
         sys.argv = self.SYSARGV[:]
-        sys.argv += ["-d %s" % TESTFN]
-        safe_rmdir(TESTFN)
+        sys.argv += ["-d %s" % dirname]
+        safe_rmpath(dirname)
         self.assertRaises(ValueError, pyftpdlib.__main__.main)
 
     def test_r_option(self):
@@ -147,4 +149,5 @@ class TestCommandLineParser(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main(verbosity=VERBOSITY)
+    from pyftpdlib.test.runner import run_from_name
+    run_from_name(__file__)

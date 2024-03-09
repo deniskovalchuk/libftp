@@ -43,13 +43,12 @@ import time
 import traceback
 
 from .ioloop import Acceptor
-from .ioloop import IOLoop
+from .log import PREFIX
+from .log import PREFIX_MPROC
 from .log import config_logging
 from .log import debug
 from .log import is_logging_configured
 from .log import logger
-from .log import PREFIX
-from .log import PREFIX_MPROC
 from .prefork import fork_processes
 
 
@@ -161,11 +160,11 @@ class FTPServer(Acceptor):
         else:
             pasv_ports = None
         model = 'prefork + ' if prefork else ''
-        if ('ThreadedFTPServer' in __all__ and
-                issubclass(self.__class__, ThreadedFTPServer)):
+        if 'ThreadedFTPServer' in __all__ and \
+                issubclass(self.__class__, ThreadedFTPServer):
             model += 'multi-thread'
-        elif ('MultiprocessFTPServer' in __all__ and
-                issubclass(self.__class__, MultiprocessFTPServer)):
+        elif 'MultiprocessFTPServer' in __all__ and \
+                issubclass(self.__class__, MultiprocessFTPServer):
             model += 'multi-process'
         elif issubclass(self.__class__, FTPServer):
             model += 'async'
@@ -375,7 +374,7 @@ class _SpawnerBase(FTPServer):
 
     def _loop(self, handler):
         """Serve handler's IO loop in a separate thread or process."""
-        with IOLoop() as ioloop:
+        with self.ioloop.factory() as ioloop:
             handler.ioloop = ioloop
             try:
                 handler.add_channel()
@@ -402,7 +401,7 @@ class _SpawnerBase(FTPServer):
                         poll(timeout=soonest_timeout)
                     if ioloop.sched._tasks:
                         soonest_timeout = sched_poll()
-                        # Handle the case where socket_map is emty but some
+                        # Handle the case where socket_map is empty but some
                         # cancelled scheduled calls are still around causing
                         # this while loop to hog CPU resources.
                         # In theory this should never happen as all the sched
@@ -422,10 +421,10 @@ class _SpawnerBase(FTPServer):
                     # note: these two exceptions are raised in all sub
                     # processes
                     self._exit.set()
-                except select.error as err:
+                except OSError as err:
                     # on Windows we can get WSAENOTSOCK if the client
                     # rapidly connect and disconnects
-                    if os.name == 'nt' and err[0] == 10038:
+                    if os.name == 'nt' and err.winerror == 10038:
                         for fd in list(ioloop.socket_map.keys()):
                             try:
                                 select.select([fd], [], [], 0)
@@ -441,8 +440,8 @@ class _SpawnerBase(FTPServer):
                         raise
                 else:
                     if poll_timeout:
-                        if (soonest_timeout is None or
-                                soonest_timeout > poll_timeout):
+                        if soonest_timeout is None or \
+                                soonest_timeout > poll_timeout:
                             soonest_timeout = poll_timeout
 
     def handle_accepted(self, sock, addr):
@@ -535,10 +534,6 @@ class ThreadedFTPServer(_SpawnerBase):
     _lock = threading.Lock()
     _exit = threading.Event()
 
-    # compatibility with python <= 2.6
-    if not hasattr(_exit, 'is_set'):
-        _exit.is_set = _exit.isSet
-
     def _start_task(self, *args, **kwargs):
         return threading.Thread(*args, **kwargs)
 
@@ -547,7 +542,7 @@ if os.name == 'posix':
     try:
         import multiprocessing
         multiprocessing.Lock()
-    except Exception:
+    except Exception:  # noqa
         # see https://github.com/giampaolo/pyftpdlib/issues/496
         pass
     else:
