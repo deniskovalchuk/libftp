@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright (C) 2007 Giampaolo Rodola' <g.rodola@gmail.com>.
 # Use of this source code is governed by MIT license that can be
 # found in the LICENSE file.
@@ -8,34 +6,34 @@ import contextlib
 import errno
 import select
 import socket
-import sys
 import time
+import unittest
 
+import pyftpdlib.ioloop
 from pyftpdlib._compat import PY3
+from pyftpdlib._compat import super
 from pyftpdlib.ioloop import Acceptor
 from pyftpdlib.ioloop import AsyncChat
 from pyftpdlib.ioloop import IOLoop
 from pyftpdlib.ioloop import RetryError
-from pyftpdlib.test import mock
 from pyftpdlib.test import POSIX
-from pyftpdlib.test import unittest
-from pyftpdlib.test import VERBOSITY
-import pyftpdlib.ioloop
+from pyftpdlib.test import PyftpdlibTestCase
+from pyftpdlib.test import mock
 
 
 if hasattr(socket, 'socketpair'):
     socketpair = socket.socketpair
 else:
     def socketpair(family=socket.AF_INET, type=socket.SOCK_STREAM, proto=0):
-        with contextlib.closing(socket.socket(family, type, proto)) as l:
-            l.bind(("localhost", 0))
-            l.listen(5)
+        with contextlib.closing(socket.socket(family, type, proto)) as ls:
+            ls.bind(("localhost", 0))
+            ls.listen(5)
             c = socket.socket(family, type, proto)
             try:
-                c.connect(l.getsockname())
+                c.connect(ls.getsockname())
                 caddr = c.getsockname()
                 while True:
-                    a, addr = l.accept()
+                    a, addr = ls.accept()
                     # check that we've got the correct client
                     if addr == caddr:
                         return c, a
@@ -46,7 +44,7 @@ else:
 
 
 # TODO: write more tests.
-class BaseIOLoopTestCase(object):
+class BaseIOLoopTestCase:
 
     ioloop_class = None
 
@@ -107,7 +105,7 @@ class BaseIOLoopTestCase(object):
         class Handler(AsyncChat):
 
             def close(self):
-                1 / 0
+                1 / 0  # noqa
 
         s = self.ioloop_class()
         self.addCleanup(s.close)
@@ -151,7 +149,7 @@ class BaseIOLoopTestCase(object):
                 self.assertIn('ZeroDivisionError', logerr.call_args[0][0])
 
 
-class DefaultIOLoopTestCase(unittest.TestCase, BaseIOLoopTestCase):
+class DefaultIOLoopTestCase(PyftpdlibTestCase, BaseIOLoopTestCase):
     ioloop_class = pyftpdlib.ioloop.IOLoop
 
 
@@ -159,7 +157,7 @@ class DefaultIOLoopTestCase(unittest.TestCase, BaseIOLoopTestCase):
 # select()
 # ===================================================================
 
-class SelectIOLoopTestCase(unittest.TestCase, BaseIOLoopTestCase):
+class SelectIOLoopTestCase(PyftpdlibTestCase, BaseIOLoopTestCase):
     ioloop_class = pyftpdlib.ioloop.Select
 
     def test_select_eintr(self):
@@ -183,11 +181,10 @@ class SelectIOLoopTestCase(unittest.TestCase, BaseIOLoopTestCase):
 
 @unittest.skipUnless(hasattr(pyftpdlib.ioloop, 'Poll'),
                      "poll() not available on this platform")
-class PollIOLoopTestCase(unittest.TestCase, BaseIOLoopTestCase):
+class PollIOLoopTestCase(PyftpdlibTestCase, BaseIOLoopTestCase):
     ioloop_class = getattr(pyftpdlib.ioloop, "Poll", None)
     poller_mock = "pyftpdlib.ioloop.Poll._poller"
 
-    @unittest.skipIf(sys.version_info[:2] == (3, 2), "")
     def test_eintr_on_poll(self):
         # EINTR is supposed to be ignored
         with mock.patch(self.poller_mock, return_vaue=mock.Mock()) as m:
@@ -263,7 +260,7 @@ class EpollIOLoopTestCase(PollIOLoopTestCase):
 
 @unittest.skipUnless(hasattr(pyftpdlib.ioloop, 'DevPoll'),
                      "/dev/poll not available on this platform (Solaris only)")
-class DevPollIOLoopTestCase(unittest.TestCase, BaseIOLoopTestCase):
+class DevPollIOLoopTestCase(PyftpdlibTestCase, BaseIOLoopTestCase):
     ioloop_class = getattr(pyftpdlib.ioloop, "DevPoll", None)
 
 
@@ -273,14 +270,15 @@ class DevPollIOLoopTestCase(unittest.TestCase, BaseIOLoopTestCase):
 
 @unittest.skipUnless(hasattr(pyftpdlib.ioloop, 'Kqueue'),
                      "/dev/poll not available on this platform (BSD only)")
-class KqueueIOLoopTestCase(unittest.TestCase, BaseIOLoopTestCase):
+class KqueueIOLoopTestCase(PyftpdlibTestCase, BaseIOLoopTestCase):
     ioloop_class = getattr(pyftpdlib.ioloop, "Kqueue", None)
 
 
-class TestCallLater(unittest.TestCase):
+class TestCallLater(PyftpdlibTestCase):
     """Tests for CallLater class."""
 
     def setUp(self):
+        super().setUp()
         self.ioloop = IOLoop.instance()
         for task in self.ioloop.sched._tasks:
             if not task.cancelled:
@@ -308,22 +306,22 @@ class TestCallLater(unittest.TestCase):
 
     def test_order(self):
         def fun(x):
-            l.append(x)
+            ls.append(x)
 
-        l = []
+        ls = []
         for x in [0.05, 0.04, 0.03, 0.02, 0.01]:
             self.ioloop.call_later(x, fun, x)
         self.scheduler()
-        self.assertEqual(l, [0.01, 0.02, 0.03, 0.04, 0.05])
+        self.assertEqual(ls, [0.01, 0.02, 0.03, 0.04, 0.05])
 
     # The test is reliable only on those systems where time.time()
     # provides time with a better precision than 1 second.
     if not str(time.time()).endswith('.0'):
         def test_reset(self):
             def fun(x):
-                l.append(x)
+                ls.append(x)
 
-            l = []
+            ls = []
             self.ioloop.call_later(0.01, fun, 0.01)
             self.ioloop.call_later(0.02, fun, 0.02)
             self.ioloop.call_later(0.03, fun, 0.03)
@@ -332,27 +330,27 @@ class TestCallLater(unittest.TestCase):
             time.sleep(0.1)
             x.reset()
             self.scheduler()
-            self.assertEqual(l, [0.01, 0.02, 0.03, 0.05, 0.04])
+            self.assertEqual(ls, [0.01, 0.02, 0.03, 0.05, 0.04])
 
     def test_cancel(self):
         def fun(x):
-            l.append(x)
+            ls.append(x)
 
-        l = []
+        ls = []
         self.ioloop.call_later(0.01, fun, 0.01).cancel()
         self.ioloop.call_later(0.02, fun, 0.02)
         self.ioloop.call_later(0.03, fun, 0.03)
         self.ioloop.call_later(0.04, fun, 0.04)
         self.ioloop.call_later(0.05, fun, 0.05).cancel()
         self.scheduler()
-        self.assertEqual(l, [0.02, 0.03, 0.04])
+        self.assertEqual(ls, [0.02, 0.03, 0.04])
 
     def test_errback(self):
-        l = []
+        ls = []
         self.ioloop.call_later(
-            0.0, lambda: 1 // 0, _errback=lambda: l.append(True))
+            0.0, lambda: 1 // 0, _errback=lambda: ls.append(True))
         self.scheduler()
-        self.assertEqual(l, [True])
+        self.assertEqual(ls, [True])
 
     def test__repr__(self):
         repr(self.ioloop.call_later(0.01, lambda: 0, 0.01))
@@ -360,18 +358,19 @@ class TestCallLater(unittest.TestCase):
     def test__lt__(self):
         a = self.ioloop.call_later(0.01, lambda: 0, 0.01)
         b = self.ioloop.call_later(0.02, lambda: 0, 0.02)
-        self.assertTrue(a < b)
+        self.assertLess(a, b)
 
     def test__le__(self):
         a = self.ioloop.call_later(0.01, lambda: 0, 0.01)
         b = self.ioloop.call_later(0.02, lambda: 0, 0.02)
-        self.assertTrue(a <= b)
+        self.assertLessEqual(a, b)
 
 
-class TestCallEvery(unittest.TestCase):
+class TestCallEvery(PyftpdlibTestCase):
     """Tests for CallEvery class."""
 
     def setUp(self):
+        super().setUp()
         self.ioloop = IOLoop.instance()
         for task in self.ioloop.sched._tasks:
             if not task.cancelled:
@@ -399,68 +398,68 @@ class TestCallEvery(unittest.TestCase):
     def test_only_once(self):
         # make sure that callback is called only once per-loop
         def fun():
-            l1.append(None)
+            ls.append(None)
 
-        l1 = []
+        ls = []
         self.ioloop.call_every(0, fun)
         self.ioloop.sched.poll()
-        self.assertEqual(l1, [None])
+        self.assertEqual(ls, [None])
 
     def test_multi_0_timeout(self):
         # make sure a 0 timeout callback is called as many times
         # as the number of loops
         def fun():
-            l.append(None)
+            ls.append(None)
 
-        l = []
+        ls = []
         self.ioloop.call_every(0, fun)
-        for x in range(100):
+        for _ in range(100):
             self.ioloop.sched.poll()
-        self.assertEqual(len(l), 100)
+        self.assertEqual(len(ls), 100)
 
     # run it on systems where time.time() has a higher precision
     if POSIX:
         def test_low_and_high_timeouts(self):
             # make sure a callback with a lower timeout is called more
             # frequently than another with a greater timeout
-            def fun():
+            def fun_1():
                 l1.append(None)
 
             l1 = []
-            self.ioloop.call_every(0.001, fun)
+            self.ioloop.call_every(0.001, fun_1)
             self.scheduler()
 
-            def fun():
+            def fun_2():
                 l2.append(None)
 
             l2 = []
-            self.ioloop.call_every(0.005, fun)
+            self.ioloop.call_every(0.005, fun_2)
             self.scheduler(timeout=0.01)
 
-            self.assertTrue(len(l1) > len(l2))
+            self.assertGreater(len(l1), len(l2))
 
     def test_cancel(self):
         # make sure a cancelled callback doesn't get called anymore
         def fun():
-            l.append(None)
+            ls.append(None)
 
-        l = []
+        ls = []
         call = self.ioloop.call_every(0.001, fun)
         self.scheduler()
-        len_l = len(l)
+        len_l = len(ls)
         call.cancel()
         self.scheduler()
-        self.assertEqual(len_l, len(l))
+        self.assertEqual(len_l, len(ls))
 
     def test_errback(self):
-        l = []
+        ls = []
         self.ioloop.call_every(
-            0.0, lambda: 1 // 0, _errback=lambda: l.append(True))
+            0.0, lambda: 1 // 0, _errback=lambda: ls.append(True))
         self.scheduler()
-        self.assertTrue(l)
+        self.assertTrue(ls)
 
 
-class TestAsyncChat(unittest.TestCase):
+class TestAsyncChat(PyftpdlibTestCase):
 
     def get_connected_handler(self):
         s = socket.socket()
@@ -516,7 +515,7 @@ class TestAsyncChat(unittest.TestCase):
             self.assertIsNone(ac.socket)
 
 
-class TestAcceptor(unittest.TestCase):
+class TestAcceptor(PyftpdlibTestCase):
 
     def test_bind_af_unspecified_err(self):
         ac = Acceptor()
@@ -548,4 +547,5 @@ class TestAcceptor(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main(verbosity=VERBOSITY)
+    from pyftpdlib.test.runner import run_from_name
+    run_from_name(__file__)

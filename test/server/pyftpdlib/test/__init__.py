@@ -3,42 +3,64 @@
 # found in the LICENSE file.
 
 from __future__ import print_function
+
+import atexit
 import contextlib
-import errno
 import functools
 import logging
 import multiprocessing
 import os
 import shutil
 import socket
+import stat
 import sys
 import tempfile
 import threading
 import time
-try:
-    from unittest import mock  # py3
-except ImportError:
-    import mock  # NOQA - requires "pip install mock"
-
-from pyftpdlib._compat import getcwdu
-from pyftpdlib._compat import u
-from pyftpdlib.authorizers import DummyAuthorizer
-from pyftpdlib.handlers import _import_sendfile
-from pyftpdlib.handlers import FTPHandler
-from pyftpdlib.ioloop import IOLoop
-from pyftpdlib.servers import FTPServer
+import unittest
+import warnings
 
 import psutil
 
-if sys.version_info < (2, 7):
-    import unittest2 as unittest  # pip install unittest2
-else:
-    import unittest
+from pyftpdlib._compat import PY3
+from pyftpdlib._compat import FileNotFoundError
+from pyftpdlib._compat import getcwdu
+from pyftpdlib._compat import super
+from pyftpdlib.authorizers import DummyAuthorizer
+from pyftpdlib.handlers import FTPHandler
+from pyftpdlib.handlers import _import_sendfile
+from pyftpdlib.ioloop import IOLoop
+from pyftpdlib.servers import FTPServer
 
-if not hasattr(unittest.TestCase, "assertRaisesRegex"):
-    unittest.TestCase.assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
+
+try:
+    from unittest import mock  # py3
+except ImportError:
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        import mock  # NOQA - requires "pip install mock"
+
 
 sendfile = _import_sendfile()
+
+
+# --- platforms
+
+HERE = os.path.realpath(os.path.abspath(os.path.dirname(__file__)))
+ROOT_DIR = os.path.realpath(os.path.join(HERE, '..', '..'))
+PYPY = '__pypy__' in sys.builtin_module_names
+# whether we're running this test suite on a Continuous Integration service
+APPVEYOR = 'APPVEYOR' in os.environ
+GITHUB_ACTIONS = 'GITHUB_ACTIONS' in os.environ or 'CIBUILDWHEEL' in os.environ
+CI_TESTING = APPVEYOR or GITHUB_ACTIONS
+COVERAGE = 'COVERAGE_RUN' in os.environ
+# are we a 64 bit process?
+IS_64BIT = sys.maxsize > 2 ** 32
+OSX = sys.platform.startswith("darwin")
+POSIX = os.name == 'posix'
+WINDOWS = os.name == 'nt'
+LOG_FMT = "[%(levelname)1.1s t: %(threadName)-15s p: %(processName)-25s "
+LOG_FMT += "@%(module)-12s: %(lineno)-4s] %(message)s"
 
 
 # Attempt to use IP rather than hostname (test suite will run a lot faster)
@@ -46,34 +68,58 @@ try:
     HOST = socket.gethostbyname('localhost')
 except socket.error:
     HOST = 'localhost'
+
 USER = 'user'
 PASSWD = '12345'
 HOME = getcwdu()
-TESTFN = 'tmp-pyftpdlib'
-TESTFN_UNICODE = TESTFN + '-unicode-' + '\xe2\x98\x83'
-TESTFN_UNICODE_2 = TESTFN_UNICODE + '-2'
-TIMEOUT = 2
+# Use PID to disambiguate file name for parallel testing.
+TESTFN_PREFIX = 'pyftpd-tmp-%s-' % os.getpid()
+GLOBAL_TIMEOUT = 2
 BUFSIZE = 1024
 INTERRUPTED_TRANSF_SIZE = 32768
 NO_RETRIES = 5
-OSX = sys.platform.startswith("darwin")
-POSIX = os.name == 'posix'
-WINDOWS = os.name == 'nt'
-TRAVIS = bool(os.environ.get('TRAVIS'))
 VERBOSITY = 1 if os.getenv('SILENT') else 2
 
+if CI_TESTING:
+    GLOBAL_TIMEOUT *= 3
+    NO_RETRIES *= 3
 
-class TestCase(unittest.TestCase):
+
+class PyftpdlibTestCase(unittest.TestCase):
+    """All test classes inherit from this one."""
+
+    def setUp(self):
+        self._test_ctx = {}
+        self._test_ctx["threads"] = set(threading.enumerate())
+
+    def tearDown(self):
+        if not hasattr(self, "_test_ctx"):
+            raise AssertionError("super().setUp() was not called for this "
+                                 "test class")
+        threads = set(threading.enumerate())
+        if len(threads) > len(self._test_ctx["threads"]):
+            extra = threads - self._test_ctx["threads"]
+            raise AssertionError("%s orphaned thread(s) were left "
+                                 "behind: %r" % (len(extra), extra))
 
     def __str__(self):
+        # Print a full path representation of the single unit tests
+        # being run.
+        fqmod = self.__class__.__module__
+        if not fqmod.startswith('pyftpdlib.'):
+            fqmod = 'pyftpdlib.test.' + fqmod
         return "%s.%s.%s" % (
-            self.__class__.__module__, self.__class__.__name__,
-            self._testMethodName)
+            fqmod, self.__class__.__name__, self._testMethodName)
 
+    # assertRaisesRegexp renamed to assertRaisesRegex in 3.3;
+    # add support for the new name.
+    if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
+        assertRaisesRegex = unittest.TestCase.assertRaisesRegexp  # noqa
 
-# Hack that overrides default unittest.TestCase in order to print
-# a full path representation of the single unit tests being run.
-unittest.TestCase = TestCase
+    def get_testfn(self, suffix="", dir=None):
+        fname = get_testfn(suffix=suffix, dir=dir)
+        self.addCleanup(safe_rmpath, fname)
+        return fname
 
 
 def close_client(session):
@@ -82,7 +128,7 @@ def close_client(session):
         if session.sock is not None:
             try:
                 resp = session.quit()
-            except Exception:
+            except Exception:  # noqa
                 pass
             else:
                 # ...just to make sure the server isn't replying to some
@@ -109,36 +155,52 @@ SUPPORTS_IPV6 = socket.has_ipv6 and try_address('::1', family=socket.AF_INET6)
 SUPPORTS_SENDFILE = hasattr(os, 'sendfile') or sendfile is not None
 
 
-def safe_remove(*files):
-    "Convenience function for removing temporary test files"
-    for file in files:
-        try:
-            os.remove(file)
-        except OSError as err:
-            if os.name == 'nt':
-                return
-            if err.errno != errno.ENOENT:
-                raise
+def get_testfn(suffix="", dir=None):
+    """Return an absolute pathname of a file or dir that did not
+    exist at the time this call is made. Also schedule it for safe
+    deletion at interpreter exit. It's technically racy but probably
+    not really due to the time variant.
+    """
+    if dir is None:
+        dir = os.getcwd()
+    while True:
+        name = tempfile.mktemp(prefix=TESTFN_PREFIX, suffix=suffix, dir=dir)
+        if not os.path.exists(name):  # also include dirs
+            return os.path.basename(name)
 
 
-def safe_rmdir(dir):
-    "Convenience function for removing temporary test directories"
+def safe_rmpath(path):
+    """Convenience function for removing temporary test files or dirs."""
+    def retry_fun(fun):
+        # On Windows it could happen that the file or directory has
+        # open handles or references preventing the delete operation
+        # to succeed immediately, so we retry for a while. See:
+        # https://bugs.python.org/issue33240
+        stop_at = time.time() + GLOBAL_TIMEOUT
+        while time.time() < stop_at:
+            try:
+                return fun()
+            except FileNotFoundError:
+                pass
+            except WindowsError as _:
+                err = _
+                warnings.warn("ignoring %s" % str(err), UserWarning,
+                              stacklevel=2)
+            time.sleep(0.01)
+        raise err
+
     try:
-        os.rmdir(dir)
-    except OSError as err:
-        if os.name == 'nt':
-            return
-        if err.errno != errno.ENOENT:
-            raise
-
-
-def safe_mkdir(dir):
-    "Convenience function for creating a directory"
-    try:
-        os.mkdir(dir)
-    except OSError as err:
-        if err.errno != errno.EEXIST:
-            raise
+        st = os.stat(path)
+        if stat.S_ISDIR(st.st_mode):
+            fun = functools.partial(shutil.rmtree, path)
+        else:
+            fun = functools.partial(os.remove, path)
+        if POSIX:
+            fun()
+        else:
+            retry_fun(fun)
+    except FileNotFoundError:
+        pass
 
 
 def touch(name):
@@ -147,22 +209,15 @@ def touch(name):
         return f.name
 
 
-def remove_test_files():
-    """Remove files and directores created during tests."""
-    for name in os.listdir(u('.')):
-        if name.startswith(tempfile.template):
-            if os.path.isdir(name):
-                shutil.rmtree(name)
-            else:
-                safe_remove(name)
-
-
 def configure_logging():
     """Set pyftpdlib logger to "WARNING" level."""
-    channel = logging.StreamHandler()
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(fmt=LOG_FMT)
+    handler.setFormatter(formatter)
     logger = logging.getLogger('pyftpdlib')
     logger.setLevel(logging.WARNING)
-    logger.addHandler(channel)
+    logger.addHandler(handler)
+
 
 
 def disable_log_warning(fun):
@@ -181,40 +236,96 @@ def disable_log_warning(fun):
 
 def cleanup():
     """Cleanup function executed on interpreter exit."""
-    remove_test_files()
     map = IOLoop.instance().socket_map
     for x in list(map.values()):
         try:
             sys.stderr.write("garbage: %s\n" % repr(x))
             x.close()
-        except Exception:
+        except Exception:  # noqa
             pass
     map.clear()
 
 
-def retry_on_failure(ntimes=None):
-    """Decorator to retry a test in case of failure."""
-    def decorator(fun):
+class retry:
+    """A retry decorator."""
+
+    def __init__(self,
+                 exception=Exception,
+                 timeout=None,
+                 retries=None,
+                 interval=0.001,
+                 logfun=None,
+                 ):
+        if timeout and retries:
+            raise ValueError("timeout and retries args are mutually exclusive")
+        self.exception = exception
+        self.timeout = timeout
+        self.retries = retries
+        self.interval = interval
+        self.logfun = logfun
+
+    def __iter__(self):
+        if self.timeout:
+            stop_at = time.time() + self.timeout
+            while time.time() < stop_at:
+                yield
+        elif self.retries:
+            for _ in range(self.retries):
+                yield
+        else:
+            while True:
+                yield
+
+    def sleep(self):
+        if self.interval is not None:
+            time.sleep(self.interval)
+
+    def __call__(self, fun):
         @functools.wraps(fun)
-        def wrapper(*args, **kwargs):
-            for x in range(ntimes or NO_RETRIES):
+        def wrapper(cls, *args, **kwargs):
+            exc = None
+            for _ in self:
                 try:
-                    return fun(*args, **kwargs)
-                except AssertionError as _:
-                    err = _
-            raise err
+                    return fun(cls, *args, **kwargs)
+                except self.exception as _:
+                    exc = _
+                    if self.logfun is not None:
+                        self.logfun(exc)
+                    self.sleep()
+                    if isinstance(cls, unittest.TestCase):
+                        cls.tearDown()
+                        cls.setUp()
+                    continue
+            if PY3:
+                raise exc
+            else:
+                raise
+
+        # This way the user of the decorated function can change config
+        # parameters.
+        wrapper.decorator = self
         return wrapper
-    return decorator
 
 
-def call_until(fun, expr, timeout=TIMEOUT):
+def retry_on_failure(retries=NO_RETRIES):
+    """Decorator which runs a test function and retries N times before
+    actually failing.
+    """
+    def logfun(exc):
+        print("%r, retrying" % exc, file=sys.stderr)  # NOQA
+
+    return retry(exception=AssertionError, timeout=None, retries=retries,
+                 logfun=logfun)
+
+
+def call_until(fun, expr, timeout=GLOBAL_TIMEOUT):
     """Keep calling function for timeout secs and exit if eval()
     expression is True.
     """
     stop_at = time.time() + timeout
     while time.time() < stop_at:
         ret = fun()
-        if eval(expr):
+        if eval(expr):  # noqa
             return ret
         time.sleep(0.001)
     raise RuntimeError('timed out (ret=%r)' % ret)
@@ -241,7 +352,7 @@ def setup_server(handler, server_class, addr=None):
     authorizer.add_anonymous(HOME)
     handler.authorizer = authorizer
     handler.auth_failed_timeout = 0.001
-    # lower buffer sizes = more "loops" while transfering data
+    # lower buffer sizes = more "loops" while transferring data
     # = less false positives
     handler.dtp_handler.ac_in_buffer_size = 4096
     handler.dtp_handler.ac_out_buffer_size = 4096
@@ -249,19 +360,29 @@ def setup_server(handler, server_class, addr=None):
     return server
 
 
-def assert_free_resources():
+def assert_free_resources(parent_pid=None):
+    # check orphaned threads
     ts = threading.enumerate()
     assert len(ts) == 1, ts
-    p = psutil.Process()
-    children = p.children()
+    # check orphaned process children
+    this_proc = psutil.Process(parent_pid or os.getpid())
+    children = this_proc.children()
     if children:
-        for p in children:
-            p.kill()
-            p.wait(1)
-        assert not children, children
-    cons = [x for x in p.connections('tcp')
-            if x.status != psutil.CONN_CLOSE_WAIT]
-    assert not cons, cons
+        warnings.warn("some children didn't terminate %r" % str(children),
+                      UserWarning, stacklevel=2)
+        for child in children:
+            try:
+                child.kill()
+                child.wait(GLOBAL_TIMEOUT)
+            except psutil.NoSuchProcess:
+                pass
+    # check unclosed connections
+    if POSIX:
+        cons = [x for x in this_proc.connections('tcp')
+                if x.status != psutil.CONN_CLOSE_WAIT]
+        if cons:
+            warnings.warn("some connections didn't close %r" % str(cons),
+                          UserWarning, stacklevel=2)
 
 
 def reset_server_opts():
@@ -269,7 +390,6 @@ def reset_server_opts():
     # we reset them at module.class level.
     import pyftpdlib.handlers
     import pyftpdlib.servers
-    from pyftpdlib.handlers import _import_sendfile
 
     # Control handlers.
     tls_handler = getattr(pyftpdlib.handlers, "TLS_FTPHandler",
@@ -309,7 +429,7 @@ def reset_server_opts():
     # Acceptors.
     ls = [pyftpdlib.servers.FTPServer,
           pyftpdlib.servers.ThreadedFTPServer]
-    if os.name == 'posix':
+    if POSIX:
         ls.append(pyftpdlib.servers.MultiprocessFTPServer)
     for klass in ls:
         klass.max_cons = 0
@@ -324,12 +444,13 @@ class ThreadedTestFTPd(threading.Thread):
     """
     handler = FTPHandler
     server_class = FTPServer
-    poll_interval = 0.001 if TRAVIS else 0.000001
+    poll_interval = 0.001 if CI_TESTING else 0.000001
     # Makes the thread stop on interpreter exit.
     daemon = True
 
     def __init__(self, addr=None):
-        super(ThreadedTestFTPd, self).__init__(name='test-ftpd')
+        self.parent_pid = os.getpid()
+        super().__init__(name='test-ftpd')
         self.server = setup_server(self.handler, self.server_class, addr=addr)
         self.host, self.port = self.server.socket.getsockname()[:2]
 
@@ -352,28 +473,41 @@ class ThreadedTestFTPd(threading.Thread):
         self.server.close_all()
         self.join()
         reset_server_opts()
-        assert_free_resources()
+        assert_free_resources(self.parent_pid)
 
 
-class MProcessTestFTPd(multiprocessing.Process):
-    """Same as above but using a sub process instead."""
-    handler = FTPHandler
-    server_class = FTPServer
+if POSIX:
+    class MProcessTestFTPd(multiprocessing.Process):
+        """Same as above but using a sub process instead."""
+        handler = FTPHandler
+        server_class = FTPServer
 
-    def __init__(self, addr=None):
-        super(MProcessTestFTPd, self).__init__(name='test-ftpd')
-        self.server = setup_server(self.handler, self.server_class, addr=addr)
-        self.host, self.port = self.server.socket.getsockname()[:2]
-        self._started = False
+        def __init__(self, addr=None):
+            super().__init__()
+            self.server = setup_server(
+                self.handler, self.server_class, addr=addr)
+            self.host, self.port = self.server.socket.getsockname()[:2]
+            self._started = False
 
-    def run(self):
-        assert not self._started
-        self._started = True
-        self.server.serve_forever()
+        def run(self):
+            assert not self._started
+            self._started = True
+            self.name = "%s(%s)" % (self.__class__.__name__, self.pid)
+            self.server.serve_forever()
 
-    def stop(self):
-        self.server.close_all()
-        self.terminate()
-        self.join()
-        reset_server_opts()
-        assert_free_resources()
+        def stop(self):
+            self.server.close_all()
+            self.terminate()
+            self.join()
+            reset_server_opts()
+            assert_free_resources()
+else:
+    # Windows
+    MProcessTestFTPd = ThreadedTestFTPd
+
+
+@atexit.register
+def exit_cleanup():
+    for name in os.listdir(ROOT_DIR):
+        if name.startswith(TESTFN_PREFIX):
+            safe_rmpath(os.path.join(ROOT_DIR, name))

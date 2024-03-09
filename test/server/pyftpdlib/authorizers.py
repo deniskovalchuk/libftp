@@ -20,12 +20,11 @@ interact with UNIX and Windows password database.
 
 import errno
 import os
-import sys
 import warnings
 
 from ._compat import PY3
-from ._compat import unicode
 from ._compat import getcwdu
+from ._compat import unicode
 
 
 __all__ = ['DummyAuthorizer',
@@ -50,7 +49,7 @@ class AuthenticationFailed(Exception):
 # --- base class
 # ===================================================================
 
-class DummyAuthorizer(object):
+class DummyAuthorizer:
     """Basic "dummy" authorizer class, suitable for subclassing to
     create your own custom authorizers.
 
@@ -206,7 +205,7 @@ class DummyAuthorizer(object):
             return perm in self.user_table[username]['perm']
 
         path = os.path.normcase(path)
-        for dir in self.user_table[username]['operms'].keys():
+        for dir in self.user_table[username]['operms']:
             operm, recursive = self.user_table[username]['operms'][dir]
             if self._issubpath(path, dir):
                 if recursive:
@@ -237,11 +236,11 @@ class DummyAuthorizer(object):
         for p in perm:
             if p not in self.read_perms + self.write_perms:
                 raise ValueError('no such permission %r' % p)
-            if (username == 'anonymous' and
-                    p in self.write_perms and not
-                    warned):
+            if username == 'anonymous' and \
+                    p in self.write_perms and not \
+                    warned:
                 warnings.warn("write permissions assigned to anonymous user.",
-                              RuntimeWarning)
+                              RuntimeWarning, stacklevel=2)
                 warned = 1
 
     def _issubpath(self, a, b):
@@ -268,7 +267,7 @@ def replace_anonymous(callable):
 # --- platform specific authorizers
 # ===================================================================
 
-class _Base(object):
+class _Base:
     """Methods common to both Unix and Windows authorizers.
     Not supposed to be used directly.
     """
@@ -381,7 +380,7 @@ else:
     PROCESS_UID = os.getuid()
     PROCESS_GID = os.getgid()
 
-    class BaseUnixAuthorizer(object):
+    class BaseUnixAuthorizer:
         """An authorizer compatible with Unix user account and password
         database.
         This class should not be used directly unless for subclassing.
@@ -395,7 +394,7 @@ else:
 
             if self.anonymous_user is not None:
                 try:
-                    pwd.getpwnam(self.anonymous_user).pw_dir
+                    pwd.getpwnam(self.anonymous_user).pw_dir  # noqa
                 except KeyError:
                     raise AuthorizerError('no such user %s' % anonymous_user)
 
@@ -613,7 +612,7 @@ else:
             in /etc/shells. If /etc/shells can't be found return True.
             """
             try:
-                file = open('/etc/shells', 'r')
+                file = open('/etc/shells')
             except IOError as err:
                 if err.errno == errno.ENOENT:
                     return True
@@ -646,15 +645,15 @@ try:
     import win32security
 except ImportError:
     pass
-else:
-    if sys.version_info < (3, 0):
-        import _winreg as winreg
-    else:
+else:  # pragma: no cover
+    if PY3:
         import winreg
+    else:
+        import _winreg as winreg
 
     __all__.extend(['BaseWindowsAuthorizer', 'WindowsAuthorizer'])
 
-    class BaseWindowsAuthorizer(object):
+    class BaseWindowsAuthorizer:
         """An authorizer compatible with Windows user account and
         password database.
         This class should not be used directly unless for subclassing.
@@ -710,8 +709,8 @@ else:
                     win32security.LookupAccountName(None, username)[0])
             except pywintypes.error as err:
                 raise AuthorizerError(err)
-            path = r"SOFTWARE\Microsoft\Windows NT" \
-                   r"\CurrentVersion\ProfileList" + "\\" + sid
+            path = r"SOFTWARE\Microsoft\Windows NT"
+            path += r"\CurrentVersion\ProfileList" + "\\" + sid
             try:
                 key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path)
             except WindowsError:

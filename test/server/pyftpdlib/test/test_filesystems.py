@@ -1,34 +1,27 @@
-#!/usr/bin/env python
-
 # Copyright (C) 2007 Giampaolo Rodola' <g.rodola@gmail.com>.
 # Use of this source code is governed by MIT license that can be
 # found in the LICENSE file.
 
 import os
 import tempfile
+import unittest
 
 from pyftpdlib._compat import getcwdu
 from pyftpdlib._compat import u
 from pyftpdlib.filesystems import AbstractedFS
 from pyftpdlib.test import HOME
 from pyftpdlib.test import POSIX
-from pyftpdlib.test import safe_remove
-from pyftpdlib.test import TESTFN
+from pyftpdlib.test import PyftpdlibTestCase
+from pyftpdlib.test import safe_rmpath
 from pyftpdlib.test import touch
-from pyftpdlib.test import unittest
-from pyftpdlib.test import VERBOSITY
+
 
 if POSIX:
     from pyftpdlib.filesystems import UnixFilesystem
 
 
-class TestAbstractedFS(unittest.TestCase):
+class TestAbstractedFS(PyftpdlibTestCase):
     """Test for conversion utility methods of AbstractedFS class."""
-
-    def setUp(self):
-        safe_remove(TESTFN)
-
-    tearDown = setUp
 
     def test_ftpnorm(self):
         # Tests for ftpnorm method.
@@ -174,15 +167,13 @@ class TestAbstractedFS(unittest.TestCase):
         def test_validpath_validlink(self):
             # Test validpath by issuing a symlink pointing to a path
             # inside the root directory.
+            testfn = self.get_testfn()
+            testfn2 = self.get_testfn()
             fs = AbstractedFS(u('/'), None)
             fs._root = HOME
-            TESTFN2 = TESTFN + '1'
-            try:
-                touch(TESTFN)
-                os.symlink(TESTFN, TESTFN2)
-                self.assertTrue(fs.validpath(u(TESTFN)))
-            finally:
-                safe_remove(TESTFN, TESTFN2)
+            touch(testfn)
+            os.symlink(testfn, testfn2)
+            self.assertTrue(fs.validpath(u(testfn)))
 
         def test_validpath_external_symlink(self):
             # Test validpath by issuing a symlink pointing to a path
@@ -192,18 +183,19 @@ class TestAbstractedFS(unittest.TestCase):
             # tempfile should create our file in /tmp directory
             # which should be outside the user root.  If it is
             # not we just skip the test.
+            testfn = self.get_testfn()
             with tempfile.NamedTemporaryFile() as file:
                 try:
-                    if HOME == os.path.dirname(file.name):
+                    if os.path.dirname(file.name) == HOME:
                         return
-                    os.symlink(file.name, TESTFN)
-                    self.assertFalse(fs.validpath(u(TESTFN)))
+                    os.symlink(file.name, testfn)
+                    self.assertFalse(fs.validpath(u(testfn)))
                 finally:
-                    safe_remove(TESTFN)
+                    safe_rmpath(testfn)
 
 
 @unittest.skipUnless(POSIX, "UNIX only")
-class TestUnixFilesystem(unittest.TestCase):
+class TestUnixFilesystem(PyftpdlibTestCase):
 
     def test_case(self):
         root = getcwdu()
@@ -216,4 +208,5 @@ class TestUnixFilesystem(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main(verbosity=VERBOSITY)
+    from pyftpdlib.test.runner import run_from_name
+    run_from_name(__file__)

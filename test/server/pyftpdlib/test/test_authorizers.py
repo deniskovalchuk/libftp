@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright (C) 2007 Giampaolo Rodola' <g.rodola@gmail.com>.
 # Use of this source code is governed by MIT license that can be
 # found in the LICENSE file.
@@ -8,10 +6,11 @@ import os
 import random
 import string
 import sys
-import tempfile
+import unittest
 import warnings
 
 from pyftpdlib._compat import getcwdu
+from pyftpdlib._compat import super
 from pyftpdlib._compat import unicode
 from pyftpdlib.authorizers import AuthenticationFailed
 from pyftpdlib.authorizers import AuthorizerError
@@ -19,12 +18,11 @@ from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.test import HOME
 from pyftpdlib.test import PASSWD
 from pyftpdlib.test import POSIX
-from pyftpdlib.test import TESTFN
-from pyftpdlib.test import touch
-from pyftpdlib.test import unittest
 from pyftpdlib.test import USER
-from pyftpdlib.test import VERBOSITY
 from pyftpdlib.test import WINDOWS
+from pyftpdlib.test import PyftpdlibTestCase
+from pyftpdlib.test import touch
+
 
 if POSIX:
     import pwd
@@ -37,21 +35,26 @@ else:
 
 if WINDOWS:
     from pywintypes import error as Win32ExtError
+
     from pyftpdlib.authorizers import WindowsAuthorizer
 else:
     WindowsAuthorizer = None
 
 
-class TestDummyAuthorizer(unittest.TestCase):
+class TestDummyAuthorizer(PyftpdlibTestCase):
     """Tests for DummyAuthorizer class."""
 
     # temporarily change warnings to exceptions for the purposes of testing
     def setUp(self):
-        self.tempdir = tempfile.mkdtemp(dir=HOME)
-        self.subtempdir = tempfile.mkdtemp(
-            dir=os.path.join(HOME, self.tempdir))
-        self.tempfile = touch(os.path.join(self.tempdir, TESTFN))
-        self.subtempfile = touch(os.path.join(self.subtempdir, TESTFN))
+        super().setUp()
+        self.tempdir = os.path.abspath(self.get_testfn())
+        self.subtempdir = os.path.join(self.tempdir, self.get_testfn())
+        self.tempfile = os.path.join(self.tempdir, self.get_testfn())
+        self.subtempfile = os.path.join(self.subtempdir, self.get_testfn())
+        os.mkdir(self.tempdir)
+        os.mkdir(self.subtempdir)
+        touch(self.tempfile)
+        touch(self.subtempfile)
         warnings.filterwarnings("error")
 
     def tearDown(self):
@@ -60,6 +63,7 @@ class TestDummyAuthorizer(unittest.TestCase):
         os.rmdir(self.subtempdir)
         os.rmdir(self.tempdir)
         warnings.resetwarnings()
+        super().tearDown()
 
     def test_common_methods(self):
         auth = DummyAuthorizer()
@@ -189,7 +193,7 @@ class TestDummyAuthorizer(unittest.TestCase):
                              True)
 
 
-class _SharedAuthorizerTests(object):
+class _SharedAuthorizerTests:
     """Tests valid for both UnixAuthorizer and WindowsAuthorizer for
     those parts which share the same API.
     """
@@ -199,13 +203,15 @@ class _SharedAuthorizerTests(object):
     def get_users(self):
         return self.authorizer_class._get_system_users()
 
-    def get_current_user(self):
+    @staticmethod
+    def get_current_user():
         if POSIX:
             return pwd.getpwuid(os.getuid()).pw_name
         else:
             return os.environ['USERNAME']
 
-    def get_current_user_homedir(self):
+    @staticmethod
+    def get_current_user_homedir():
         if POSIX:
             return pwd.getpwuid(os.getuid()).pw_dir
         else:
@@ -238,7 +244,7 @@ class _SharedAuthorizerTests(object):
     def test_get_home_dir(self):
         auth = self.authorizer_class()
         home = auth.get_home_dir(self.get_current_user())
-        self.assertTrue(isinstance(home, unicode))
+        self.assertIsInstance(home, unicode)
         nonexistent_user = self.get_nonexistent_user()
         self.assertTrue(os.path.isdir(home))
         if auth.has_user('nobody'):
@@ -297,8 +303,8 @@ class _SharedAuthorizerTests(object):
 
     def test_get_perms(self):
         auth = self.authorizer_class(global_perm='elr')
-        self.assertTrue('r' in auth.get_perms(self.get_current_user()))
-        self.assertFalse('w' in auth.get_perms(self.get_current_user()))
+        self.assertIn('r', auth.get_perms(self.get_current_user()))
+        self.assertNotIn('w', auth.get_perms(self.get_current_user()))
 
     def test_has_perm(self):
         auth = self.authorizer_class(global_perm='elr')
@@ -339,8 +345,8 @@ class _SharedAuthorizerTests(object):
         user = self.get_current_user()
         auth.override_user(user, password='foo')
         auth.validate_authentication(user, 'foo', None)
-        self.assertRaises(AuthenticationFailed(auth.validate_authentication,
-                                               user, 'bar', None))
+        self.assertRaises(AuthenticationFailed, auth.validate_authentication,
+                          user, 'bar', None)
         # make sure other settings keep using default values
         self.assertEqual(auth.get_home_dir(user),
                          self.get_current_user_homedir())
@@ -437,12 +443,13 @@ class _SharedAuthorizerTests(object):
 @unittest.skipUnless(POSIX, "UNIX only")
 @unittest.skipUnless(UnixAuthorizer is not None,
                      "UnixAuthorizer class not available")
-class TestUnixAuthorizer(_SharedAuthorizerTests, unittest.TestCase):
+class TestUnixAuthorizer(_SharedAuthorizerTests, PyftpdlibTestCase):
     """Unix authorizer specific tests."""
 
     authorizer_class = UnixAuthorizer
 
     def setUp(self):
+        super().setUp()
         try:
             UnixAuthorizer()
         except AuthorizerError:  # not root
@@ -451,12 +458,12 @@ class TestUnixAuthorizer(_SharedAuthorizerTests, unittest.TestCase):
     def test_get_perms_anonymous(self):
         auth = UnixAuthorizer(
             global_perm='elr', anonymous_user=self.get_current_user())
-        self.assertTrue('e' in auth.get_perms('anonymous'))
-        self.assertFalse('w' in auth.get_perms('anonymous'))
+        self.assertIn('e', auth.get_perms('anonymous'))
+        self.assertNotIn('w', auth.get_perms('anonymous'))
         warnings.filterwarnings("ignore")
         auth.override_user('anonymous', perm='w')
         warnings.resetwarnings()
-        self.assertTrue('w' in auth.get_perms('anonymous'))
+        self.assertIn('w', auth.get_perms('anonymous'))
 
     def test_has_perm_anonymous(self):
         auth = UnixAuthorizer(
@@ -537,7 +544,7 @@ class TestUnixAuthorizer(_SharedAuthorizerTests, unittest.TestCase):
 
 
 @unittest.skipUnless(WINDOWS, "Windows only")
-class TestWindowsAuthorizer(_SharedAuthorizerTests, unittest.TestCase):
+class TestWindowsAuthorizer(_SharedAuthorizerTests, PyftpdlibTestCase):
     """Windows authorizer specific tests."""
 
     authorizer_class = WindowsAuthorizer
@@ -550,4 +557,5 @@ class TestWindowsAuthorizer(_SharedAuthorizerTests, unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main(verbosity=VERBOSITY)
+    from pyftpdlib.test.runner import run_from_name
+    run_from_name(__file__)
