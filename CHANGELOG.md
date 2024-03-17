@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.3
+
+- Updated to [pyftpdlib](https://github.com/giampaolo/pyftpdlib) 1.5.9.
+
 ## v0.3.2
 
 ### New
