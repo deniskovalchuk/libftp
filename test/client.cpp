@@ -307,7 +307,7 @@ TEST_F(client, send_noop)
                                                        "230 Login successful.",
                                                        "200 Type set to: Binary."));
 
-    check_reply(client.send_noop(), "200 I successfully done nothin'.");
+    check_reply(client.send_noop(), "200 I successfully did nothing'.");
 
     check_reply(client.disconnect(), "221 Goodbye.");
 }
