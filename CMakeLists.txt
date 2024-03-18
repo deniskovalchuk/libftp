@@ -75,3 +75,15 @@ endif()
 if (LIBFTP_BUILD_CMDLINE_CLIENT)
     add_subdirectory(app/cmdline)
 endif()
+
+include(GNUInstallDirs)
+install(
+    TARGETS ftp
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+install(
+    DIRECTORY include/ftp
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
