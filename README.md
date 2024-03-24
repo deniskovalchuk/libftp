@@ -169,3 +169,4 @@ $ ctest -V
 - [RFC 2228](doc/RFC2228.txt) FTP Security Extensions. October 1997.
 - [RFC 2428](doc/RFC2428.txt) Extensions for IPv6, NAT, and Extended passive mode. September 1998.
 - [RFC 3659](doc/RFC3659.txt) Extensions to FTP. P. Hethmon. March 2007.
+- [RFC 4217](doc/RFC4217.txt) Securing FTP with TLS. October 2005.
