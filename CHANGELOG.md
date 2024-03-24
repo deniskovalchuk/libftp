@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.0
+
+### New
+
+- Added support for CMake install target.
+
 ## v0.3.3
 
 - Updated to [pyftpdlib](https://github.com/giampaolo/pyftpdlib) 1.5.9.
