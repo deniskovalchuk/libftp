@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.1
+
+### Fixed
+
+- Fixed compilation errors on gcc 13+.
+
 ## v0.4.0
 
 ### New
