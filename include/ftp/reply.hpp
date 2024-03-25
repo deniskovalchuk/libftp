@@ -28,6 +28,7 @@
 #include <string>
 #include <string_view>
 #include <limits>
+#include <cstdint>
 
 namespace ftp
 {

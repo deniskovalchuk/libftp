@@ -27,6 +27,7 @@
 
 #include <ftp/reply.hpp>
 #include <optional>
+#include <cstdint>
 
 namespace ftp
 {
