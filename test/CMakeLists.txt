@@ -22,9 +22,9 @@ set(sources
         net_utils.cpp
         replies.cpp
         reply.cpp
-        test_helpers.cpp
-        test_helpers.hpp
         test_server.hpp
+        test_utils.cpp
+        test_utils.hpp
         utils.cpp)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
