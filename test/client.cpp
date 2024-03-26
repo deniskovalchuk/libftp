@@ -24,7 +24,6 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <boost/process.hpp>
 #include <filesystem>
 #include <memory>
 #include <ftp/client.hpp>
@@ -33,6 +32,7 @@
 #include <ftp/stream/istream_adapter.hpp>
 #include <ftp/stream/ostream_adapter.hpp>
 #include "test_helpers.hpp"
+#include "test_server.hpp"
 
 namespace
 {
@@ -96,40 +96,21 @@ class client : public testing::Test
 protected:
     static void SetUpTestSuite()
     {
-        std::optional<std::string> server_path = get_test_server_path();
-
-        if (!server_path)
-            return;
-
-        boost::filesystem::path python = get_python_path();
-
-        if (python.empty())
-            return;
-
-        std::filesystem::create_directory(server_root_dir_);
-
-        /* Run test server. Usage: python server.py port root_directory */
-        boost::process::ipstream server_output;
-        server_process_
-            = boost::process::child(python, server_path.value(), "2121", server_root_dir_,
-                                    boost::process::std_out > boost::process::null,
-                                    boost::process::std_err > server_output);
-
-        while (server_process_.running())
+        try
         {
-            std::string line;
-            std::getline(server_output, line);
-
-            if (line.find("starting FTP server") != std::string::npos)
-                break;
+            server_.start(server_root_dir_, 2121);
+        }
+        catch (const std::exception & ex)
+        {
+            GTEST_SKIP() << "Skip. Test FTP server is not running: " << ex.what();
         }
     }
 
     static void TearDownTestSuite()
     {
-        if (server_process_.running())
+        if (server_.running())
         {
-            server_process_.terminate();
+            server_.stop();
         }
 
         std::filesystem::remove_all(server_root_dir_);
@@ -137,7 +118,7 @@ protected:
 
     void SetUp() override
     {
-        if (!server_process_.running())
+        if (!server_.running())
         {
             GTEST_SKIP() << "Skip. Test FTP server is not running.";
         }
@@ -156,36 +137,8 @@ protected:
     }
 
 private:
-    static std::optional<std::string> get_test_server_path()
-    {
-        const char *path = std::getenv("LIBFTP_TEST_SERVER_PATH");
-
-        if (path)
-        {
-            return { path };
-        }
-        else
-        {
-            return std::nullopt;
-        }
-    }
-
-    static boost::filesystem::path get_python_path()
-    {
-        boost::filesystem::path path = boost::process::search_path("python3");
-
-        if (path.empty())
-        {
-            return boost::process::search_path("python");
-        }
-        else
-        {
-            return path;
-        }
-    }
-
     inline static std::string server_root_dir_ = "server_root";
-    inline static boost::process::child server_process_;
+    inline static ftp::test::server server_;
 };
 
 TEST_F(client, open_connection)
