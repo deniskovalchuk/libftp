@@ -24,6 +24,7 @@ set(sources
         reply.cpp
         test_helpers.cpp
         test_helpers.hpp
+        test_server.hpp
         utils.cpp)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
