@@ -22,52 +22,39 @@
  * SOFTWARE.
  */
 
-#include <gtest/gtest.h>
-#include "test_helpers.hpp"
+#ifndef LIBFTP_TEST_UTILS_HPP
+#define LIBFTP_TEST_UTILS_HPP
+
+#include <string>
+#include <string_view>
+#include <optional>
+#include <ftp/replies.hpp>
+#include <ftp/reply.hpp>
 
 namespace ftp::test
 {
 
-void check_reply(const ftp::replies & replies, std::string_view expected, std::optional<bool> positive)
-{
-    if (positive.has_value())
-    {
-        ASSERT_EQ(positive.value(), replies.is_positive());
-    }
+void check_reply(const ftp::replies & replies, std::string_view expected, std::optional<bool> positive = std::nullopt);
 
-    ASSERT_EQ(expected, replies.get_status_string());
+void check_reply(const ftp::reply & reply, std::string_view expected);
+
+void check_reply(const std::optional<ftp::reply> & reply, std::string_view expected);
+
+void check_last_reply(const ftp::replies & replies, std::string_view expected);
+
+bool is_windows_platform();
+
+template<typename ...Strings>
+std::string CRLF(const std::string & str, Strings && ...strs)
+{
+    return (str + ... + (std::string("\r\n") + std::forward<Strings>(strs)));
 }
 
-void check_reply(const ftp::reply & reply, std::string_view expected)
+template<typename ...Strings>
+std::string LF(const std::string & str, Strings && ...strs)
 {
-    ASSERT_EQ(expected, reply.get_status_string());
-}
-
-void check_reply(const std::optional<ftp::reply> & reply, std::string_view expected)
-{
-    ASSERT_TRUE(reply.has_value());
-    ASSERT_EQ(expected, reply->get_status_string());
-}
-
-void check_last_reply(const ftp::replies & replies, std::string_view expected)
-{
-    const std::vector<ftp::reply> & reply_list = replies.get_replies();
-
-    if (reply_list.empty())
-    {
-        FAIL() << "Empty reply.";
-    }
-
-    ASSERT_EQ(expected, reply_list.back().get_status_string());
-}
-
-bool is_windows_platform()
-{
-#ifdef _WIN32
-    return true;
-#else
-    return false;
-#endif
+    return (str + ... + (std::string("\n") + std::forward<Strings>(strs)));
 }
 
 } // namespace ftp::test
+#endif //LIBFTP_TEST_UTILS_HPP

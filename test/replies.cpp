@@ -24,7 +24,7 @@
 
 #include <gtest/gtest.h>
 #include <ftp/replies.hpp>
-#include "test_helpers.hpp"
+#include "test_utils.hpp"
 
 namespace
 {

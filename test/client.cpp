@@ -31,8 +31,8 @@
 #include <ftp/observer.hpp>
 #include <ftp/stream/istream_adapter.hpp>
 #include <ftp/stream/ostream_adapter.hpp>
-#include "test_helpers.hpp"
 #include "test_server.hpp"
+#include "test_utils.hpp"
 
 namespace
 {

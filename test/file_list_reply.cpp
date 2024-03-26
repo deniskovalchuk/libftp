@@ -25,7 +25,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <ftp/file_list_reply.hpp>
-#include "test_helpers.hpp"
+#include "test_utils.hpp"
 
 namespace
 {
