@@ -30,11 +30,11 @@ from pyftpdlib.servers import FTPServer
 
 def main():
     if len(sys.argv) != 3:
-        print("Usage: server.py port root_directory")
+        print("Usage: server.py root_directory port")
         return
 
-    port = sys.argv[1]
-    root_directory = sys.argv[2]
+    root_directory = sys.argv[1]
+    port = sys.argv[2]
 
     # Add user with the following permissions:
     #   e - change directory (CWD, CDUP commands)
