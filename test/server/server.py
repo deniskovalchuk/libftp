@@ -23,18 +23,16 @@
 
 import os
 import logging
-import sys
+import argparse
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
 
 def main():
-    if len(sys.argv) != 3:
-        print("Usage: server.py root_directory port")
-        return
-
-    root_directory = sys.argv[1]
-    port = sys.argv[2]
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('root_directory')
+    arg_parser.add_argument('port')
+    args = arg_parser.parse_args()
 
     # Add user with the following permissions:
     #   e - change directory (CWD, CDUP commands)
@@ -47,8 +45,8 @@ def main():
     #   w - store a file to the server (STOR, STOU commands)
     #   M - change file mode / permission (SITE CHMOD command)
     authorizer = DummyAuthorizer()
-    authorizer.add_user("user", "password", root_directory, perm = "elradfmwM")
-    authorizer.add_user("alice", "password", root_directory, perm = "elradfmwM")
+    authorizer.add_user("user", "password", args.root_directory, perm = "elradfmwM")
+    authorizer.add_user("alice", "password", args.root_directory, perm = "elradfmwM")
 
     handler = FTPHandler
     handler.authorizer = authorizer
@@ -62,8 +60,8 @@ def main():
                             logging.StreamHandler()],
                         level = logging.DEBUG)
 
-    server = FTPServer(("127.0.0.1", port), handler)
-    server = FTPServer(("::1", port), handler)
+    server = FTPServer(("127.0.0.1", args.port), handler)
+    server = FTPServer(("::1", args.port), handler)
     server.serve_forever()
 
 if __name__ == "__main__":
