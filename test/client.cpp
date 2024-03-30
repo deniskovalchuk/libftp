@@ -1097,4 +1097,25 @@ TEST_F(ssl_client, login_without_ssl)
     check_reply(client.disconnect(), "221 Goodbye.");
 }
 
+TEST_F(ssl_client, get_help)
+{
+    ftp::client client;
+
+    check_reply(client.connect("127.0.0.1", 2142), "220 FTP server is ready.");
+
+    check_reply(client.get_help(),
+        CRLF("214-The following commands are recognized:",
+             " ABOR   ALLO   APPE   AUTH   CDUP   CWD    DELE   EPRT  ",
+             " EPSV   FEAT   HELP   LIST   MDTM   MFMT   MKD    MLSD  ",
+             " MLST   MODE   NLST   NOOP   OPTS   PASS   PASV   PBSZ  ",
+             " PORT   PROT   PWD    QUIT   REIN   REST   RETR   RMD   ",
+             " RNFR   RNTO   SITE   SIZE   STAT   STOR   STOU   STRU  ",
+             " SYST   TYPE   USER   XCUP   XCWD   XMKD   XPWD   XRMD  ",
+             "214 Help command successful."));
+
+    check_reply(client.get_help("AUTH"), "AUTH <SP> TLS|SSL (set up secure control channel).");
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
 } // namespace
