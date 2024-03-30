@@ -24,8 +24,6 @@
 
 #include <gtest/gtest.h>
 #include <ftp/detail/net_utils.hpp>
-/* TODO: Remove. */
-#include <boost/asio/ssl/context.hpp>
 
 namespace
 {
@@ -43,12 +41,6 @@ TEST(net_utils, address_to_string)
               ftp::detail::net_utils::address_to_string(make_address("2001:0db8:85a3:0000:0000:8a2e:0370:7334")));
     EXPECT_EQ("2345:425:2ca1::567:5673:23b5",
               ftp::detail::net_utils::address_to_string(make_address("2345:425:2CA1::567:5673:23B5")));
-}
-
-/* TODO: This is a temporary test to check compilation with the OpenSSL library. */
-TEST(net_utils, compile_with_OpenSSL)
-{
-    boost::asio::ssl::context context(boost::asio::ssl::context::method::tls_client);
 }
 
 } // namespace
