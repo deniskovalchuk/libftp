@@ -52,22 +52,25 @@ def main():
     authorizer.add_user("alice", "password", args.root_directory, perm = "elradfmwM")
 
     handler = None
+    log_filename = None
     if args.use_ssl == 'yes':
         handler = TLS_FTPHandler
         handler.certfile = os.path.join(sys.path[0], 'pyftpdlib/test/keycert.pem')
         handler.tls_control_required = True
         handler.tls_data_required = True
+        log_filename = "ssl_server.log"
     else:
         handler = FTPHandler
+        log_filename = "server.log"
 
     handler.authorizer = authorizer
     handler.banner = "FTP server is ready."
 
-    if os.path.exists("pyftpd.log"):
-        os.remove("pyftpd.log")
+    if os.path.exists(log_filename):
+        os.remove(log_filename)
 
     logging.basicConfig(handlers = [
-                            logging.FileHandler("pyftpd.log"),
+                            logging.FileHandler(log_filename),
                             logging.StreamHandler()],
                         level = logging.DEBUG)
 
