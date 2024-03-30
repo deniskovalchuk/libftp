@@ -92,7 +92,7 @@ public:
 };
 
 template<std::uint16_t server_port, bool server_use_ssl>
-class base_client : public testing::Test
+class client_base : public testing::Test
 {
 protected:
     static void SetUpTestSuite()
@@ -142,7 +142,7 @@ private:
     inline static ftp::test::server server_;
 };
 
-class client : public base_client<2121, false>
+class client : public client_base<2121, false>
 {
 };
 
@@ -1082,7 +1082,7 @@ TEST_P(client_with_transfer_mode, disable_rfc2428_support)
     check_reply(client.disconnect(), "221 Goodbye.");
 }
 
-class ssl_client : public base_client<2142, true>
+class ssl_client : public client_base<2142, true>
 {
 };
 
