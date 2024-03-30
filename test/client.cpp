@@ -91,14 +91,15 @@ public:
     }
 };
 
-class client : public testing::Test
+template<std::uint16_t server_port, bool server_use_ssl>
+class base_client : public testing::Test
 {
 protected:
     static void SetUpTestSuite()
     {
         try
         {
-            server_.start(server_root_dir_, 2121);
+            server_.start(server_root_dir_, server_port, server_use_ssl);
         }
         catch (const std::exception & ex)
         {
@@ -139,6 +140,10 @@ protected:
 private:
     inline static std::string server_root_dir_ = "server_root";
     inline static ftp::test::server server_;
+};
+
+class client : public base_client<2121, false>
+{
 };
 
 TEST_F(client, open_connection)
@@ -1073,6 +1078,21 @@ TEST_P(client_with_transfer_mode, disable_rfc2428_support)
     std::ostringstream oss;
     check_last_reply(client.download_file(ftp::ostream_adapter(oss), "file"), "226 Transfer complete.");
     ASSERT_EQ(data, oss.str());
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
+class ssl_client : public base_client<2142, true>
+{
+};
+
+TEST_F(ssl_client, login_without_ssl)
+{
+    ftp::client client;
+
+    check_reply(client.connect("127.0.0.1", 2142), "220 FTP server is ready.");
+
+    check_reply(client.login("user", "password"), CRLF("550 SSL/TLS required on the control channel."));
 
     check_reply(client.disconnect(), "221 Goodbye.");
 }

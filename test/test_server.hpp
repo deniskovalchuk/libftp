@@ -36,7 +36,7 @@ namespace ftp::test
 class server
 {
 public:
-    void start(const std::string & root_directory, std::uint16_t port)
+    void start(const std::string & root_directory, std::uint16_t port, bool use_ssl)
     {
         const char *server_path = std::getenv("LIBFTP_TEST_SERVER_PATH");
         if (!server_path)
@@ -56,9 +56,20 @@ public:
 
         std::filesystem::create_directory(root_directory);
 
-        /* Usage: python server.py root_directory port */
+        const char *use_ssl_arg;
+        if (use_ssl)
+        {
+            use_ssl_arg = "--use-ssl=yes";
+        }
+        else
+        {
+            use_ssl_arg = "--use-ssl=no";
+        }
+
+        /* Usage: python server.py root_directory port [--use-ssl {yes,no}] */
         boost::process::ipstream output;
-        process_ = boost::process::child(python_path, server_path, root_directory, std::to_string(port),
+        process_ = boost::process::child(python_path, server_path,
+                                         root_directory, std::to_string(port), use_ssl_arg,
                                          boost::process::std_out > boost::process::null,
                                          boost::process::std_err > output);
 
@@ -67,8 +78,11 @@ public:
             std::string line;
             std::getline(output, line);
 
-            if (line.find("starting FTP server") != std::string::npos)
+            if (line.find("starting FTP server") != std::string::npos ||
+                line.find("starting FTP+SSL server") != std::string::npos)
+            {
                 break;
+            }
         }
     }
 
