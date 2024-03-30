@@ -1113,7 +1113,7 @@ TEST_F(ssl_client, get_help)
              " SYST   TYPE   USER   XCUP   XCWD   XMKD   XPWD   XRMD  ",
              "214 Help command successful."));
 
-    check_reply(client.get_help("AUTH"), "AUTH <SP> TLS|SSL (set up secure control channel).");
+    check_reply(client.get_help("AUTH"), "214 Syntax: AUTH <SP> TLS|SSL (set up secure control channel).");
 
     check_reply(client.disconnect(), "221 Goodbye.");
 }
