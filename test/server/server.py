@@ -34,7 +34,7 @@ def main():
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('root_directory')
     arg_parser.add_argument('port')
-    arg_parser.add_argument('--use_ssl', choices = ['yes', 'no'], default = 'no')
+    arg_parser.add_argument('--use-ssl', choices = ['yes', 'no'], default = 'no')
     args = arg_parser.parse_args()
 
     # Add user with the following permissions:
