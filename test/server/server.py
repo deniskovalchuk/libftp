@@ -51,8 +51,6 @@ def main():
     authorizer.add_user("user", "password", args.root_directory, perm = "elradfmwM")
     authorizer.add_user("alice", "password", args.root_directory, perm = "elradfmwM")
 
-    handler = None
-    log_filename = None
     if args.use_ssl == 'yes':
         handler = TLS_FTPHandler
         handler.certfile = os.path.join(sys.path[0], 'pyftpdlib/test/keycert.pem')
