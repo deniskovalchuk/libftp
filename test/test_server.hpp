@@ -56,7 +56,7 @@ public:
 
         std::filesystem::create_directory(root_directory);
 
-        /* Usage: python server.py port root_directory */
+        /* Usage: python server.py root_directory port */
         boost::process::ipstream output;
         process_ = boost::process::child(python_path, server_path, root_directory, std::to_string(port),
                                          boost::process::std_out > boost::process::null,
