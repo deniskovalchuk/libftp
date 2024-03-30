@@ -34,7 +34,7 @@ def main():
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('root_directory')
     arg_parser.add_argument('port')
-    arg_parser.add_argument('--use_tls', choices = ['yes', 'no'], default = 'no')
+    arg_parser.add_argument('--use_ssl', choices = ['yes', 'no'], default = 'no')
     args = arg_parser.parse_args()
 
     # Add user with the following permissions:
@@ -52,7 +52,7 @@ def main():
     authorizer.add_user("alice", "password", args.root_directory, perm = "elradfmwM")
 
     handler = None
-    if args.use_tls == 'yes':
+    if args.use_ssl == 'yes':
         handler = TLS_FTPHandler
         handler.certfile = os.path.join(sys.path[0], 'pyftpdlib/test/keycert.pem')
         handler.tls_control_required = True
