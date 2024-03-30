@@ -22,6 +22,9 @@ set(sources
         include/ftp/detail/data_connection.hpp
         include/ftp/detail/net_context.hpp
         include/ftp/detail/net_utils.hpp
+        include/ftp/detail/socket.hpp
+        include/ftp/detail/socket_base.hpp
+        include/ftp/detail/socket_factory.hpp
         include/ftp/detail/utils.hpp
         include/ftp/stream/input_stream.hpp
         include/ftp/stream/istream_adapter.hpp
@@ -53,6 +56,8 @@ set(sources
         src/ostream_adapter.cpp
         src/replies.cpp
         src/reply.cpp
+        src/socket.cpp
+        src/socket_factory.cpp
         src/utils.cpp)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})

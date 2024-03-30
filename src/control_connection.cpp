@@ -24,6 +24,7 @@
 
 #include <ftp/ftp_exception.hpp>
 #include <ftp/detail/control_connection.hpp>
+#include <ftp/detail/socket_factory.hpp>
 #include <ftp/detail/utils.hpp>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/read_until.hpp>
@@ -43,13 +44,14 @@ static bool try_parse_status_code(std::string_view line, std::uint16_t & status_
 }
 
 control_connection::control_connection(net_context & net_context)
-    : socket_(net_context.get_io_context())
 {
+    socket_ptr_ = socket_factory::create(net_context.get_io_context());
 }
 
 void control_connection::connect(std::string_view hostname, std::uint16_t port)
 {
-    boost::asio::ip::tcp::resolver resolver(socket_.get_executor());
+    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
+    boost::asio::ip::tcp::resolver resolver(socket.get_executor());
     boost::system::error_code ec;
 
     boost::asio::ip::tcp::resolver::results_type endpoints =
@@ -60,7 +62,7 @@ void control_connection::connect(std::string_view hostname, std::uint16_t port)
         throw ftp_exception(ec, "Cannot open control connection");
     }
 
-    boost::asio::connect(socket_, endpoints, ec);
+    boost::asio::connect(socket, endpoints, ec);
 
     if (ec)
     {
@@ -71,7 +73,7 @@ void control_connection::connect(std::string_view hostname, std::uint16_t port)
          *
          * https://www.boost.org/doc/libs/1_70_0/doc/html/boost_asio/reference/basic_stream_socket/connect/overload2.html
          */
-        socket_.close(ignored);
+        socket.close(ignored);
 
         throw ftp_exception(ec, "Cannot open control connection");
     }
@@ -79,7 +81,8 @@ void control_connection::connect(std::string_view hostname, std::uint16_t port)
 
 bool control_connection::is_connected() const
 {
-    return socket_.is_open();
+    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
+    return socket.is_open();
 }
 
 reply control_connection::recv()
@@ -139,9 +142,10 @@ reply control_connection::recv()
      */
     if (code == 421)
     {
+        boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
         boost::system::error_code ec;
 
-        socket_.close(ec);
+        socket.close(ec);
 
         if (ec)
         {
@@ -181,12 +185,13 @@ bool control_connection::is_last_line(std::string_view line, std::uint16_t statu
 
 void control_connection::send(std::string_view command)
 {
+    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
     boost::system::error_code ec;
 
     std::string data(command);
     data.append("\r\n");
 
-    boost::asio::write(socket_, boost::asio::buffer(data), ec);
+    boost::asio::write(socket, boost::asio::buffer(data), ec);
 
     if (ec)
     {
@@ -226,9 +231,10 @@ match_eol(boost::asio::buffers_iterator<boost::asio::const_buffers_1> begin,
 
 std::string control_connection::read_line()
 {
+    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
     boost::system::error_code ec;
 
-    std::size_t len = boost::asio::read_until(socket_,
+    std::size_t len = boost::asio::read_until(socket,
                                               boost::asio::dynamic_buffer(buffer_, 8192),
                                               match_eol, ec);
 
@@ -249,9 +255,10 @@ std::string control_connection::read_line()
 
 void control_connection::disconnect()
 {
+    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
     boost::system::error_code ec;
 
-    socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 
     if (ec == boost::asio::error::not_connected)
     {
@@ -265,7 +272,7 @@ void control_connection::disconnect()
         throw ftp_exception(ec, "Cannot close control connection");
     }
 
-    socket_.close(ec);
+    socket.close(ec);
 
     if (ec)
     {
@@ -275,9 +282,10 @@ void control_connection::disconnect()
 
 boost::asio::ip::tcp::endpoint control_connection::get_local_endpoint() const
 {
+    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
     boost::system::error_code ec;
 
-    boost::asio::ip::tcp::endpoint local_endpoint = socket_.local_endpoint(ec);
+    boost::asio::ip::tcp::endpoint local_endpoint = socket.local_endpoint(ec);
 
     if (ec)
     {
@@ -289,9 +297,10 @@ boost::asio::ip::tcp::endpoint control_connection::get_local_endpoint() const
 
 boost::asio::ip::tcp::endpoint control_connection::get_remote_endpoint() const
 {
+    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
     boost::system::error_code ec;
 
-    boost::asio::ip::tcp::endpoint remote_endpoint = socket_.remote_endpoint(ec);
+    boost::asio::ip::tcp::endpoint remote_endpoint = socket.remote_endpoint(ec);
 
     if (ec)
     {
