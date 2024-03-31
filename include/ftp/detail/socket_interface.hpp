@@ -41,6 +41,8 @@ public:
 
     virtual bool is_connected() const = 0;
 
+    virtual std::size_t write(const char *buf, std::size_t size, boost::system::error_code & ec) = 0;
+
     virtual std::size_t write(std::string_view buf, boost::system::error_code & ec) = 0;
 
     virtual std::size_t read_some(char *buf, std::size_t max_size, boost::system::error_code & ec) = 0;

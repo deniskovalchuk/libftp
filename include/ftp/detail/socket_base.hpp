@@ -70,6 +70,12 @@ public:
         return socket.is_open();
     }
 
+    std::size_t write(const char *buf, std::size_t size, boost::system::error_code & ec) override
+    {
+        SocketType & socket = get_sock();
+        return boost::asio::write(socket, boost::asio::buffer(buf, size), ec);
+    }
+
     std::size_t write(std::string_view buf, boost::system::error_code & ec) override
     {
         SocketType & socket = get_sock();

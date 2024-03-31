@@ -26,7 +26,6 @@
 #include <ftp/detail/socket_factory.hpp>
 #include <ftp/ftp_exception.hpp>
 #include <boost/asio/read.hpp>
-#include <boost/asio/write.hpp>
 #include <array>
 
 namespace ftp::detail
@@ -146,10 +145,9 @@ void data_connection::send(input_stream & stream, transfer_callback * transfer_c
 
     while ((size = stream.read(buf.data(), buf.size())) > 0)
     {
-        boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
         boost::system::error_code ec;
 
-        boost::asio::write(socket, boost::asio::buffer(buf, size), ec);
+        socket_ptr_->write(buf.data(), size, ec);
 
         if (ec)
         {
