@@ -27,6 +27,7 @@
 
 #include <ftp/detail/socket_interface.hpp>
 #include <boost/asio/connect.hpp>
+#include <boost/asio/write.hpp>
 
 namespace ftp::detail
 {
@@ -66,6 +67,12 @@ public:
     {
         const SocketType & socket = get_sock();
         return socket.is_open();
+    }
+
+    std::size_t write(std::string_view data, boost::system::error_code & ec) override
+    {
+        SocketType & socket = get_sock();
+        return boost::asio::write(socket, boost::asio::buffer(data), ec);
     }
 
     void shutdown(boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec) override

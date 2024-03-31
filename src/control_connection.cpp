@@ -27,7 +27,6 @@
 #include <ftp/detail/socket_factory.hpp>
 #include <ftp/detail/utils.hpp>
 #include <boost/asio/read_until.hpp>
-#include <boost/asio/write.hpp>
 
 namespace ftp::detail
 {
@@ -163,13 +162,12 @@ bool control_connection::is_last_line(std::string_view line, std::uint16_t statu
 
 void control_connection::send(std::string_view command)
 {
-    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
     boost::system::error_code ec;
 
     std::string data(command);
     data.append("\r\n");
 
-    boost::asio::write(socket, boost::asio::buffer(data), ec);
+    socket_ptr_->write(data, ec);
 
     if (ec)
     {
