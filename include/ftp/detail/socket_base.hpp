@@ -39,78 +39,66 @@ class socket_base : public socket_interface
 public:
     void connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec) override
     {
-        SocketType & socket = get_sock();
-        boost::asio::connect(socket, eps, ec);
+        boost::asio::connect(get_sock(), eps, ec);
     }
 
     void connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec) override
     {
-        SocketType & socket = get_sock();
-        socket.connect(ep, ec);
+        get_sock().connect(ep, ec);
     }
 
     [[nodiscard]]
     bool is_connected() const override
     {
-        const SocketType & socket = get_sock();
-        return socket.is_open();
+        return get_sock().is_open();
     }
 
     std::size_t write(const char *buf, std::size_t size, boost::system::error_code & ec) override
     {
-        SocketType & socket = get_sock();
-        return boost::asio::write(socket, boost::asio::buffer(buf, size), ec);
+        return boost::asio::write(get_sock(), boost::asio::buffer(buf, size), ec);
     }
 
     std::size_t write(std::string_view buf, boost::system::error_code & ec) override
     {
-        SocketType & socket = get_sock();
-        return boost::asio::write(socket, boost::asio::buffer(buf), ec);
+        return boost::asio::write(get_sock(), boost::asio::buffer(buf), ec);
     }
 
     std::size_t read_some(char *buf, std::size_t max_size, boost::system::error_code & ec) override
     {
-        SocketType & socket = get_sock();
-        return socket.read_some(boost::asio::buffer(buf, max_size), ec);
+        return get_sock().read_some(boost::asio::buffer(buf, max_size), ec);
     }
 
     std::size_t read_line(std::string & buf, std::size_t max_size, boost::system::error_code & ec) override
     {
-        SocketType & socket = get_sock();
-        return boost::asio::read_until(socket,
+        return boost::asio::read_until(get_sock(),
                                        boost::asio::dynamic_buffer(buf, max_size),
                                        match_eol, ec);
     }
 
     void shutdown(boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec) override
     {
-        SocketType & socket = get_sock();
-        socket.shutdown(type, ec);
+        get_sock().shutdown(type, ec);
     }
 
     void close(boost::system::error_code & ec) override
     {
-        SocketType & socket = get_sock();
-        socket.close(ec);
+        get_sock().close(ec);
     }
 
     boost::asio::ip::tcp::endpoint local_endpoint(boost::system::error_code & ec) const override
     {
-        const SocketType & socket = get_sock();
-        return socket.local_endpoint(ec);
+        return get_sock().local_endpoint(ec);
     }
 
     boost::asio::ip::tcp::endpoint remote_endpoint(boost::system::error_code & ec) const override
     {
-        const SocketType & socket = get_sock();
-        return socket.remote_endpoint(ec);
+        return get_sock().remote_endpoint(ec);
     }
 
     [[nodiscard]]
     const boost::asio::ip::tcp::socket::executor_type & get_executor() override
     {
-        SocketType & socket = get_sock();
-        return socket.get_executor();
+        return get_sock().get_executor();
     }
 
     SocketType & get_socket() override
