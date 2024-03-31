@@ -25,7 +25,6 @@
 #include <ftp/detail/data_connection.hpp>
 #include <ftp/detail/socket_factory.hpp>
 #include <ftp/ftp_exception.hpp>
-#include <boost/asio/read.hpp>
 #include <array>
 
 namespace ftp::detail
