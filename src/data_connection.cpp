@@ -187,7 +187,7 @@ void data_connection::recv(output_stream & stream, transfer_callback * transfer_
     std::array<char, 8192> buf;
     std::size_t size;
 
-    while ((size = socket_ptr_->read_some(buf.data(), buf.max_size(), ec)) > 0)
+    while ((size = socket_ptr_->read_some(buf.data(), buf.size(), ec)) > 0)
     {
         stream.write(buf.data(), size);
 
