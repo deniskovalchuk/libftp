@@ -37,30 +37,10 @@ template<typename SocketType>
 class socket_base : public socket_interface
 {
 public:
-    void connect(std::string_view hostname, std::uint16_t port, boost::system::error_code & ec) override
+    void connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec) override
     {
         SocketType & socket = get_sock();
-
-        boost::asio::ip::tcp::resolver resolver(socket.get_executor());
-        boost::asio::ip::tcp::resolver::results_type endpoints =
-            resolver.resolve(hostname, std::to_string(port), ec);
-
-        if (ec)
-            return;
-
-        boost::asio::connect(socket, endpoints, ec);
-
-        if (ec)
-        {
-            boost::system::error_code ignored;
-
-            /* If the connect fails, and the socket was automatically opened,
-             * the socket is not returned to the closed state.
-             *
-             * https://www.boost.org/doc/libs/1_70_0/doc/html/boost_asio/reference/basic_stream_socket/connect/overload2.html
-             */
-            socket.close(ignored);
-        }
+        boost::asio::connect(socket, eps, ec);
     }
 
     void connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec) override
@@ -124,6 +104,13 @@ public:
     {
         const SocketType & socket = get_sock();
         return socket.remote_endpoint(ec);
+    }
+
+    [[nodiscard]]
+    const boost::asio::ip::tcp::socket::executor_type & get_executor() override
+    {
+        SocketType & socket = get_sock();
+        return socket.get_executor();
     }
 
     SocketType & get_socket() override

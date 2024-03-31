@@ -47,12 +47,30 @@ control_connection::control_connection(net_context & net_context)
 
 void control_connection::connect(std::string_view hostname, std::uint16_t port)
 {
+    boost::asio::ip::tcp::resolver resolver(socket_ptr_->get_executor());
     boost::system::error_code ec;
 
-    socket_ptr_->connect(hostname, port, ec);
+    boost::asio::ip::tcp::resolver::results_type endpoints =
+            resolver.resolve(hostname, std::to_string(port), ec);
 
     if (ec)
     {
+        throw ftp_exception(ec, "Cannot open control connection");
+    }
+
+    socket_ptr_->connect(endpoints, ec);
+
+    if (ec)
+    {
+        boost::system::error_code ignored;
+
+        /* If the connect fails, and the socket was automatically opened,
+         * the socket is not returned to the closed state.
+         *
+         * https://www.boost.org/doc/libs/1_70_0/doc/html/boost_asio/reference/basic_stream_socket/connect/overload2.html
+         */
+        socket_ptr_->close(ignored);
+
         throw ftp_exception(ec, "Cannot open control connection");
     }
 }

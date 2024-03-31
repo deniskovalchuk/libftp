@@ -37,7 +37,7 @@ namespace ftp::detail
 class socket_interface
 {
 public:
-    virtual void connect(std::string_view hostname, std::uint16_t port, boost::system::error_code & ec) = 0;
+    virtual void connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec) = 0;
 
     virtual void connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec) = 0;
 
@@ -58,6 +58,8 @@ public:
     virtual boost::asio::ip::tcp::endpoint local_endpoint(boost::system::error_code & ec) const = 0;
 
     virtual boost::asio::ip::tcp::endpoint remote_endpoint(boost::system::error_code & ec) const = 0;
+
+    virtual const boost::asio::ip::tcp::socket::executor_type & get_executor() = 0;
 
     // TODO: Remove.
     virtual boost::asio::ip::tcp::socket & get_socket() = 0;
