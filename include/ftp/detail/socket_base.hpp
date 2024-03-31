@@ -68,6 +68,12 @@ public:
         return socket.is_open();
     }
 
+    void shutdown(boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec) override
+    {
+        SocketType & socket = get_sock();
+        socket.shutdown(type, ec);
+    }
+
     SocketType & get_socket() override
     {
         return get_sock();

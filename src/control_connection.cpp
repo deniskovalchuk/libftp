@@ -237,7 +237,7 @@ void control_connection::disconnect()
     boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
     boost::system::error_code ec;
 
-    socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    socket_ptr_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 
     if (ec == boost::asio::error::not_connected)
     {

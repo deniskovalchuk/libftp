@@ -229,7 +229,7 @@ void data_connection::disconnect(bool graceful)
 
     if (graceful)
     {
-        socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        socket_ptr_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 
         if (ec == boost::asio::error::not_connected)
         {

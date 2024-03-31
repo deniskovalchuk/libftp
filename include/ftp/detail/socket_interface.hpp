@@ -40,6 +40,8 @@ public:
 
     virtual bool is_connected() const = 0;
 
+    virtual void shutdown(boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec) = 0;
+
     // TODO: Remove.
     virtual boost::asio::ip::tcp::socket & get_socket() = 0;
 
