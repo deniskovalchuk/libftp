@@ -39,7 +39,6 @@ data_connection::data_connection(net_context & net_context)
 
 void data_connection::connect(std::string_view ip, std::uint16_t port)
 {
-    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
     boost::system::error_code ec;
 
     boost::asio::ip::address address = boost::asio::ip::make_address(ip, ec);
@@ -50,7 +49,7 @@ void data_connection::connect(std::string_view ip, std::uint16_t port)
     }
 
     boost::asio::ip::tcp::endpoint remote_endpoint(address, port);
-    socket.connect(remote_endpoint, ec);
+    socket_ptr_->connect(remote_endpoint, ec);
 
     if (ec)
     {
@@ -61,7 +60,7 @@ void data_connection::connect(std::string_view ip, std::uint16_t port)
          *
          * https://www.boost.org/doc/libs/1_70_0/doc/html/boost_asio/reference/basic_stream_socket/connect/overload2.html
          */
-        socket.close(ignored);
+        socket_ptr_->close(ignored);
 
         throw ftp_exception(ec, "Cannot open data connection");
     }
@@ -69,10 +68,9 @@ void data_connection::connect(std::string_view ip, std::uint16_t port)
 
 void data_connection::connect(const boost::asio::ip::tcp::endpoint & endpoint)
 {
-    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
     boost::system::error_code ec;
 
-    socket.connect(endpoint, ec);
+    socket_ptr_->connect(endpoint, ec);
 
     if (ec)
     {
@@ -83,7 +81,7 @@ void data_connection::connect(const boost::asio::ip::tcp::endpoint & endpoint)
          *
          * https://www.boost.org/doc/libs/1_70_0/doc/html/boost_asio/reference/basic_stream_socket/connect/overload2.html
          */
-        socket.close(ignored);
+        socket_ptr_->close(ignored);
 
         throw ftp_exception(ec, "Cannot open data connection");
     }

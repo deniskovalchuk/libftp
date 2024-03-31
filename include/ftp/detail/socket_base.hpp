@@ -63,6 +63,12 @@ public:
         }
     }
 
+    void connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec) override
+    {
+        SocketType & socket = get_sock();
+        socket.connect(ep, ec);
+    }
+
     [[nodiscard]]
     bool is_connected() const override
     {

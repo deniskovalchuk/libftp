@@ -39,6 +39,8 @@ class socket_interface
 public:
     virtual void connect(std::string_view hostname, std::uint16_t port, boost::system::error_code & ec) = 0;
 
+    virtual void connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec) = 0;
+
     virtual bool is_connected() const = 0;
 
     virtual std::size_t write(const char *buf, std::size_t size, boost::system::error_code & ec) = 0;
