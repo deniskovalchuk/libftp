@@ -29,7 +29,7 @@
 namespace ftp::detail
 {
 
-socket_base_ptr socket_factory::create(boost::asio::io_context & io_context)
+socket_interface_ptr socket_factory::create(boost::asio::io_context & io_context)
 {
     return std::make_unique<socket>(io_context);
 }

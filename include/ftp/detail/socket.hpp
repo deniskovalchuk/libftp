@@ -32,14 +32,14 @@
 namespace ftp::detail
 {
 
-class socket : public socket_base
+class socket : public socket_base<boost::asio::ip::tcp::socket>
 {
 public:
     explicit socket(boost::asio::io_context & io_context);
 
-    boost::asio::ip::tcp::socket & get_socket() override;
-
 private:
+    boost::asio::ip::tcp::socket & get_sock() override;
+
     boost::asio::ip::tcp::socket socket_;
 };
 

@@ -25,7 +25,7 @@
 #ifndef LIBFTP_SOCKET_FACTORY_HPP
 #define LIBFTP_SOCKET_FACTORY_HPP
 
-#include <ftp/detail/socket_base.hpp>
+#include <ftp/detail/socket_interface.hpp>
 #include <boost/asio/io_context.hpp>
 
 namespace ftp::detail
@@ -34,7 +34,7 @@ namespace ftp::detail
 class socket_factory
 {
 public:
-    static socket_base_ptr create(boost::asio::io_context & io_context);
+    static socket_interface_ptr create(boost::asio::io_context & io_context);
 };
 
 } // namespace ftp::detail

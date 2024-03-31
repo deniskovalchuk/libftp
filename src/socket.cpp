@@ -31,7 +31,7 @@ socket::socket(boost::asio::io_context & io_context)
     : socket_(io_context)
 {}
 
-boost::asio::ip::tcp::socket & socket::get_socket()
+boost::asio::ip::tcp::socket & socket::get_sock()
 {
     return socket_;
 }

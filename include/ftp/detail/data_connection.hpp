@@ -29,7 +29,7 @@
 #include <ftp/stream/output_stream.hpp>
 #include <ftp/transfer_callback.hpp>
 #include <ftp/detail/net_context.hpp>
-#include <ftp/detail/socket_base.hpp>
+#include <ftp/detail/socket_interface.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <memory>
 #include <string_view>
@@ -63,7 +63,7 @@ public:
     [[nodiscard]] boost::asio::ip::tcp::endpoint get_listen_endpoint() const;
 
 private:
-    socket_base_ptr socket_ptr_;
+    socket_interface_ptr socket_ptr_;
     boost::asio::ip::tcp::acceptor acceptor_;
 };
 

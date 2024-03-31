@@ -22,27 +22,26 @@
  * SOFTWARE.
  */
 
-#ifndef LIBFTP_SOCKET_BASE_HPP
-#define LIBFTP_SOCKET_BASE_HPP
+#ifndef LIBFTP_SOCKET_INTERFACE_HPP
+#define LIBFTP_SOCKET_INTERFACE_HPP
 
-#include <ftp/detail/socket_interface.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <memory>
 
 namespace ftp::detail
 {
 
-template<typename SocketType>
-class socket_base : public socket_interface
+// TODO: This class will declare connect(), read(), write() methods.
+class socket_interface
 {
 public:
-    SocketType & get_socket() override
-    {
-        return get_sock();
-    }
+    // TODO: Remove.
+    virtual boost::asio::ip::tcp::socket & get_socket() = 0;
 
-protected:
-    // TODO: Rename to get_socket();
-    virtual SocketType & get_sock() = 0;
+    virtual ~socket_interface() = default;
 };
 
+using socket_interface_ptr = std::unique_ptr<socket_interface>;
+
 } // namespace ftp::detail
-#endif //LIBFTP_SOCKET_BASE_HPP
+#endif //LIBFTP_SOCKET_INTERFACE_HPP
