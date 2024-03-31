@@ -33,7 +33,7 @@ namespace ftp::detail
 data_connection::data_connection(net_context & net_context)
     : acceptor_(net_context.get_io_context())
 {
-    socket_ptr_ = socket_factory::create(net_context.get_io_context());
+    socket_ = socket_factory::create(net_context.get_io_context());
 }
 
 void data_connection::connect(std::string_view ip, std::uint16_t port)
@@ -48,7 +48,7 @@ void data_connection::connect(std::string_view ip, std::uint16_t port)
     }
 
     boost::asio::ip::tcp::endpoint remote_endpoint(address, port);
-    socket_ptr_->connect(remote_endpoint, ec);
+    socket_->connect(remote_endpoint, ec);
 
     if (ec)
     {
@@ -59,7 +59,7 @@ void data_connection::connect(std::string_view ip, std::uint16_t port)
          *
          * https://www.boost.org/doc/libs/1_70_0/doc/html/boost_asio/reference/basic_stream_socket/connect/overload2.html
          */
-        socket_ptr_->close(ignored);
+        socket_->close(ignored);
 
         throw ftp_exception(ec, "Cannot open data connection");
     }
@@ -69,7 +69,7 @@ void data_connection::connect(const boost::asio::ip::tcp::endpoint & endpoint)
 {
     boost::system::error_code ec;
 
-    socket_ptr_->connect(endpoint, ec);
+    socket_->connect(endpoint, ec);
 
     if (ec)
     {
@@ -80,7 +80,7 @@ void data_connection::connect(const boost::asio::ip::tcp::endpoint & endpoint)
          *
          * https://www.boost.org/doc/libs/1_70_0/doc/html/boost_asio/reference/basic_stream_socket/connect/overload2.html
          */
-        socket_ptr_->close(ignored);
+        socket_->close(ignored);
 
         throw ftp_exception(ec, "Cannot open data connection");
     }
@@ -114,7 +114,7 @@ void data_connection::listen(const boost::asio::ip::tcp::endpoint & endpoint)
 
 void data_connection::accept()
 {
-    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
+    boost::asio::ip::tcp::socket & socket = socket_->get_socket();
     boost::system::error_code ec;
 
     acceptor_.accept(socket, ec);
@@ -144,7 +144,7 @@ void data_connection::send(input_stream & stream, transfer_callback * transfer_c
     {
         boost::system::error_code ec;
 
-        socket_ptr_->write(buf.data(), size, ec);
+        socket_->write(buf.data(), size, ec);
 
         if (ec)
         {
@@ -184,7 +184,7 @@ void data_connection::recv(output_stream & stream, transfer_callback * transfer_
     std::array<char, 8192> buf;
     std::size_t size;
 
-    while ((size = socket_ptr_->read_some(buf.data(), buf.size(), ec)) > 0)
+    while ((size = socket_->read_some(buf.data(), buf.size(), ec)) > 0)
     {
         stream.write(buf.data(), size);
 
@@ -222,7 +222,7 @@ void data_connection::disconnect(bool graceful)
 
     if (graceful)
     {
-        socket_ptr_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 
         if (ec == boost::asio::error::not_connected)
         {
@@ -237,7 +237,7 @@ void data_connection::disconnect(bool graceful)
         }
     }
 
-    socket_ptr_->close(ec);
+    socket_->close(ec);
 
     if (ec)
     {

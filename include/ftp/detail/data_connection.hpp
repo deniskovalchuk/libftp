@@ -63,7 +63,7 @@ public:
     [[nodiscard]] boost::asio::ip::tcp::endpoint get_listen_endpoint() const;
 
 private:
-    socket_interface_ptr socket_ptr_;
+    socket_interface_ptr socket_;
     boost::asio::ip::tcp::acceptor acceptor_;
 };
 

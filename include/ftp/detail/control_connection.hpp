@@ -62,7 +62,7 @@ private:
     static bool is_last_line(std::string_view line, std::uint16_t status_code);
 
     std::string buffer_;
-    socket_interface_ptr socket_ptr_;
+    socket_interface_ptr socket_;
 };
 
 } // namespace ftp::detail
