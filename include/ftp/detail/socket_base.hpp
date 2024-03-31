@@ -70,10 +70,10 @@ public:
         return socket.is_open();
     }
 
-    std::size_t write(std::string_view data, boost::system::error_code & ec) override
+    std::size_t write(std::string_view buffer, boost::system::error_code & ec) override
     {
         SocketType & socket = get_sock();
-        return boost::asio::write(socket, boost::asio::buffer(data), ec);
+        return boost::asio::write(socket, boost::asio::buffer(buffer), ec);
     }
 
     std::size_t read_line(std::string & buffer, std::size_t max_size, boost::system::error_code & ec) override

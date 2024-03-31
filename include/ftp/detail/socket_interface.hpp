@@ -41,7 +41,7 @@ public:
 
     virtual bool is_connected() const = 0;
 
-    virtual std::size_t write(std::string_view data, boost::system::error_code & ec) = 0;
+    virtual std::size_t write(std::string_view buffer, boost::system::error_code & ec) = 0;
 
     virtual std::size_t read_line(std::string & buffer, std::size_t max_size, boost::system::error_code & ec) = 0;
 
