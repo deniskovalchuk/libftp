@@ -224,7 +224,6 @@ void data_connection::recv(output_stream & stream, transfer_callback * transfer_
 
 void data_connection::disconnect(bool graceful)
 {
-    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
     boost::system::error_code ec;
 
     if (graceful)
@@ -244,7 +243,7 @@ void data_connection::disconnect(bool graceful)
         }
     }
 
-    socket.close(ec);
+    socket_ptr_->close(ec);
 
     if (ec)
     {

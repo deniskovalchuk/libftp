@@ -121,10 +121,9 @@ reply control_connection::recv()
      */
     if (code == 421)
     {
-        boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
         boost::system::error_code ec;
 
-        socket.close(ec);
+        socket_ptr_->close(ec);
 
         if (ec)
         {
@@ -234,7 +233,6 @@ std::string control_connection::read_line()
 
 void control_connection::disconnect()
 {
-    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
     boost::system::error_code ec;
 
     socket_ptr_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
@@ -251,7 +249,7 @@ void control_connection::disconnect()
         throw ftp_exception(ec, "Cannot close control connection");
     }
 
-    socket.close(ec);
+    socket_ptr_->close(ec);
 
     if (ec)
     {

@@ -74,6 +74,12 @@ public:
         socket.shutdown(type, ec);
     }
 
+    void close(boost::system::error_code & ec) override
+    {
+        SocketType & socket = get_sock();
+        socket.close(ec);
+    }
+
     SocketType & get_socket() override
     {
         return get_sock();
