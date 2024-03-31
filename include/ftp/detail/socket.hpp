@@ -38,6 +38,7 @@ public:
     explicit socket(boost::asio::io_context & io_context);
 
 private:
+    const boost::asio::ip::tcp::socket & get_sock() const override;
     boost::asio::ip::tcp::socket & get_sock() override;
 
     boost::asio::ip::tcp::socket socket_;

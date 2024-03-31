@@ -61,6 +61,13 @@ public:
         }
     }
 
+    [[nodiscard]]
+    bool is_connected() const override
+    {
+        const SocketType & socket = get_sock();
+        return socket.is_open();
+    }
+
     SocketType & get_socket() override
     {
         return get_sock();
@@ -68,6 +75,7 @@ public:
 
 protected:
     // TODO: Rename to get_socket();
+    virtual const SocketType & get_sock() const = 0;
     virtual SocketType & get_sock() = 0;
 };
 

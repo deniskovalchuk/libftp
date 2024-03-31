@@ -61,8 +61,7 @@ void control_connection::connect(std::string_view hostname, std::uint16_t port)
 
 bool control_connection::is_connected() const
 {
-    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
-    return socket.is_open();
+    return socket_ptr_->is_connected();
 }
 
 reply control_connection::recv()

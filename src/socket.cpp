@@ -31,6 +31,11 @@ socket::socket(boost::asio::io_context & io_context)
     : socket_(io_context)
 {}
 
+const boost::asio::ip::tcp::socket & socket::get_sock() const
+{
+    return socket_;
+}
+
 boost::asio::ip::tcp::socket & socket::get_sock()
 {
     return socket_;
