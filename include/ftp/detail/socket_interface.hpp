@@ -32,7 +32,6 @@
 namespace ftp::detail
 {
 
-// TODO: This class will declare connect(), read(), write() methods.
 // TODO: Move error handling to socket_interface implementation?
 class socket_interface
 {
