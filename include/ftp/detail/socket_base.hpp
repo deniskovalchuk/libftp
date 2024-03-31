@@ -70,23 +70,23 @@ public:
         return socket.is_open();
     }
 
-    std::size_t write(std::string_view buffer, boost::system::error_code & ec) override
+    std::size_t write(std::string_view buf, boost::system::error_code & ec) override
     {
         SocketType & socket = get_sock();
-        return boost::asio::write(socket, boost::asio::buffer(buffer), ec);
+        return boost::asio::write(socket, boost::asio::buffer(buf), ec);
     }
 
-    std::size_t read_some(char *buffer, std::size_t max_size, boost::system::error_code & ec) override
+    std::size_t read_some(char *buf, std::size_t max_size, boost::system::error_code & ec) override
     {
         SocketType & socket = get_sock();
-        return socket.read_some(boost::asio::buffer(buffer, max_size), ec);
+        return socket.read_some(boost::asio::buffer(buf, max_size), ec);
     }
 
-    std::size_t read_line(std::string & buffer, std::size_t max_size, boost::system::error_code & ec) override
+    std::size_t read_line(std::string & buf, std::size_t max_size, boost::system::error_code & ec) override
     {
         SocketType & socket = get_sock();
         return boost::asio::read_until(socket,
-                                       boost::asio::dynamic_buffer(buffer, max_size),
+                                       boost::asio::dynamic_buffer(buf, max_size),
                                        match_eol, ec);
     }
 

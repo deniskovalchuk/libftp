@@ -41,11 +41,11 @@ public:
 
     virtual bool is_connected() const = 0;
 
-    virtual std::size_t write(std::string_view buffer, boost::system::error_code & ec) = 0;
+    virtual std::size_t write(std::string_view buf, boost::system::error_code & ec) = 0;
 
-    virtual std::size_t read_some(char *buffer, std::size_t max_size, boost::system::error_code & ec) = 0;
+    virtual std::size_t read_some(char *buf, std::size_t max_size, boost::system::error_code & ec) = 0;
 
-    virtual std::size_t read_line(std::string & buffer, std::size_t max_size, boost::system::error_code & ec) = 0;
+    virtual std::size_t read_line(std::string & buf, std::size_t max_size, boost::system::error_code & ec) = 0;
 
     virtual void shutdown(boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec) = 0;
 
