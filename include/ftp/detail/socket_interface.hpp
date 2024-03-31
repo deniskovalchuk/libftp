@@ -44,6 +44,10 @@ public:
 
     virtual void close(boost::system::error_code & ec) = 0;
 
+    virtual boost::asio::ip::tcp::endpoint local_endpoint(boost::system::error_code & ec) const = 0;
+
+    virtual boost::asio::ip::tcp::endpoint remote_endpoint(boost::system::error_code & ec) const = 0;
+
     // TODO: Remove.
     virtual boost::asio::ip::tcp::socket & get_socket() = 0;
 

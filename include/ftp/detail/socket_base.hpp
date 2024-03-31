@@ -80,6 +80,18 @@ public:
         socket.close(ec);
     }
 
+    boost::asio::ip::tcp::endpoint local_endpoint(boost::system::error_code & ec) const override
+    {
+        const SocketType & socket = get_sock();
+        return socket.local_endpoint(ec);
+    }
+
+    boost::asio::ip::tcp::endpoint remote_endpoint(boost::system::error_code & ec) const override
+    {
+        const SocketType & socket = get_sock();
+        return socket.remote_endpoint(ec);
+    }
+
     SocketType & get_socket() override
     {
         return get_sock();

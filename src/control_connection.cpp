@@ -259,10 +259,9 @@ void control_connection::disconnect()
 
 boost::asio::ip::tcp::endpoint control_connection::get_local_endpoint() const
 {
-    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
     boost::system::error_code ec;
 
-    boost::asio::ip::tcp::endpoint local_endpoint = socket.local_endpoint(ec);
+    boost::asio::ip::tcp::endpoint local_endpoint = socket_ptr_->local_endpoint(ec);
 
     if (ec)
     {
@@ -274,10 +273,9 @@ boost::asio::ip::tcp::endpoint control_connection::get_local_endpoint() const
 
 boost::asio::ip::tcp::endpoint control_connection::get_remote_endpoint() const
 {
-    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
     boost::system::error_code ec;
 
-    boost::asio::ip::tcp::endpoint remote_endpoint = socket.remote_endpoint(ec);
+    boost::asio::ip::tcp::endpoint remote_endpoint = socket_ptr_->remote_endpoint(ec);
 
     if (ec)
     {
