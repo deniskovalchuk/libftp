@@ -28,6 +28,7 @@
 #include <ftp/detail/socket_interface.hpp>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/write.hpp>
+#include <boost/asio/read_until.hpp>
 
 namespace ftp::detail
 {
@@ -75,6 +76,14 @@ public:
         return boost::asio::write(socket, boost::asio::buffer(data), ec);
     }
 
+    std::size_t read_line(std::string & buffer, std::size_t max_size, boost::system::error_code & ec) override
+    {
+        SocketType & socket = get_sock();
+        return boost::asio::read_until(socket,
+                                       boost::asio::dynamic_buffer(buffer, max_size),
+                                       match_eol, ec);
+    }
+
     void shutdown(boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec) override
     {
         SocketType & socket = get_sock();
@@ -108,6 +117,37 @@ protected:
     // TODO: Rename to get_socket();
     virtual const SocketType & get_sock() const = 0;
     virtual SocketType & get_sock() = 0;
+
+private:
+    static std::pair<boost::asio::buffers_iterator<boost::asio::const_buffers_1>, bool>
+    match_eol(boost::asio::buffers_iterator<boost::asio::const_buffers_1> begin,
+              boost::asio::buffers_iterator<boost::asio::const_buffers_1> end)
+    {
+        boost::asio::buffers_iterator<boost::asio::const_buffers_1> it = begin;
+
+        while (it != end)
+        {
+            if (*it == '\n')
+            {
+                it++;
+                return std::make_pair(it, true);
+            }
+            else if (*it == '\r')
+            {
+                it++;
+
+                // Handle CRLF case.
+                if (it != end && *it == '\n')
+                    it++;
+
+                return std::make_pair(it, true);
+            }
+
+            it++;
+        }
+
+        return std::make_pair(it, false);
+    }
 };
 
 } // namespace ftp::detail

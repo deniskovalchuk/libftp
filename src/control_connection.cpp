@@ -26,7 +26,6 @@
 #include <ftp/detail/control_connection.hpp>
 #include <ftp/detail/socket_factory.hpp>
 #include <ftp/detail/utils.hpp>
-#include <boost/asio/read_until.hpp>
 
 namespace ftp::detail
 {
@@ -175,44 +174,11 @@ void control_connection::send(std::string_view command)
     }
 }
 
-static std::pair<boost::asio::buffers_iterator<boost::asio::const_buffers_1>, bool>
-match_eol(boost::asio::buffers_iterator<boost::asio::const_buffers_1> begin,
-          boost::asio::buffers_iterator<boost::asio::const_buffers_1> end)
-{
-    boost::asio::buffers_iterator<boost::asio::const_buffers_1> it = begin;
-
-    while (it != end)
-    {
-        if (*it == '\n')
-        {
-            it++;
-            return std::make_pair(it, true);
-        }
-        else if (*it == '\r')
-        {
-            it++;
-
-            // Handle CRLF case.
-            if (it != end && *it == '\n')
-                it++;
-
-            return std::make_pair(it, true);
-        }
-
-        it++;
-    }
-
-    return std::make_pair(it, false);
-}
-
 std::string control_connection::read_line()
 {
-    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
     boost::system::error_code ec;
 
-    std::size_t len = boost::asio::read_until(socket,
-                                              boost::asio::dynamic_buffer(buffer_, 8192),
-                                              match_eol, ec);
+    std::size_t len = socket_ptr_->read_line(buffer_, 8192, ec);
 
     if (ec == boost::asio::error::eof)
     {
