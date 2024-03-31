@@ -32,7 +32,6 @@
 namespace ftp::detail
 {
 
-// TODO: Move error handling to socket_interface implementation?
 class socket_interface
 {
 public:
