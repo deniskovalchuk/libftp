@@ -27,6 +27,7 @@
 
 #include <boost/asio/ip/tcp.hpp>
 #include <memory>
+#include <cstdint>
 
 namespace ftp::detail
 {
