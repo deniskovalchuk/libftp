@@ -26,7 +26,6 @@
 #include <ftp/detail/control_connection.hpp>
 #include <ftp/detail/socket_factory.hpp>
 #include <ftp/detail/utils.hpp>
-#include <boost/asio/connect.hpp>
 #include <boost/asio/read_until.hpp>
 #include <boost/asio/write.hpp>
 
@@ -50,31 +49,12 @@ control_connection::control_connection(net_context & net_context)
 
 void control_connection::connect(std::string_view hostname, std::uint16_t port)
 {
-    boost::asio::ip::tcp::socket & socket = socket_ptr_->get_socket();
-    boost::asio::ip::tcp::resolver resolver(socket.get_executor());
     boost::system::error_code ec;
 
-    boost::asio::ip::tcp::resolver::results_type endpoints =
-            resolver.resolve(hostname, std::to_string(port), ec);
+    socket_ptr_->connect(hostname, port, ec);
 
     if (ec)
     {
-        throw ftp_exception(ec, "Cannot open control connection");
-    }
-
-    boost::asio::connect(socket, endpoints, ec);
-
-    if (ec)
-    {
-        boost::system::error_code ignored;
-
-        /* If the connect fails, and the socket was automatically opened,
-         * the socket is not returned to the closed state.
-         *
-         * https://www.boost.org/doc/libs/1_70_0/doc/html/boost_asio/reference/basic_stream_socket/connect/overload2.html
-         */
-        socket.close(ignored);
-
         throw ftp_exception(ec, "Cannot open control connection");
     }
 }
