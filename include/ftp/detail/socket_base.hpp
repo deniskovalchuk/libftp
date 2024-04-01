@@ -96,7 +96,7 @@ public:
     }
 
     [[nodiscard]]
-    const boost::asio::ip::tcp::socket::executor_type & get_executor() override
+    boost::asio::ip::tcp::socket::executor_type get_executor() override
     {
         return get_sock().get_executor();
     }

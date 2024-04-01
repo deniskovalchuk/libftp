@@ -57,7 +57,7 @@ public:
 
     virtual boost::asio::ip::tcp::endpoint remote_endpoint(boost::system::error_code & ec) const = 0;
 
-    virtual const boost::asio::ip::tcp::socket::executor_type & get_executor() = 0;
+    virtual boost::asio::ip::tcp::socket::executor_type get_executor() = 0;
 
     // TODO: Remove.
     virtual boost::asio::ip::tcp::socket & get_socket() = 0;
