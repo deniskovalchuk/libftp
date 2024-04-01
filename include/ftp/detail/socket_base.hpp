@@ -25,91 +25,123 @@
 #ifndef LIBFTP_SOCKET_BASE_HPP
 #define LIBFTP_SOCKET_BASE_HPP
 
-#include <ftp/detail/socket_interface.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/asio/read_until.hpp>
+#include <memory>
 
 namespace ftp::detail
 {
 
-template<typename SocketType>
-class socket_base : public socket_interface
+class socket_base
 {
 public:
-    void connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec) override
+    virtual void connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec) = 0;
+
+    virtual void connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec) = 0;
+
+    virtual bool is_connected() const = 0;
+
+    virtual std::size_t write(const char *buf, std::size_t size, boost::system::error_code & ec) = 0;
+
+    virtual std::size_t write(std::string_view buf, boost::system::error_code & ec) = 0;
+
+    virtual std::size_t read_some(char *buf, std::size_t max_size, boost::system::error_code & ec) = 0;
+
+    virtual std::size_t read_line(std::string & buf, std::size_t max_size, boost::system::error_code & ec) = 0;
+
+    virtual void shutdown(boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec) = 0;
+
+    virtual void close(boost::system::error_code & ec) = 0;
+
+    virtual boost::asio::ip::tcp::endpoint local_endpoint(boost::system::error_code & ec) const = 0;
+
+    virtual boost::asio::ip::tcp::endpoint remote_endpoint(boost::system::error_code & ec) const = 0;
+
+    virtual boost::asio::ip::tcp::socket::executor_type get_executor() = 0;
+
+    // TODO: Remove.
+    virtual boost::asio::ip::tcp::socket & get_socket() = 0;
+
+    virtual ~socket_base() = default;
+
+protected:
+    template<typename SocketType>
+    void connect(SocketType & socket, const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec)
     {
-        boost::asio::connect(get_sock(), eps, ec);
+        boost::asio::connect(socket, eps, ec);
     }
 
-    void connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec) override
+    template<typename SocketType>
+    void connect(SocketType & socket, const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec)
     {
-        get_sock().connect(ep, ec);
+        socket.connect(ep, ec);
     }
 
+    template<typename SocketType>
     [[nodiscard]]
-    bool is_connected() const override
+    bool is_connected(const SocketType & socket) const
     {
-        return get_sock().is_open();
+        return socket.is_open();
     }
 
-    std::size_t write(const char *buf, std::size_t size, boost::system::error_code & ec) override
+    template<typename SocketType>
+    std::size_t write(SocketType & socket, const char *buf, std::size_t size, boost::system::error_code & ec)
     {
-        return boost::asio::write(get_sock(), boost::asio::buffer(buf, size), ec);
+        return boost::asio::write(socket, boost::asio::buffer(buf, size), ec);
     }
 
-    std::size_t write(std::string_view buf, boost::system::error_code & ec) override
+    template<typename SocketType>
+    std::size_t write(SocketType & socket, std::string_view buf, boost::system::error_code & ec)
     {
-        return boost::asio::write(get_sock(), boost::asio::buffer(buf), ec);
+        return boost::asio::write(socket, boost::asio::buffer(buf), ec);
     }
 
-    std::size_t read_some(char *buf, std::size_t max_size, boost::system::error_code & ec) override
+    template<typename SocketType>
+    std::size_t read_some(SocketType & socket, char *buf, std::size_t max_size, boost::system::error_code & ec)
     {
-        return get_sock().read_some(boost::asio::buffer(buf, max_size), ec);
+        return socket.read_some(boost::asio::buffer(buf, max_size), ec);
     }
 
-    std::size_t read_line(std::string & buf, std::size_t max_size, boost::system::error_code & ec) override
+    template<typename SocketType>
+    std::size_t read_line(SocketType & socket, std::string & buf, std::size_t max_size, boost::system::error_code & ec)
     {
-        return boost::asio::read_until(get_sock(),
+        return boost::asio::read_until(socket,
                                        boost::asio::dynamic_buffer(buf, max_size),
                                        match_eol, ec);
     }
 
-    void shutdown(boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec) override
+    template<typename SocketType>
+    void shutdown(SocketType & socket, boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec)
     {
-        get_sock().shutdown(type, ec);
+        socket.shutdown(type, ec);
     }
 
-    void close(boost::system::error_code & ec) override
+    template<typename SocketType>
+    void close(SocketType & socket, boost::system::error_code & ec)
     {
-        get_sock().close(ec);
+        socket.close(ec);
     }
 
-    boost::asio::ip::tcp::endpoint local_endpoint(boost::system::error_code & ec) const override
+    template<typename SocketType>
+    boost::asio::ip::tcp::endpoint local_endpoint(const SocketType & socket, boost::system::error_code & ec) const
     {
-        return get_sock().local_endpoint(ec);
+        return socket.local_endpoint(ec);
     }
 
-    boost::asio::ip::tcp::endpoint remote_endpoint(boost::system::error_code & ec) const override
+    template<typename SocketType>
+    boost::asio::ip::tcp::endpoint remote_endpoint(const SocketType & socket, boost::system::error_code & ec) const
     {
-        return get_sock().remote_endpoint(ec);
+        return socket.remote_endpoint(ec);
     }
 
+    template<typename SocketType>
     [[nodiscard]]
-    boost::asio::ip::tcp::socket::executor_type get_executor() override
+    boost::asio::ip::tcp::socket::executor_type get_executor(SocketType & socket)
     {
-        return get_sock().get_executor();
+        return socket.get_executor();
     }
-
-    SocketType & get_socket() override
-    {
-        return get_sock();
-    }
-
-protected:
-    // TODO: Rename to get_socket();
-    virtual const SocketType & get_sock() const = 0;
-    virtual SocketType & get_sock() = 0;
 
 private:
     static std::pair<boost::asio::buffers_iterator<boost::asio::const_buffers_1>, bool>
@@ -142,6 +174,8 @@ private:
         return std::make_pair(it, false);
     }
 };
+
+using socket_base_ptr = std::unique_ptr<socket_base>;
 
 } // namespace ftp::detail
 #endif //LIBFTP_SOCKET_BASE_HPP

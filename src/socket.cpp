@@ -31,12 +31,67 @@ socket::socket(boost::asio::io_context & io_context)
     : socket_(io_context)
 {}
 
-const boost::asio::ip::tcp::socket & socket::get_sock() const
+void socket::connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec)
 {
-    return socket_;
+    socket_base::connect(socket_, eps, ec);
 }
 
-boost::asio::ip::tcp::socket & socket::get_sock()
+void socket::connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec)
+{
+    socket_base::connect(socket_, ep, ec);
+}
+
+bool socket::is_connected() const
+{
+    return socket_base::is_connected(socket_);
+}
+
+std::size_t socket::write(const char *buf, std::size_t size, boost::system::error_code & ec)
+{
+    return socket_base::write(socket_, buf, size, ec);
+}
+
+std::size_t socket::write(std::string_view buf, boost::system::error_code & ec)
+{
+    return socket_base::write(socket_, buf, ec);
+}
+
+std::size_t socket::read_some(char *buf, std::size_t max_size, boost::system::error_code & ec)
+{
+    return socket_base::read_some(socket_, buf, max_size, ec);
+}
+
+std::size_t socket::read_line(std::string & buf, std::size_t max_size, boost::system::error_code & ec)
+{
+    return socket_base::read_line(socket_, buf, max_size, ec);
+}
+
+void socket::shutdown(boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec)
+{
+    socket_base::shutdown(socket_, type, ec);
+}
+
+void socket::close(boost::system::error_code & ec)
+{
+    socket_base::close(socket_, ec);
+}
+
+boost::asio::ip::tcp::endpoint socket::local_endpoint(boost::system::error_code & ec) const
+{
+    return socket_base::local_endpoint(socket_, ec);
+}
+
+boost::asio::ip::tcp::endpoint socket::remote_endpoint(boost::system::error_code & ec) const
+{
+    return socket_base::remote_endpoint(socket_, ec);
+}
+
+boost::asio::ip::tcp::socket::executor_type socket::get_executor()
+{
+    return socket_base::get_executor(socket_);
+}
+
+boost::asio::ip::tcp::socket & socket::get_socket()
 {
     return socket_;
 }

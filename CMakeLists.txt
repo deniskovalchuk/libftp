@@ -26,7 +26,6 @@ set(sources
         include/ftp/detail/socket_base.hpp
         include/ftp/detail/socket_factory.hpp
         include/ftp/detail/utils.hpp
-        include/ftp/detail/socket_interface.hpp
         include/ftp/stream/input_stream.hpp
         include/ftp/stream/istream_adapter.hpp
         include/ftp/stream/ostream_adapter.hpp

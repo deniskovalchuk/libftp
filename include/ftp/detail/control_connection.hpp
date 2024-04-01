@@ -27,7 +27,7 @@
 
 #include <ftp/reply.hpp>
 #include <ftp/detail/net_context.hpp>
-#include <ftp/detail/socket_interface.hpp>
+#include <ftp/detail/socket_base.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
 namespace ftp::detail
@@ -62,7 +62,7 @@ private:
     static bool is_last_line(std::string_view line, std::uint16_t status_code);
 
     std::string buffer_;
-    socket_interface_ptr socket_;
+    socket_base_ptr socket_;
 };
 
 } // namespace ftp::detail

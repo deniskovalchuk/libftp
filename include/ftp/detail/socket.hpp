@@ -32,15 +32,38 @@
 namespace ftp::detail
 {
 
-class socket : public socket_base<boost::asio::ip::tcp::socket>
+class socket : public socket_base
 {
 public:
     explicit socket(boost::asio::io_context & io_context);
 
-private:
-    const boost::asio::ip::tcp::socket & get_sock() const override;
-    boost::asio::ip::tcp::socket & get_sock() override;
+    void connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec) override;
 
+    void connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec) override;
+
+    bool is_connected() const override;
+
+    std::size_t write(const char *buf, std::size_t size, boost::system::error_code & ec) override;
+
+    std::size_t write(std::string_view buf, boost::system::error_code & ec) override;
+
+    std::size_t read_some(char *buf, std::size_t max_size, boost::system::error_code & ec) override;
+
+    std::size_t read_line(std::string & buf, std::size_t max_size, boost::system::error_code & ec) override;
+
+    void shutdown(boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec) override;
+
+    void close(boost::system::error_code & ec) override;
+
+    boost::asio::ip::tcp::endpoint local_endpoint(boost::system::error_code & ec) const override;
+
+    boost::asio::ip::tcp::endpoint remote_endpoint(boost::system::error_code & ec) const override;
+
+    boost::asio::ip::tcp::socket::executor_type get_executor() override;
+
+    boost::asio::ip::tcp::socket & get_socket() override;
+
+private:
     boost::asio::ip::tcp::socket socket_;
 };
 
