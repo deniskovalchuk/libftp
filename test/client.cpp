@@ -1086,6 +1086,36 @@ class ssl_client : public client_base<2142, true>
 {
 };
 
+TEST_F(ssl_client, open_connection)
+{
+    ftp::client client;
+
+    ASSERT_FALSE(client.is_connected());
+
+    for (int i = 0; i < 5; i++)
+    {
+        check_reply(client.connect("127.0.0.1", 2142), CRLF("220 FTP server is ready.",
+                                                            "234 AUTH TLS successful."));
+        ASSERT_TRUE(client.is_connected());
+
+        check_reply(client.disconnect(), "221 Goodbye.");
+        ASSERT_FALSE(client.is_connected());
+    }
+
+    for (int i = 0; i < 5; i++)
+    {
+        check_reply(client.connect("127.0.0.1", 2142, "alice", "password"), CRLF("220 FTP server is ready.",
+                                                                                 "234 AUTH TLS successful.",
+                                                                                 "331 Username ok, send password.",
+                                                                                 "230 Login successful.",
+                                                                                 "200 Type set to: Binary."));
+        ASSERT_TRUE(client.is_connected());
+
+        check_reply(client.disconnect(), "221 Goodbye.");
+        ASSERT_FALSE(client.is_connected());
+    }
+}
+
 TEST_F(ssl_client, login_without_ssl)
 {
     ftp::client client;
