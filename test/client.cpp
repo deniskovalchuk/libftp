@@ -1120,7 +1120,7 @@ TEST_F(ssl_client, open_connection)
     }
 }
 
-TEST_F(ssl_client, login_without_ssl)
+TEST_F(ssl_client, login_without_ssl_context)
 {
     ftp::client client;
 
