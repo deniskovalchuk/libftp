@@ -41,7 +41,7 @@ public:
 
     void connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec) override;
 
-    bool is_connected() const override;
+    [[nodiscard]] bool is_connected() const override;
 
     std::size_t write(const char *buf, std::size_t size, boost::system::error_code & ec) override;
 
@@ -55,13 +55,13 @@ public:
 
     void close(boost::system::error_code & ec) override;
 
-    boost::asio::ip::tcp::endpoint local_endpoint(boost::system::error_code & ec) const override;
+    [[nodiscard]] boost::asio::ip::tcp::endpoint local_endpoint(boost::system::error_code & ec) const override;
 
-    boost::asio::ip::tcp::endpoint remote_endpoint(boost::system::error_code & ec) const override;
+    [[nodiscard]] boost::asio::ip::tcp::endpoint remote_endpoint(boost::system::error_code & ec) const override;
 
-    boost::asio::ip::tcp::socket::executor_type get_executor() override;
+    [[nodiscard]] boost::asio::ip::tcp::socket::executor_type get_executor() override;
 
-    boost::asio::ip::tcp::socket & get_socket() override;
+    [[nodiscard]] boost::asio::ip::tcp::socket & get_socket() override;
 
 private:
     boost::asio::ip::tcp::socket socket_;

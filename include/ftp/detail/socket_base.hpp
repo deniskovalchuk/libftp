@@ -41,7 +41,7 @@ public:
 
     virtual void connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec) = 0;
 
-    virtual bool is_connected() const = 0;
+    [[nodiscard]] virtual bool is_connected() const = 0;
 
     virtual std::size_t write(const char *buf, std::size_t size, boost::system::error_code & ec) = 0;
 
@@ -55,14 +55,14 @@ public:
 
     virtual void close(boost::system::error_code & ec) = 0;
 
-    virtual boost::asio::ip::tcp::endpoint local_endpoint(boost::system::error_code & ec) const = 0;
+    [[nodiscard]] virtual boost::asio::ip::tcp::endpoint local_endpoint(boost::system::error_code & ec) const = 0;
 
-    virtual boost::asio::ip::tcp::endpoint remote_endpoint(boost::system::error_code & ec) const = 0;
+    [[nodiscard]] virtual boost::asio::ip::tcp::endpoint remote_endpoint(boost::system::error_code & ec) const = 0;
 
-    virtual boost::asio::ip::tcp::socket::executor_type get_executor() = 0;
+    [[nodiscard]] virtual boost::asio::ip::tcp::socket::executor_type get_executor() = 0;
 
     // TODO: Remove.
-    virtual boost::asio::ip::tcp::socket & get_socket() = 0;
+    [[nodiscard]] virtual boost::asio::ip::tcp::socket & get_socket() = 0;
 
     virtual ~socket_base() = default;
 
@@ -125,12 +125,14 @@ protected:
     }
 
     template<typename SocketType>
+    [[nodiscard]]
     boost::asio::ip::tcp::endpoint local_endpoint(const SocketType & socket, boost::system::error_code & ec) const
     {
         return socket.local_endpoint(ec);
     }
 
     template<typename SocketType>
+    [[nodiscard]]
     boost::asio::ip::tcp::endpoint remote_endpoint(const SocketType & socket, boost::system::error_code & ec) const
     {
         return socket.remote_endpoint(ec);
