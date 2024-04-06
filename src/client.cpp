@@ -70,6 +70,12 @@ replies client::connect(std::string_view hostname,
     replies replies;
     reply reply = recv(replies);
 
+    if (ssl_context_)
+    {
+        // TODO: Check reply.
+        process_command("AUTH TLS", replies);
+    }
+
     if (username && reply.is_positive())
     {
         process_login(username.value(), password, replies);
