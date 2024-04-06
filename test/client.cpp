@@ -1133,13 +1133,12 @@ TEST_F(ssl_client, open_connection)
     }
 }
 
-TEST_F(ssl_client, login_without_ssl_context)
+TEST_F(ssl_client, open_non_ssl_connection)
 {
     ftp::client client;
 
-    check_reply(client.connect("127.0.0.1", 2142), "220 FTP server is ready.");
-
-    check_reply(client.login("user", "password"), CRLF("550 SSL/TLS required on the control channel."));
+    check_reply(client.connect("127.0.0.1", 2142, "user", "password"), CRLF("220 FTP server is ready.",
+                                                                            "550 SSL/TLS required on the control channel."));
 
     check_reply(client.disconnect(), "221 Goodbye.");
 }
