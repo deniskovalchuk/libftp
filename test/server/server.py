@@ -53,7 +53,8 @@ def main():
 
     if args.use_ssl == 'yes':
         handler = TLS_FTPHandler
-        handler.certfile = os.path.join(sys.path[0], 'pyftpdlib/test/keycert.pem')
+        handler.certfile = os.path.join(sys.path[0], 'certs/server_cert.pem')
+        handler.keyfile = os.path.join(sys.path[0], 'certs/server_cert.key')
         handler.tls_control_required = True
         handler.tls_data_required = True
         log_filename = "ssl_server.log"
