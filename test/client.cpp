@@ -29,6 +29,7 @@
 #include <ftp/client.hpp>
 #include <ftp/ftp_exception.hpp>
 #include <ftp/observer.hpp>
+#include <ftp/ssl_context.hpp>
 #include <ftp/stream/istream_adapter.hpp>
 #include <ftp/stream/ostream_adapter.hpp>
 #include "test_server.hpp"
@@ -1088,7 +1089,12 @@ class ssl_client : public client_base<2142, true>
 
 TEST_F(ssl_client, open_connection)
 {
-    ftp::client client;
+    ftp::ssl_context_ptr ssl_context =
+        std::make_unique<ftp::ssl_context>(ftp::ssl_context::tls_client);
+
+    ftp::client client(ftp::transfer_mode::passive,
+                       ftp::transfer_type::binary,
+                       std::move(ssl_context));
 
     ASSERT_FALSE(client.is_connected());
 

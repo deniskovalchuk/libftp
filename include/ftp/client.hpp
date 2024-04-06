@@ -30,6 +30,7 @@
 #include <ftp/file_size_reply.hpp>
 #include <ftp/replies.hpp>
 #include <ftp/reply.hpp>
+#include <ftp/ssl_context.hpp>
 #include <ftp/transfer_callback.hpp>
 #include <ftp/transfer_mode.hpp>
 #include <ftp/transfer_type.hpp>
@@ -52,6 +53,7 @@ class client
 public:
     explicit client(transfer_mode mode = transfer_mode::passive,
                     transfer_type type = transfer_type::binary,
+                    ssl_context_ptr && ssl_context = nullptr,
                     bool rfc2428_support = true);
 
     client(const client &) = delete;
@@ -188,6 +190,7 @@ private:
 
     transfer_mode transfer_mode_;
     transfer_type transfer_type_;
+    ssl_context_ptr ssl_context_;
     bool rfc2428_support_;
     detail::net_context net_context_;
     detail::control_connection control_connection_;
