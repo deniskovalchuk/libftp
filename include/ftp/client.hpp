@@ -56,6 +56,8 @@ public:
                     ssl_context_ptr && ssl_context = nullptr,
                     bool rfc2428_support = true);
 
+    explicit client(ssl_context_ptr && ssl_context);
+
     client(const client &) = delete;
 
     client & operator=(const client &) = delete;

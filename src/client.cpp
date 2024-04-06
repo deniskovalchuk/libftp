@@ -50,6 +50,13 @@ client::client(transfer_mode mode,
 {
 }
 
+client::client(ftp::ssl_context_ptr && ssl_context)
+    : client(transfer_mode::passive,
+             transfer_type::binary,
+             std::move(ssl_context))
+{
+}
+
 replies client::connect(std::string_view hostname,
                         std::uint16_t port,
                         const std::optional<std::string_view> & username,

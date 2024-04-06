@@ -1092,9 +1092,7 @@ TEST_F(ssl_client, open_connection)
     ftp::ssl_context_ptr ssl_context =
         std::make_unique<ftp::ssl_context>(ftp::ssl_context::tls_client);
 
-    ftp::client client(ftp::transfer_mode::passive,
-                       ftp::transfer_type::binary,
-                       std::move(ssl_context));
+    ftp::client client(std::move(ssl_context));
 
     ASSERT_FALSE(client.is_connected());
 
