@@ -797,6 +797,19 @@ TEST_F(client, upload_unique_file)
     check_reply(client.disconnect(), "221 Goodbye.");
 }
 
+TEST_F(client, open_ssl_connection)
+{
+    ftp::ssl_context_ptr ssl_context =
+        std::make_unique<ftp::ssl_context>(ftp::ssl_context::tls_client);
+
+    ftp::client client(std::move(ssl_context));
+
+    check_reply(client.connect("127.0.0.1", 2121, "user", "password"), CRLF("220 FTP server is ready.",
+                                                                            "500 Command \"AUTH\" not understood."));
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
 class client_with_transfer_mode : public client,
                                   public testing::WithParamInterface<ftp::transfer_mode>
 {
