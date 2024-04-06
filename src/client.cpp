@@ -70,10 +70,9 @@ replies client::connect(std::string_view hostname,
     replies replies;
     reply reply = recv(replies);
 
-    if (ssl_context_)
+    if (ssl_context_ && reply.is_positive())
     {
-        // TODO: Check reply.
-        process_command("AUTH TLS", replies);
+        reply = process_command("AUTH TLS", replies);
     }
 
     if (username && reply.is_positive())
