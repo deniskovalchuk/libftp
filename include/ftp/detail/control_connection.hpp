@@ -47,7 +47,7 @@ public:
 
     void set_ssl(ssl_context *ssl_context);
 
-    bool is_ssl() const;
+    [[nodiscard]] bool is_ssl() const;
 
     void handshake();
 
