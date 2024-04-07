@@ -38,6 +38,11 @@ jobs:
         .\bootstrap
         .\b2 link=static
 
+    - name: Install pyOpenSSL
+      working-directory: ${{runner.temp}}
+      shell: powershell
+      run: pip3 install pyOpenSSL
+
     - name: Build
       env:
         BOOST_ROOT: ${{runner.temp}}\boost_1_83_0
