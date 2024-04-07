@@ -1101,16 +1101,8 @@ class ssl_client : public client_base<2142, true>
 public:
     static ftp::ssl_context_ptr create_ssl_context()
     {
-        const char *server_path = std::getenv("LIBFTP_TEST_SERVER_PATH");
-        if (!server_path)
-        {
-            throw std::runtime_error("LIBFTP_TEST_SERVER_PATH is not set.");
-        }
-
-        std::filesystem::path server_dir = std::filesystem::path(server_path).parent_path();
-        std::filesystem::path certs_dir = server_dir / "certs";
-        std::filesystem::path root_ca_cert = certs_dir / "root_ca_cert.pem";
-        std::filesystem::path ca_cert = certs_dir / "ca_cert.pem";
+        std::filesystem::path root_ca_cert = ftp::test::server::get_root_ca_cert_path();
+        std::filesystem::path ca_cert = ftp::test::server::get_ca_cert_path();
 
         ftp::ssl_context_ptr ssl_context = std::make_unique<ftp::ssl_context>(ftp::ssl_context::tls_client);
         ssl_context->load_verify_file(root_ca_cert);

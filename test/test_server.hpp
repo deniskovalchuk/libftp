@@ -38,11 +38,7 @@ class server
 public:
     void start(const std::string & root_directory, std::uint16_t port, bool use_ssl)
     {
-        const char *server_path = std::getenv("LIBFTP_TEST_SERVER_PATH");
-        if (!server_path)
-        {
-            throw std::runtime_error("LIBFTP_TEST_SERVER_PATH is not set.");
-        }
+        std::filesystem::path server_script_path = get_server_script_path();
 
         boost::filesystem::path python_path = boost::process::search_path("python3");
         if (python_path.empty())
@@ -68,7 +64,7 @@ public:
 
         /* Usage: python server.py root_directory port [--use-ssl {yes,no}] */
         boost::process::ipstream output;
-        process_ = boost::process::child(python_path, server_path,
+        process_ = boost::process::child(python_path, server_script_path.c_str(),
                                          root_directory, std::to_string(port), use_ssl_arg,
                                          boost::process::std_out > boost::process::null,
                                          boost::process::std_err > output);
@@ -96,7 +92,37 @@ public:
         process_.terminate();
     }
 
+    static std::filesystem::path get_root_ca_cert_path()
+    {
+        std::filesystem::path server_script_path = get_server_script_path();
+        std::filesystem::path server_dir = server_script_path.parent_path();
+        std::filesystem::path certs_dir = server_dir / "certs";
+        std::filesystem::path root_ca_cert = certs_dir / "root_ca_cert.pem";
+        return root_ca_cert;
+    }
+
+    static std::filesystem::path get_ca_cert_path()
+    {
+        std::filesystem::path server_script_path = get_server_script_path();
+        std::filesystem::path server_dir = server_script_path.parent_path();
+        std::filesystem::path certs_dir = server_dir / "certs";
+        std::filesystem::path ca_cert = certs_dir / "ca_cert.pem";
+        return ca_cert;
+    }
+
 private:
+    static std::filesystem::path get_server_script_path()
+    {
+        const char *path = std::getenv("LIBFTP_TEST_SERVER_PATH");
+
+        if (!path)
+        {
+            throw std::runtime_error("LIBFTP_TEST_SERVER_PATH is not set.");
+        }
+
+        return { path };
+    }
+
     boost::process::child process_;
 };
 
