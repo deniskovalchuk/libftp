@@ -23,7 +23,7 @@
  */
 
 #include <ftp/detail/data_connection.hpp>
-#include <ftp/detail/socket_factory.hpp>
+#include <ftp/detail/socket.hpp>
 #include <ftp/ftp_exception.hpp>
 #include <array>
 
@@ -33,7 +33,7 @@ namespace ftp::detail
 data_connection::data_connection(net_context & net_context)
     : acceptor_(net_context.get_io_context())
 {
-    socket_ = socket_factory::create(net_context.get_io_context());
+    socket_ = std::make_unique<socket>(net_context.get_io_context());
 }
 
 void data_connection::connect(std::string_view ip, std::uint16_t port)

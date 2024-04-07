@@ -24,7 +24,6 @@
 
 #include <ftp/ftp_exception.hpp>
 #include <ftp/detail/control_connection.hpp>
-#include <ftp/detail/socket_factory.hpp>
 #include <ftp/detail/socket.hpp>
 #include <ftp/detail/ssl_socket.hpp>
 #include <ftp/detail/utils.hpp>
@@ -44,7 +43,7 @@ static bool try_parse_status_code(std::string_view line, std::uint16_t & status_
 
 control_connection::control_connection(net_context & net_context)
 {
-    socket_ = socket_factory::create(net_context.get_io_context());
+    socket_ = std::make_unique<socket>(net_context.get_io_context());
 }
 
 void control_connection::connect(std::string_view hostname, std::uint16_t port)

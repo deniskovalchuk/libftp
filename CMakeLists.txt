@@ -24,7 +24,6 @@ set(sources
         include/ftp/detail/net_utils.hpp
         include/ftp/detail/socket.hpp
         include/ftp/detail/socket_base.hpp
-        include/ftp/detail/socket_factory.hpp
         include/ftp/detail/ssl_socket.hpp
         include/ftp/detail/utils.hpp
         include/ftp/stream/input_stream.hpp
@@ -59,7 +58,6 @@ set(sources
         src/replies.cpp
         src/reply.cpp
         src/socket.cpp
-        src/socket_factory.cpp
         src/ssl_socket.cpp
         src/utils.cpp)
 
