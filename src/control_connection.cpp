@@ -90,6 +90,11 @@ void control_connection::use_ssl(ssl_context *ssl_context)
     }
 }
 
+bool control_connection::is_ssl_used() const
+{
+    return socket_->has_ssl_support();
+}
+
 void control_connection::handshake()
 {
     boost::system::error_code ec;

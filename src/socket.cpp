@@ -50,6 +50,11 @@ void socket::handshake(boost::asio::ssl::stream_base::handshake_type type, boost
     /* Handshake makes sense only for SSL-sockets. */
 }
 
+bool socket::has_ssl_support() const
+{
+    return false;
+}
+
 bool socket::is_connected() const
 {
     return socket_base::is_connected(socket_);

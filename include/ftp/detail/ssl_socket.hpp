@@ -45,6 +45,8 @@ public:
 
     void handshake(boost::asio::ssl::stream_base::handshake_type type, boost::system::error_code & ec) override;
 
+    [[nodiscard]] bool has_ssl_support() const override;
+
     [[nodiscard]] bool is_connected() const override;
 
     std::size_t write(const char *buf, std::size_t size, boost::system::error_code & ec) override;

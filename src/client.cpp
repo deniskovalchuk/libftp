@@ -332,6 +332,12 @@ std::optional<reply> client::disconnect(bool graceful)
         control_connection_.disconnect();
     }
 
+    /* Switch the control connection to non-SSL mode. */
+    if (control_connection_.is_ssl_used())
+    {
+        control_connection_.use_ssl(nullptr);
+    }
+
     return reply;
 }
 

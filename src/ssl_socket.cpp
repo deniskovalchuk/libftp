@@ -47,6 +47,11 @@ void ssl_socket::handshake(boost::asio::ssl::stream_base::handshake_type type, b
     socket_.handshake(type, ec);
 }
 
+bool ssl_socket::has_ssl_support() const
+{
+    return true;
+}
+
 bool ssl_socket::is_connected() const
 {
     return socket_base::is_connected(socket_.lowest_layer());

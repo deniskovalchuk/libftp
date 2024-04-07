@@ -44,6 +44,8 @@ public:
 
     virtual void handshake(boost::asio::ssl::stream_base::handshake_type type, boost::system::error_code & ec) = 0;
 
+    [[nodiscard]] virtual bool has_ssl_support() const = 0;
+
     [[nodiscard]] virtual bool is_connected() const = 0;
 
     virtual std::size_t write(const char *buf, std::size_t size, boost::system::error_code & ec) = 0;

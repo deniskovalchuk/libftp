@@ -47,6 +47,8 @@ public:
 
     void use_ssl(ssl_context *ssl_context);
 
+    bool is_ssl_used() const;
+
     void handshake();
 
     [[nodiscard]] bool is_connected() const;
