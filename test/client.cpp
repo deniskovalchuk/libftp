@@ -1108,7 +1108,7 @@ public:
         }
 
         std::filesystem::path server_dir = std::filesystem::path(server_path).parent_path();
-        std::filesystem::path certs_dir = server_dir / "certs_dir";
+        std::filesystem::path certs_dir = server_dir / "certs";
         std::filesystem::path root_ca_cert = certs_dir / "root_ca_cert.pem";
         std::filesystem::path ca_cert = certs_dir / "ca_cert.pem";
 
