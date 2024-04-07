@@ -29,6 +29,7 @@
 #include <boost/asio/connect.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/asio/read_until.hpp>
+#include <boost/asio/ssl/stream_base.hpp>
 #include <memory>
 
 namespace ftp::detail
@@ -40,6 +41,8 @@ public:
     virtual void connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec) = 0;
 
     virtual void connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec) = 0;
+
+    virtual void handshake(boost::asio::ssl::stream_base::handshake_type type, boost::system::error_code & ec) = 0;
 
     [[nodiscard]] virtual bool is_connected() const = 0;
 

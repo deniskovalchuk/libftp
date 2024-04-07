@@ -42,6 +42,11 @@ void ssl_socket::connect(const boost::asio::ip::tcp::endpoint & ep, boost::syste
     socket_base::connect(socket_.lowest_layer(), ep, ec);
 }
 
+void ssl_socket::handshake(boost::asio::ssl::stream_base::handshake_type type, boost::system::error_code & ec)
+{
+    socket_.handshake(type, ec);
+}
+
 bool ssl_socket::is_connected() const
 {
     return socket_base::is_connected(socket_.lowest_layer());

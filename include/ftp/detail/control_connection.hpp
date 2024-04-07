@@ -47,6 +47,8 @@ public:
 
     void use_ssl(ssl_context *ssl_context);
 
+    void handshake();
+
     [[nodiscard]] bool is_connected() const;
 
     void send(std::string_view command);

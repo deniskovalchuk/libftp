@@ -90,6 +90,18 @@ void control_connection::use_ssl(ssl_context *ssl_context)
     }
 }
 
+void control_connection::handshake()
+{
+    boost::system::error_code ec;
+
+    socket_->handshake(boost::asio::ssl::stream_base::client, ec);
+
+    if (ec)
+    {
+        throw ftp_exception(ec, "Cannot perform SSL/TLS handshake");
+    }
+}
+
 bool control_connection::is_connected() const
 {
     return socket_->is_connected();

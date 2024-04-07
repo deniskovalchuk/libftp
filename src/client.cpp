@@ -77,6 +77,7 @@ replies client::connect(std::string_view hostname,
         if (reply.is_positive())
         {
             control_connection_.use_ssl(ssl_context_.get());
+            control_connection_.handshake();
         }
     }
 

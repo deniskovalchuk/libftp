@@ -45,6 +45,11 @@ void socket::connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::e
     socket_base::connect(socket_, ep, ec);
 }
 
+void socket::handshake(boost::asio::ssl::stream_base::handshake_type type, boost::system::error_code & ec)
+{
+    /* Handshake makes sense only for SSL-sockets. */
+}
+
 bool socket::is_connected() const
 {
     return socket_base::is_connected(socket_);
