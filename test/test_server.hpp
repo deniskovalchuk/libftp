@@ -64,7 +64,7 @@ public:
 
         /* Usage: python server.py root_directory port [--use-ssl {yes,no}] */
         boost::process::ipstream output;
-        process_ = boost::process::child(python_path, server_script_path.c_str(),
+        process_ = boost::process::child(python_path, server_script_path.string(),
                                          root_directory, std::to_string(port), use_ssl_arg,
                                          boost::process::std_out > boost::process::null,
                                          boost::process::std_err > output);
