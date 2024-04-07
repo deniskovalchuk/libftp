@@ -42,9 +42,9 @@ void ssl_socket::connect(const boost::asio::ip::tcp::endpoint & ep, boost::syste
     socket_base::connect(socket_.lowest_layer(), ep, ec);
 }
 
-void ssl_socket::handshake(boost::asio::ssl::stream_base::handshake_type type, boost::system::error_code & ec)
+bool ssl_socket::is_connected() const
 {
-    socket_.handshake(type, ec);
+    return socket_base::is_connected(socket_.lowest_layer());
 }
 
 bool ssl_socket::has_ssl_support() const
@@ -52,9 +52,9 @@ bool ssl_socket::has_ssl_support() const
     return true;
 }
 
-bool ssl_socket::is_connected() const
+void ssl_socket::handshake(boost::asio::ssl::stream_base::handshake_type type, boost::system::error_code & ec)
 {
-    return socket_base::is_connected(socket_.lowest_layer());
+    socket_.handshake(type, ec);
 }
 
 std::size_t ssl_socket::write(const char *buf, std::size_t size, boost::system::error_code & ec)
