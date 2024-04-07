@@ -73,6 +73,11 @@ replies client::connect(std::string_view hostname,
     if (ssl_context_ && reply.is_positive())
     {
         reply = process_command("AUTH TLS", replies);
+
+        if (reply.is_positive())
+        {
+            control_connection_.use_ssl(ssl_context_.get());
+        }
     }
 
     if (username && reply.is_positive())

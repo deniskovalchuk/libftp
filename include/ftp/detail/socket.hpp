@@ -37,6 +37,8 @@ class socket : public socket_base
 public:
     explicit socket(boost::asio::io_context & io_context);
 
+    explicit socket(boost::asio::ip::tcp::socket && socket);
+
     void connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec) override;
 
     void connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec) override;
@@ -62,6 +64,8 @@ public:
     [[nodiscard]] boost::asio::ip::tcp::socket::executor_type get_executor() override;
 
     [[nodiscard]] boost::asio::ip::tcp::socket & get_socket() override;
+
+    [[nodiscard]] boost::asio::ip::tcp::socket detach() override;
 
 private:
     boost::asio::ip::tcp::socket socket_;

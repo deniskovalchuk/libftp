@@ -27,8 +27,8 @@
 namespace ftp::detail
 {
 
-ssl_socket::ssl_socket(boost::asio::io_context & io_context, boost::asio::ssl::context & ssl_context)
-    : socket_(io_context, ssl_context)
+ssl_socket::ssl_socket(boost::asio::ip::tcp::socket && socket, boost::asio::ssl::context & ssl_context)
+    : socket_(std::move(socket), ssl_context)
 {
 }
 
@@ -96,6 +96,11 @@ boost::asio::ip::tcp::socket::executor_type ssl_socket::get_executor()
 boost::asio::ip::tcp::socket & ssl_socket::get_socket()
 {
     return socket_.next_layer();
+}
+
+boost::asio::ip::tcp::socket ssl_socket::detach()
+{
+    return std::move(socket_.next_layer());
 }
 
 } // namespace ftp::detail

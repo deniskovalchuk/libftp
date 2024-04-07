@@ -26,6 +26,7 @@
 #define LIBFTP_CONTROL_CONNECTION_HPP
 
 #include <ftp/reply.hpp>
+#include <ftp/ssl_context.hpp>
 #include <ftp/detail/net_context.hpp>
 #include <ftp/detail/socket_base.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -43,6 +44,8 @@ public:
     control_connection & operator=(const control_connection &) = delete;
 
     void connect(std::string_view hostname, std::uint16_t port);
+
+    void use_ssl(ssl_context *ssl_context);
 
     [[nodiscard]] bool is_connected() const;
 

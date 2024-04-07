@@ -37,7 +37,7 @@ namespace ftp::detail
 class ssl_socket : public socket_base
 {
 public:
-    explicit ssl_socket(boost::asio::io_context & io_context, boost::asio::ssl::context & ssl_context);
+    explicit ssl_socket(boost::asio::ip::tcp::socket && socket, boost::asio::ssl::context & ssl_context);
 
     void connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec) override;
 
@@ -64,6 +64,8 @@ public:
     [[nodiscard]] boost::asio::ip::tcp::socket::executor_type get_executor() override;
 
     [[nodiscard]] boost::asio::ip::tcp::socket & get_socket() override;
+
+    [[nodiscard]] boost::asio::ip::tcp::socket detach() override;
 
 private:
     boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket_;

@@ -25,6 +25,8 @@
 #include <ftp/ftp_exception.hpp>
 #include <ftp/detail/control_connection.hpp>
 #include <ftp/detail/socket_factory.hpp>
+#include <ftp/detail/socket.hpp>
+#include <ftp/detail/ssl_socket.hpp>
 #include <ftp/detail/utils.hpp>
 
 namespace ftp::detail
@@ -72,6 +74,20 @@ void control_connection::connect(std::string_view hostname, std::uint16_t port)
         socket_->close(ignored);
 
         throw ftp_exception(ec, "Cannot open control connection");
+    }
+}
+
+void control_connection::use_ssl(ssl_context *ssl_context)
+{
+    boost::asio::ip::tcp::socket raw = socket_->detach();
+
+    if (ssl_context)
+    {
+        socket_ = std::make_unique<ssl_socket>(std::move(raw), *ssl_context);
+    }
+    else
+    {
+        socket_ = std::make_unique<socket>(std::move(raw));
     }
 }
 

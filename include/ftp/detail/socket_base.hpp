@@ -64,6 +64,8 @@ public:
     // TODO: Remove.
     [[nodiscard]] virtual boost::asio::ip::tcp::socket & get_socket() = 0;
 
+    [[nodiscard]] virtual boost::asio::ip::tcp::socket detach() = 0;
+
     virtual ~socket_base() = default;
 
 protected:

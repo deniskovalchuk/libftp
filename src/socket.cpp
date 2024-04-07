@@ -31,6 +31,10 @@ socket::socket(boost::asio::io_context & io_context)
     : socket_(io_context)
 {}
 
+socket::socket(boost::asio::ip::tcp::socket && socket)
+    : socket_(std::move(socket))
+{}
+
 void socket::connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec)
 {
     socket_base::connect(socket_, eps, ec);
@@ -94,6 +98,11 @@ boost::asio::ip::tcp::socket::executor_type socket::get_executor()
 boost::asio::ip::tcp::socket & socket::get_socket()
 {
     return socket_;
+}
+
+boost::asio::ip::tcp::socket socket::detach()
+{
+    return std::move(socket_);
 }
 
 } // namespace ftp::detail
