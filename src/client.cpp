@@ -51,9 +51,12 @@ client::client(transfer_mode mode,
 }
 
 client::client(ftp::ssl_context_ptr && ssl_context)
-    : client(transfer_mode::passive,
-             transfer_type::binary,
-             std::move(ssl_context))
+    : transfer_mode_(transfer_mode::passive),
+      transfer_type_(transfer_type::binary),
+      ssl_context_(std::move(ssl_context)),
+      rfc2428_support_(true),
+      net_context_(),
+      control_connection_(net_context_)
 {
 }
 
