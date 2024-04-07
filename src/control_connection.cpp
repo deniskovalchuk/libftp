@@ -76,6 +76,11 @@ void control_connection::connect(std::string_view hostname, std::uint16_t port)
     }
 }
 
+bool control_connection::is_connected() const
+{
+    return socket_->is_connected();
+}
+
 void control_connection::set_ssl(ssl_context *ssl_context)
 {
     boost::asio::ip::tcp::socket raw = socket_->detach();
@@ -105,11 +110,6 @@ void control_connection::handshake()
     {
         throw ftp_exception(ec, "Cannot perform SSL/TLS handshake");
     }
-}
-
-bool control_connection::is_connected() const
-{
-    return socket_->is_connected();
 }
 
 reply control_connection::recv()

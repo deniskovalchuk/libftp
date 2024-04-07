@@ -45,13 +45,13 @@ public:
 
     void connect(std::string_view hostname, std::uint16_t port);
 
+    [[nodiscard]] bool is_connected() const;
+
     void set_ssl(ssl_context *ssl_context);
 
     [[nodiscard]] bool is_ssl() const;
 
     void handshake();
-
-    [[nodiscard]] bool is_connected() const;
 
     void send(std::string_view command);
 
