@@ -45,9 +45,9 @@ public:
 
     void connect(std::string_view hostname, std::uint16_t port);
 
-    void use_ssl(ssl_context *ssl_context);
+    void set_ssl(ssl_context *ssl_context);
 
-    bool is_ssl_used() const;
+    bool is_ssl() const;
 
     void handshake();
 

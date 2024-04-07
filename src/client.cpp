@@ -76,7 +76,7 @@ replies client::connect(std::string_view hostname,
 
         if (reply.is_positive())
         {
-            control_connection_.use_ssl(ssl_context_.get());
+            control_connection_.set_ssl(ssl_context_.get());
             control_connection_.handshake();
         }
     }
@@ -333,9 +333,9 @@ std::optional<reply> client::disconnect(bool graceful)
     }
 
     /* Switch the control connection to non-SSL mode. */
-    if (control_connection_.is_ssl_used())
+    if (control_connection_.is_ssl())
     {
-        control_connection_.use_ssl(nullptr);
+        control_connection_.set_ssl(nullptr);
     }
 
     return reply;

@@ -76,7 +76,7 @@ void control_connection::connect(std::string_view hostname, std::uint16_t port)
     }
 }
 
-void control_connection::use_ssl(ssl_context *ssl_context)
+void control_connection::set_ssl(ssl_context *ssl_context)
 {
     boost::asio::ip::tcp::socket raw = socket_->detach();
 
@@ -90,7 +90,7 @@ void control_connection::use_ssl(ssl_context *ssl_context)
     }
 }
 
-bool control_connection::is_ssl_used() const
+bool control_connection::is_ssl() const
 {
     return socket_->has_ssl_support();
 }
