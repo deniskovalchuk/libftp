@@ -23,6 +23,7 @@
  */
 
 #include <ftp/detail/ssl_socket.hpp>
+#include <boost/asio/connect.hpp>
 
 namespace ftp::detail
 {
@@ -35,17 +36,17 @@ ssl_socket::ssl_socket(boost::asio::ip::tcp::socket && socket, boost::asio::ssl:
 
 void ssl_socket::connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec)
 {
-    socket_base::connect(socket_.lowest_layer(), eps, ec);
+    boost::asio::connect(socket_.lowest_layer(), eps, ec);
 }
 
 void ssl_socket::connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec)
 {
-    socket_base::connect(socket_.lowest_layer(), ep, ec);
+    socket_.lowest_layer().connect(ep, ec);
 }
 
 bool ssl_socket::is_connected() const
 {
-    return socket_base::is_connected(socket_.lowest_layer());
+    return socket_.lowest_layer().is_open();
 }
 
 bool ssl_socket::has_ssl_support() const
@@ -81,27 +82,27 @@ std::size_t ssl_socket::read_line(std::string & buf, std::size_t max_size, boost
 void ssl_socket::shutdown(boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec)
 {
     /* Careful: the non-SSL layer shutdown. */
-    socket_base::shutdown(socket_.lowest_layer(), type, ec);
+    socket_.lowest_layer().shutdown(type, ec);
 }
 
 void ssl_socket::close(boost::system::error_code & ec)
 {
-    socket_base::close(socket_.lowest_layer(), ec);
+    socket_.lowest_layer().close(ec);
 }
 
 boost::asio::ip::tcp::endpoint ssl_socket::local_endpoint(boost::system::error_code & ec) const
 {
-    return socket_base::local_endpoint(socket_.lowest_layer(), ec);
+    return socket_.lowest_layer().local_endpoint(ec);
 }
 
 boost::asio::ip::tcp::endpoint ssl_socket::remote_endpoint(boost::system::error_code & ec) const
 {
-    return socket_base::remote_endpoint(socket_.lowest_layer(), ec);
+    return socket_.lowest_layer().remote_endpoint(ec);
 }
 
 boost::asio::ip::tcp::socket::executor_type ssl_socket::get_executor()
 {
-    return socket_base::get_executor(socket_);
+    return socket_.get_executor();
 }
 
 boost::asio::ip::tcp::socket & ssl_socket::get_socket()

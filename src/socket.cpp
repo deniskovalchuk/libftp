@@ -23,6 +23,7 @@
  */
 
 #include <ftp/detail/socket.hpp>
+#include <boost/asio/connect.hpp>
 
 namespace ftp::detail
 {
@@ -37,17 +38,17 @@ socket::socket(boost::asio::ip::tcp::socket && socket)
 
 void socket::connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec)
 {
-    socket_base::connect(socket_, eps, ec);
+    boost::asio::connect(socket_, eps, ec);
 }
 
 void socket::connect(const boost::asio::ip::tcp::endpoint & ep, boost::system::error_code & ec)
 {
-    socket_base::connect(socket_, ep, ec);
+    socket_.connect(ep, ec);
 }
 
 bool socket::is_connected() const
 {
-    return socket_base::is_connected(socket_);
+    return socket_.is_open();
 }
 
 bool socket::has_ssl_support() const
@@ -82,27 +83,27 @@ std::size_t socket::read_line(std::string & buf, std::size_t max_size, boost::sy
 
 void socket::shutdown(boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec)
 {
-    socket_base::shutdown(socket_, type, ec);
+    socket_.shutdown(type, ec);
 }
 
 void socket::close(boost::system::error_code & ec)
 {
-    socket_base::close(socket_, ec);
+    socket_.close(ec);
 }
 
 boost::asio::ip::tcp::endpoint socket::local_endpoint(boost::system::error_code & ec) const
 {
-    return socket_base::local_endpoint(socket_, ec);
+    return socket_.local_endpoint(ec);
 }
 
 boost::asio::ip::tcp::endpoint socket::remote_endpoint(boost::system::error_code & ec) const
 {
-    return socket_base::remote_endpoint(socket_, ec);
+    return socket_.remote_endpoint(ec);
 }
 
 boost::asio::ip::tcp::socket::executor_type socket::get_executor()
 {
-    return socket_base::get_executor(socket_);
+    return socket_.get_executor();
 }
 
 boost::asio::ip::tcp::socket & socket::get_socket()
