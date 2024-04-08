@@ -81,8 +81,8 @@ std::size_t ssl_socket::read_line(std::string & buf, std::size_t max_size, boost
 
 void ssl_socket::shutdown(boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec)
 {
-    /* Careful: the non-SSL layer shutdown. */
-    socket_.lowest_layer().shutdown(type, ec);
+    /* Perform SSL shutdown, ignore the 'type' param. */
+    socket_.shutdown(ec);
 }
 
 void ssl_socket::close(boost::system::error_code & ec)
