@@ -1172,6 +1172,26 @@ TEST_F(ssl_client, unknown_certificate_authority)
     }, ftp::ftp_exception);
 }
 
+TEST_F(ssl_client, short_verification_depth)
+{
+    ftp::ssl_context_ptr ssl_context = create_ssl_context();
+    ssl_context->set_verify_depth(0);
+
+    ftp::client client(std::move(ssl_context));
+
+    ASSERT_THROW({
+        try
+        {
+            client.connect("127.0.0.1", 2142, "user", "password");
+        }
+        catch (const ftp::ftp_exception & ex)
+        {
+            ASSERT_STREQ("Cannot perform SSL/TLS handshake: certificate verify failed (SSL routines)", ex.what());
+            throw;
+        }
+    }, ftp::ftp_exception);
+}
+
 TEST_F(ssl_client, get_help)
 {
     ftp::client client;
