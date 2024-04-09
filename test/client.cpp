@@ -1101,13 +1101,10 @@ class ssl_client : public client_base<2142, true>
 public:
     static ftp::ssl_context_ptr create_ssl_context()
     {
-        std::filesystem::path root_ca_cert = ftp::test::server::get_root_ca_cert_path();
-        std::filesystem::path ca_cert = ftp::test::server::get_ca_cert_path();
-
         ftp::ssl_context_ptr ssl_context = std::make_unique<ftp::ssl_context>(ftp::ssl_context::tls_client);
         ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
-        ssl_context->load_verify_file(root_ca_cert.string());
-        ssl_context->load_verify_file(ca_cert.string());
+        ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
+        ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
         return ssl_context;
     }
 };
