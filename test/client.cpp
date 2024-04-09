@@ -799,8 +799,7 @@ TEST_F(client, upload_unique_file)
 
 TEST_F(client, open_ssl_connection)
 {
-    ftp::ssl_context_ptr ssl_context =
-        std::make_unique<ftp::ssl_context>(ftp::ssl_context::tls_client);
+    ftp::ssl_context_ptr ssl_context = std::make_unique<ftp::ssl_context>(ftp::ssl_context::tls_client);
 
     ftp::client client(std::move(ssl_context));
 
