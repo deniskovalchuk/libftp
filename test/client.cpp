@@ -1188,6 +1188,25 @@ TEST_F(ssl_client, short_verification_depth)
     }, ftp::ftp_exception);
 }
 
+TEST_F(ssl_client, no_certificate_verification)
+{
+    ftp::ssl_context_ptr ssl_context = std::make_unique<ftp::ssl_context>(ftp::ssl_context::tls_client);
+
+    /* Do not specify certificate authorities, but use the "none" verification mode. */
+    ssl_context->set_verify_mode(boost::asio::ssl::verify_none);
+
+    ftp::client client(std::move(ssl_context));
+
+    check_reply(client.connect("127.0.0.1", 2142), CRLF("220 FTP server is ready.",
+                                                        "234 AUTH TLS successful."));
+
+    check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
+                                                       "230 Login successful.",
+                                                       "200 Type set to: Binary."));
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
 TEST_F(ssl_client, get_help)
 {
     ftp::client client;
