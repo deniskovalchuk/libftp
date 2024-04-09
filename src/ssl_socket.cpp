@@ -30,9 +30,7 @@ namespace ftp::detail
 
 ssl_socket::ssl_socket(boost::asio::ip::tcp::socket && socket, boost::asio::ssl::context & ssl_context)
     : socket_(std::move(socket), ssl_context)
-{
-    socket_.set_verify_mode(boost::asio::ssl::verify_peer);
-}
+{}
 
 void ssl_socket::connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec)
 {
