@@ -1148,6 +1148,8 @@ TEST_F(ssl_client, open_non_ssl_connection)
 TEST_F(ssl_client, unknown_certificate_authority)
 {
     ftp::ssl_context_ptr ssl_context = std::make_unique<ftp::ssl_context>(ftp::ssl_context::tls_client);
+
+    /* Do not specify certificate authorities. */
     ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
 
     ftp::client client(std::move(ssl_context));
