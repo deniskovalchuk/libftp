@@ -81,7 +81,7 @@ bool control_connection::is_connected() const
     return socket_->is_connected();
 }
 
-void control_connection::set_ssl(ssl_context *ssl_context)
+void control_connection::set_ssl(boost::asio::ssl::context *ssl_context)
 {
     boost::asio::ip::tcp::socket raw = socket_->detach();
 

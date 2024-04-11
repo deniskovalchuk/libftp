@@ -29,7 +29,7 @@
 #include <ftp/client.hpp>
 #include <ftp/ftp_exception.hpp>
 #include <ftp/observer.hpp>
-#include <ftp/ssl_context.hpp>
+#include <ftp/ssl.hpp>
 #include <ftp/stream/istream_adapter.hpp>
 #include <ftp/stream/ostream_adapter.hpp>
 #include "test_server.hpp"
@@ -799,7 +799,7 @@ TEST_F(client, upload_unique_file)
 
 TEST_F(client, open_ssl_connection)
 {
-    ftp::ssl_context_ptr ssl_context = std::make_unique<ftp::ssl_context>(ftp::ssl_context::tls_client);
+    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
 
     ftp::client client(std::move(ssl_context));
 
@@ -1101,7 +1101,7 @@ class ssl_client : public client_base<2142, true>
 
 TEST_F(ssl_client, open_connection)
 {
-    ftp::ssl_context_ptr ssl_context = std::make_unique<ftp::ssl_context>(ftp::ssl_context::tls_client);
+    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
     ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
@@ -1146,7 +1146,7 @@ TEST_F(ssl_client, open_non_ssl_connection)
 
 TEST_F(ssl_client, unknown_certificate_authority)
 {
-    ftp::ssl_context_ptr ssl_context = std::make_unique<ftp::ssl_context>(ftp::ssl_context::tls_client);
+    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
 
     /* Do not specify certificate authorities. */
     ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
@@ -1168,7 +1168,7 @@ TEST_F(ssl_client, unknown_certificate_authority)
 
 TEST_F(ssl_client, short_verification_depth)
 {
-    ftp::ssl_context_ptr ssl_context = std::make_unique<ftp::ssl_context>(ftp::ssl_context::tls_client);
+    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
     ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
@@ -1191,7 +1191,7 @@ TEST_F(ssl_client, short_verification_depth)
 
 TEST_F(ssl_client, no_certificate_verification)
 {
-    ftp::ssl_context_ptr ssl_context = std::make_unique<ftp::ssl_context>(ftp::ssl_context::tls_client);
+    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
 
     /* Do not specify certificate authorities, but use the "none" verification mode. */
     ssl_context->set_verify_mode(boost::asio::ssl::verify_none);

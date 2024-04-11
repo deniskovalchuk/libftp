@@ -22,17 +22,17 @@
  * SOFTWARE.
  */
 
-#ifndef LIBFTP_SSL_CONTEXT_HPP
-#define LIBFTP_SSL_CONTEXT_HPP
+#ifndef LIBFTP_SSL_HPP
+#define LIBFTP_SSL_HPP
 
-#include <boost/asio/ssl/context.hpp>
+#include <boost/asio/ssl.hpp>
 #include <memory>
 
-namespace ftp
+namespace ftp::ssl
 {
 
-using ssl_context = boost::asio::ssl::context;
-using ssl_context_ptr = std::unique_ptr<ssl_context>;
+using namespace boost::asio::ssl;
+using context_ptr = std::unique_ptr<boost::asio::ssl::context>;
 
-} // namespace ftp
-#endif //LIBFTP_SSL_CONTEXT_HPP
+} // namespace ftp::ssl
+#endif //LIBFTP_SSL_HPP

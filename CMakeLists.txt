@@ -38,7 +38,7 @@ set(sources
         include/ftp/observer.hpp
         include/ftp/replies.hpp
         include/ftp/reply.hpp
-        include/ftp/ssl_context.hpp
+        include/ftp/ssl.hpp
         include/ftp/transfer_callback.hpp
         include/ftp/transfer_mode.hpp
         include/ftp/transfer_type.hpp

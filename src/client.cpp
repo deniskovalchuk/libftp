@@ -39,7 +39,7 @@ using namespace ftp::detail;
 
 client::client(transfer_mode mode,
                transfer_type type,
-               ssl_context_ptr && ssl_context,
+               ssl::context_ptr && ssl_context,
                bool rfc2428_support)
     : transfer_mode_(mode),
       transfer_type_(type),
@@ -50,7 +50,7 @@ client::client(transfer_mode mode,
 {
 }
 
-client::client(ftp::ssl_context_ptr && ssl_context)
+client::client(ssl::context_ptr && ssl_context)
     : transfer_mode_(transfer_mode::passive),
       transfer_type_(transfer_type::binary),
       ssl_context_(std::move(ssl_context)),
