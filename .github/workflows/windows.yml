@@ -27,18 +27,21 @@ jobs:
       working-directory: ${{runner.temp}}
       shell: powershell
       run: |
-        # 1. Download and install Boost.
+        # Download Boost.
         Invoke-WebRequest `
             -Uri "https://boostorg.jfrog.io/artifactory/main/release/1.83.0/source/boost_1_83_0.7z" `
             -OutFile boost.7z
-        # 1.1. Extract.
+        # Extract.
         7z x boost.7z
-        # 1.2. Build.
+        # Build.
         cd boost_1_83_0
         .\bootstrap
         .\b2 link=static
-        # 2. Install pyOpenSSL
-        pip3 install pyOpenSSL
+
+    - name: Install pyOpenSSL
+      working-directory: ${{runner.temp}}
+      shell: powershell
+      run: pip3 install pyOpenSSL
 
     - name: Build
       env:
