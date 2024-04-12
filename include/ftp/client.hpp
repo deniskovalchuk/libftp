@@ -148,6 +148,8 @@ private:
 
     reply process_command(std::string_view command, replies & replies);
 
+    reply process_ssl_handshake(ssl::context *ssl_context, replies & replies);
+
     reply process_login(std::string_view username, std::string_view password, replies & replies);
 
     replies process_download(output_stream & dst, std::string_view path, transfer_callback * transfer_cb);

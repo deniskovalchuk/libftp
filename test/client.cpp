@@ -1113,7 +1113,9 @@ TEST_F(ssl_client, open_connection)
     for (int i = 0; i < 5; i++)
     {
         check_reply(client.connect("127.0.0.1", 2142), CRLF("220 FTP server is ready.",
-                                                            "234 AUTH TLS successful."));
+                                                            "234 AUTH TLS successful.",
+                                                            "200 PBSZ=0 successful.",
+                                                            "200 Protection set to Private"));
         ASSERT_TRUE(client.is_connected());
 
         check_reply(client.disconnect(), "221 Goodbye.");
@@ -1124,6 +1126,8 @@ TEST_F(ssl_client, open_connection)
     {
         check_reply(client.connect("127.0.0.1", 2142, "alice", "password"), CRLF("220 FTP server is ready.",
                                                                                  "234 AUTH TLS successful.",
+                                                                                 "200 PBSZ=0 successful.",
+                                                                                 "200 Protection set to Private",
                                                                                  "331 Username ok, send password.",
                                                                                  "230 Login successful.",
                                                                                  "200 Type set to: Binary."));
@@ -1199,7 +1203,9 @@ TEST_F(ssl_client, no_certificate_verification)
     ftp::client client(std::move(ssl_context));
 
     check_reply(client.connect("127.0.0.1", 2142), CRLF("220 FTP server is ready.",
-                                                        "234 AUTH TLS successful."));
+                                                        "234 AUTH TLS successful.",
+                                                        "200 PBSZ=0 successful.",
+                                                        "200 Protection set to Private"));
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
