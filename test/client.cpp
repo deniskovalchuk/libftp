@@ -1237,4 +1237,45 @@ TEST_F(ssl_client, get_help)
     check_reply(client.disconnect(), "221 Goodbye.");
 }
 
+class ssl_client_with_transfer_mode : public ssl_client,
+                                      public testing::WithParamInterface<ftp::transfer_mode>
+{
+};
+
+INSTANTIATE_TEST_SUITE_P(all_modes, ssl_client_with_transfer_mode, testing::Values(ftp::transfer_mode::active,
+                                                                                   ftp::transfer_mode::passive));
+
+TEST_P(ssl_client_with_transfer_mode, get_file_list)
+{
+    ftp::transfer_mode mode = GetParam();
+    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
+    ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
+    ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
+    ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
+
+    ftp::client client(mode, ftp::transfer_type::binary, std::move(ssl_context));
+
+    check_reply(client.connect("127.0.0.1", 2142), CRLF("220 FTP server is ready.",
+                                                        "234 AUTH TLS successful.",
+                                                        "200 PBSZ=0 successful.",
+                                                        "200 Protection set to Private"));
+
+    check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
+                                                       "230 Login successful.",
+                                                       "200 Type set to: Binary."));
+
+    ftp::file_list_reply reply = client.get_file_list(".", true);
+    check_last_reply(reply, "226 Transfer complete.");
+    ASSERT_THAT(reply.get_file_list(), ElementsAre());
+
+    check_reply(client.create_directory("dir1"), R"(257 "/dir1" directory created.)");
+    check_reply(client.create_directory("dir2"), R"(257 "/dir2" directory created.)");
+
+    reply = client.get_file_list(".", true);
+    check_last_reply(reply, "226 Transfer complete.");
+    ASSERT_THAT(reply.get_file_list(), ElementsAre("dir1", "dir2"));
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
 } // namespace
