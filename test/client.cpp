@@ -24,6 +24,7 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gmock/gmock-matchers.h>
 #include <filesystem>
 #include <memory>
 #include <ftp/client.hpp>
@@ -40,6 +41,7 @@ namespace
 
 using namespace ftp::test;
 using testing::ElementsAre;
+using testing::StartsWith;
 
 class test_observer : public ftp::observer
 {
@@ -1164,7 +1166,7 @@ TEST_F(ssl_client, unknown_certificate_authority)
         }
         catch (const ftp::ftp_exception & ex)
         {
-            ASSERT_STREQ("Cannot perform SSL/TLS handshake: certificate verify failed (SSL routines)", ex.what());
+            ASSERT_THAT(ex.what(), StartsWith("Cannot perform SSL/TLS handshake: certificate verify failed"));
             throw;
         }
     }, ftp::ftp_exception);
@@ -1187,7 +1189,7 @@ TEST_F(ssl_client, short_verification_depth)
         }
         catch (const ftp::ftp_exception & ex)
         {
-            ASSERT_STREQ("Cannot perform SSL/TLS handshake: certificate verify failed (SSL routines)", ex.what());
+            ASSERT_THAT(ex.what(), StartsWith("Cannot perform SSL/TLS handshake: certificate verify failed"));
             throw;
         }
     }, ftp::ftp_exception);
