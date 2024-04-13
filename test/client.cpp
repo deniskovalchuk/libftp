@@ -1294,4 +1294,67 @@ TEST_P(ssl_client_parameterized, get_file_list)
     check_reply(client.disconnect(), "221 Goodbye.");
 }
 
+TEST_P(ssl_client_parameterized, upload_download_file)
+{
+    auto [ mode, type, rfc2428_support ] = GetParam();
+    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
+    ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
+    ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
+    ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
+
+    ftp::client client(mode, type, std::move(ssl_context), rfc2428_support);
+
+    check_reply(client.connect("127.0.0.1", 2142), CRLF("220 FTP server is ready.",
+                                                        "234 AUTH TLS successful.",
+                                                        "200 PBSZ=0 successful.",
+                                                        "200 Protection set to Private"));
+
+    std::string type_reply;
+    if (type == ftp::transfer_type::binary)
+    {
+        type_reply = "200 Type set to: Binary.";
+    }
+    else if (type == ftp::transfer_type::ascii)
+    {
+        type_reply = "200 Type set to: ASCII.";
+    }
+    else
+    {
+        FAIL();
+    }
+
+    check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
+                                                       "230 Login successful.",
+                                                       type_reply));
+
+    std::string content = "line1\r\nline2";
+    std::istringstream iss(content);
+    check_last_reply(client.upload_file(ftp::istream_adapter(iss), "file"), "226 Transfer complete.");
+
+    std::ostringstream oss;
+    check_last_reply(client.download_file(ftp::ostream_adapter(oss), "file"), "226 Transfer complete.");
+
+    if (type == ftp::transfer_type::binary)
+    {
+        ASSERT_EQ("line1\r\nline2", oss.str());
+    }
+    else if (type == ftp::transfer_type::ascii)
+    {
+        if (is_windows_platform())
+        {
+            ASSERT_EQ("line1\r\nline2", oss.str());
+        }
+        else
+        {
+            ASSERT_EQ("line1\nline2", oss.str());
+        }
+    }
+    else
+    {
+        FAIL();
+    }
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
 } // namespace
