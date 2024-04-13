@@ -31,6 +31,7 @@
 #include <ftp/detail/net_context.hpp>
 #include <ftp/detail/socket_base.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/ssl/context.hpp>
 #include <memory>
 #include <string_view>
 
@@ -53,6 +54,10 @@ public:
     void listen(const boost::asio::ip::tcp::endpoint & endpoint);
 
     void accept();
+
+    void set_ssl(boost::asio::ssl::context *ssl_context);
+
+    void handshake();
 
     void send(input_stream & stream, transfer_callback * transfer_cb);
 

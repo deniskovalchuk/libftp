@@ -24,6 +24,7 @@
 
 #include <ftp/detail/data_connection.hpp>
 #include <ftp/detail/socket.hpp>
+#include <ftp/detail/ssl_socket.hpp>
 #include <ftp/ftp_exception.hpp>
 #include <array>
 
@@ -125,6 +126,31 @@ void data_connection::accept()
     }
 }
 
+void data_connection::set_ssl(boost::asio::ssl::context *ssl_context)
+{
+    boost::asio::ip::tcp::socket raw = socket_->detach();
+
+    if (ssl_context)
+    {
+        socket_ = std::make_unique<ssl_socket>(std::move(raw), *ssl_context);
+    }
+    else
+    {
+        socket_ = std::make_unique<socket>(std::move(raw));
+    }
+}
+
+void data_connection::handshake()
+{
+    boost::system::error_code ec;
+
+    socket_->handshake(boost::asio::ssl::stream_base::client, ec);
+
+    if (ec)
+    {
+        throw ftp_exception(ec, "Cannot perform SSL/TLS handshake");
+    }
+}
 void data_connection::send(input_stream & stream, transfer_callback * transfer_cb)
 {
     if (transfer_cb)

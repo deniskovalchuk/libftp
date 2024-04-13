@@ -685,6 +685,12 @@ data_connection_ptr client::process_epsv_command(std::string_view command, repli
         return nullptr;
     }
 
+    if (ssl_context_)
+    {
+        connection->set_ssl(ssl_context_.get());
+        connection->handshake();
+    }
+
     /* The data connection is ready for data transfer. */
     return connection;
 }
@@ -760,6 +766,12 @@ data_connection_ptr client::process_eprt_command(std::string_view command, repli
     /* Accept an incoming data connection. */
     connection->accept();
 
+    if (ssl_context_)
+    {
+        connection->set_ssl(ssl_context_.get());
+        connection->handshake();
+    }
+
     /* The data connection is ready for data transfer. */
     return connection;
 }
@@ -823,6 +835,12 @@ data_connection_ptr client::process_pasv_command(std::string_view command, repli
     {
         connection->disconnect();
         return nullptr;
+    }
+
+    if (ssl_context_)
+    {
+        connection->set_ssl(ssl_context_.get());
+        connection->handshake();
     }
 
     /* The data connection is ready for data transfer. */
@@ -928,6 +946,12 @@ data_connection_ptr client::process_port_command(std::string_view command, repli
 
     /* Accept an incoming data connection. */
     connection->accept();
+
+    if (ssl_context_)
+    {
+        connection->set_ssl(ssl_context_.get());
+        connection->handshake();
+    }
 
     /* The data connection is ready for data transfer. */
     return connection;
