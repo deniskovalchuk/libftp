@@ -1237,32 +1237,48 @@ TEST_F(ssl_client, get_help)
     check_reply(client.disconnect(), "221 Goodbye.");
 }
 
-class ssl_client_with_transfer_mode : public ssl_client,
-                                      public testing::WithParamInterface<ftp::transfer_mode>
+class ssl_client_parameterized : public ssl_client,
+                                 public testing::WithParamInterface<std::tuple<ftp::transfer_mode,
+                                                                               ftp::transfer_type,
+                                                                               bool>>
 {
 };
 
-INSTANTIATE_TEST_SUITE_P(all_modes, ssl_client_with_transfer_mode, testing::Values(ftp::transfer_mode::active,
-                                                                                   ftp::transfer_mode::passive));
+INSTANTIATE_TEST_SUITE_P(all_params, ssl_client_parameterized,
+                         testing::Combine(testing::Values(ftp::transfer_mode::active,
+                                                          ftp::transfer_mode::passive),
+                                          testing::Values(ftp::transfer_type::binary,
+                                                          ftp::transfer_type::ascii),
+                                          testing::Values(true, false)));
 
-TEST_P(ssl_client_with_transfer_mode, get_file_list)
+TEST_P(ssl_client_parameterized, get_file_list)
 {
-    ftp::transfer_mode mode = GetParam();
+    auto [ mode, type, rfc2428_support ] = GetParam();
     ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
     ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
 
-    ftp::client client(mode, ftp::transfer_type::binary, std::move(ssl_context));
+    ftp::client client(mode, type, std::move(ssl_context), rfc2428_support);
 
     check_reply(client.connect("127.0.0.1", 2142), CRLF("220 FTP server is ready.",
                                                         "234 AUTH TLS successful.",
                                                         "200 PBSZ=0 successful.",
                                                         "200 Protection set to Private"));
 
+    std::string type_reply;
+    if (type == ftp::transfer_type::binary)
+    {
+        type_reply = "200 Type set to: Binary.";
+    }
+    else if (type == ftp::transfer_type::ascii)
+    {
+        type_reply = "200 Type set to: ASCII.";
+    }
+
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
-                                                       "200 Type set to: Binary."));
+                                                       type_reply));
 
     ftp::file_list_reply reply = client.get_file_list(".", true);
     check_last_reply(reply, "226 Transfer complete.");
