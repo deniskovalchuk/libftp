@@ -73,7 +73,7 @@ replies client::connect(std::string_view hostname,
     replies replies;
     reply reply = recv(replies);
 
-    /* Perform SSL handshake */
+    /* Perform SSL handshake. */
     if (ssl_context_ && reply.is_positive())
     {
         reply = process_command("AUTH TLS", replies);
