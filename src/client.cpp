@@ -113,9 +113,9 @@ reply client::logout()
 
     reply reply = process_command(command);
 
+    /* Switch the control connection to non-SSL mode. */
     if (reply.is_positive() && control_connection_.is_ssl())
     {
-        /* Switch to plain-text mode. */
         control_connection_.ssl_shutdown();
         control_connection_.set_ssl(nullptr);
     }
