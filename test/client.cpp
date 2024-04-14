@@ -1115,9 +1115,7 @@ TEST_F(ssl_client, open_connection)
     for (int i = 0; i < 5; i++)
     {
         check_reply(client.connect("127.0.0.1", 2142), CRLF("220 FTP server is ready.",
-                                                            "234 AUTH TLS successful.",
-                                                            "200 PBSZ=0 successful.",
-                                                            "200 Protection set to Private"));
+                                                            "234 AUTH TLS successful."));
         ASSERT_TRUE(client.is_connected());
 
         check_reply(client.disconnect(), "221 Goodbye.");
@@ -1128,10 +1126,10 @@ TEST_F(ssl_client, open_connection)
     {
         check_reply(client.connect("127.0.0.1", 2142, "alice", "password"), CRLF("220 FTP server is ready.",
                                                                                  "234 AUTH TLS successful.",
-                                                                                 "200 PBSZ=0 successful.",
-                                                                                 "200 Protection set to Private",
                                                                                  "331 Username ok, send password.",
                                                                                  "230 Login successful.",
+                                                                                 "200 PBSZ=0 successful.",
+                                                                                 "200 Protection set to Private",
                                                                                  "200 Type set to: Binary."));
         ASSERT_TRUE(client.is_connected());
 
@@ -1205,12 +1203,12 @@ TEST_F(ssl_client, no_certificate_verification)
     ftp::client client(std::move(ssl_context));
 
     check_reply(client.connect("127.0.0.1", 2142), CRLF("220 FTP server is ready.",
-                                                        "234 AUTH TLS successful.",
-                                                        "200 PBSZ=0 successful.",
-                                                        "200 Protection set to Private"));
+                                                        "234 AUTH TLS successful."));
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
+                                                       "200 PBSZ=0 successful.",
+                                                       "200 Protection set to Private",
                                                        "200 Type set to: Binary."));
 
     check_reply(client.disconnect(), "221 Goodbye.");
@@ -1262,9 +1260,7 @@ TEST_P(ssl_client_parameterized, get_file_list)
     ftp::client client(mode, type, std::move(ssl_context), rfc2428_support);
 
     check_reply(client.connect("127.0.0.1", 2142), CRLF("220 FTP server is ready.",
-                                                        "234 AUTH TLS successful.",
-                                                        "200 PBSZ=0 successful.",
-                                                        "200 Protection set to Private"));
+                                                        "234 AUTH TLS successful."));
 
     std::string type_reply;
     if (type == ftp::transfer_type::binary)
@@ -1278,6 +1274,8 @@ TEST_P(ssl_client_parameterized, get_file_list)
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
+                                                       "200 PBSZ=0 successful.",
+                                                       "200 Protection set to Private",
                                                        type_reply));
 
     ftp::file_list_reply reply = client.get_file_list(".", true);
@@ -1305,9 +1303,7 @@ TEST_P(ssl_client_parameterized, upload_download_file)
     ftp::client client(mode, type, std::move(ssl_context), rfc2428_support);
 
     check_reply(client.connect("127.0.0.1", 2142), CRLF("220 FTP server is ready.",
-                                                        "234 AUTH TLS successful.",
-                                                        "200 PBSZ=0 successful.",
-                                                        "200 Protection set to Private"));
+                                                        "234 AUTH TLS successful."));
 
     std::string type_reply;
     if (type == ftp::transfer_type::binary)
@@ -1325,6 +1321,8 @@ TEST_P(ssl_client_parameterized, upload_download_file)
 
     check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
                                                        "230 Login successful.",
+                                                       "200 PBSZ=0 successful.",
+                                                       "200 Protection set to Private",
                                                        type_reply));
 
     std::string content = "line1\r\nline2";

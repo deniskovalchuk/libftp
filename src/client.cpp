@@ -73,9 +73,16 @@ replies client::connect(std::string_view hostname,
     replies replies;
     reply reply = recv(replies);
 
+    /* Perform SSL handshake */
     if (ssl_context_ && reply.is_positive())
     {
-        reply = process_ssl_handshake(ssl_context_.get(), replies);
+        reply = process_command("AUTH TLS", replies);
+
+        if (reply.is_positive())
+        {
+            control_connection_.set_ssl(ssl_context_.get());
+            control_connection_.handshake();
+        }
     }
 
     if (username && reply.is_positive())
@@ -445,28 +452,6 @@ reply client::process_command(std::string_view command, replies & replies)
     return recv(replies);
 }
 
-reply client::process_ssl_handshake(ssl::context *ssl_context, replies & replies)
-{
-    reply reply = process_command("AUTH TLS", replies);
-
-    if (reply.is_negative())
-    {
-        return reply;
-    }
-
-    control_connection_.set_ssl(ssl_context);
-    control_connection_.handshake();
-
-    reply = process_command("PBSZ 0", replies);
-
-    if (reply.is_negative())
-    {
-        return reply;
-    }
-
-    return process_command("PROT P", replies);
-}
-
 reply client::process_login(std::string_view username, std::string_view password, replies & replies)
 {
     std::string command = make_command("USER", username);
@@ -479,6 +464,17 @@ reply client::process_login(std::string_view username, std::string_view password
         command = make_command("PASS", password);
 
         reply = process_command(command, replies);
+    }
+
+    /* Set the SSL settings. */
+    if (ssl_context_ && reply.is_positive())
+    {
+        reply = process_command("PBSZ 0", replies);
+
+        if (reply.is_positive())
+        {
+            reply = process_command("PROT P", replies);
+        }
     }
 
     /* Set the configured transfer type. */
