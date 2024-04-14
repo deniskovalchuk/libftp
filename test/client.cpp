@@ -1150,8 +1150,8 @@ TEST_F(ssl_client, open_non_ssl_connection)
 
 TEST_F(ssl_client, login)
 {
-    GTEST_SKIP() << "pyftpdlib doesn't handle the logout ('REIN' command) properly. "
-                    "It doesn't switch the control connection to plain-text mode.";
+    GTEST_SKIP() << "pyftpdlib doesn't handle the 'REIN' command properly. "
+                    "The control connection is not switched to non-SSL mode.";
 
     ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
