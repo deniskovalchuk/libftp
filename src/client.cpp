@@ -73,19 +73,26 @@ replies client::connect(std::string_view hostname,
     replies replies;
     reply reply = recv(replies);
 
+    if (reply.is_negative())
+    {
+        return replies;
+    }
+
     /* Perform SSL handshake. */
-    if (ssl_context_ && reply.is_positive())
+    if (ssl_context_)
     {
         reply = process_command("AUTH TLS", replies);
 
-        if (reply.is_positive())
+        if (reply.is_negative())
         {
-            control_connection_.set_ssl(ssl_context_.get());
-            control_connection_.ssl_handshake();
+            return replies;
         }
+
+        control_connection_.set_ssl(ssl_context_.get());
+        control_connection_.ssl_handshake();
     }
 
-    if (username && reply.is_positive())
+    if (username)
     {
         reply = process_login(username.value(), password, replies);
     }
