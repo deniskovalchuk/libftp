@@ -8,5 +8,5 @@ working correctly:
 
 ```bash
 $ mkdir server_root
-$ python3 ../test/server/server.py 2121 server_root
+$ python3 ../test/server/server.py server_root 2121
 ```
