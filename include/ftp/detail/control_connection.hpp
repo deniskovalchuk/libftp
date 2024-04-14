@@ -53,6 +53,8 @@ public:
 
     void ssl_handshake();
 
+    void ssl_shutdown();
+
     void send(std::string_view command);
 
     reply recv();

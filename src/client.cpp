@@ -111,7 +111,16 @@ reply client::logout()
 {
     std::string command = make_command("REIN");
 
-    return process_command(command);
+    reply reply = process_command(command);
+
+    if (reply.is_positive() && control_connection_.is_ssl())
+    {
+        /* Switch to plain-text mode. */
+        control_connection_.ssl_shutdown();
+        control_connection_.set_ssl(nullptr);
+    }
+
+    return reply;
 }
 
 reply client::change_current_directory(std::string_view path)

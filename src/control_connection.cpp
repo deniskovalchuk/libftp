@@ -112,6 +112,23 @@ void control_connection::ssl_handshake()
     }
 }
 
+void control_connection::ssl_shutdown()
+{
+    if (socket_->has_ssl_support())
+    {
+        return;
+    }
+
+    boost::system::error_code ec;
+
+    socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+
+    if (ec)
+    {
+        throw ftp_exception(ec, "Cannot perform SSL/TLS shutdown");
+    }
+}
+
 reply control_connection::recv()
 {
     std::string status_string;
