@@ -65,7 +65,6 @@ public:
 
     [[nodiscard]] virtual boost::asio::ip::tcp::socket::executor_type get_executor() = 0;
 
-    // TODO: Remove.
     [[nodiscard]] virtual boost::asio::ip::tcp::socket & get_socket() = 0;
 
     [[nodiscard]] virtual boost::asio::ip::tcp::socket detach() = 0;
