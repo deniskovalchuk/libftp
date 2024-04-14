@@ -78,11 +78,13 @@ replies client::connect(std::string_view hostname,
     {
         reply = process_command("AUTH TLS", replies);
 
-        if (reply.is_positive())
+        if (reply.is_positive)
         {
-            control_connection_.set_ssl(ssl_context_.get());
-            control_connection_.ssl_handshake();
+
         }
+
+        control_connection_.set_ssl(ssl_context_.get());
+        control_connection_.ssl_handshake();
     }
 
     if (username && reply.is_positive())
@@ -491,7 +493,7 @@ reply client::process_login(std::string_view username, std::string_view password
     {
         command = make_type_command(transfer_type_);
 
-        process_command(command, replies);
+        reply = process_command(command, replies);
     }
 
     return reply;
