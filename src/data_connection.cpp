@@ -151,6 +151,7 @@ void data_connection::ssl_handshake()
         throw ftp_exception(ec, "Cannot perform SSL/TLS handshake");
     }
 }
+
 void data_connection::send(input_stream & stream, transfer_callback * transfer_cb)
 {
     if (transfer_cb)
