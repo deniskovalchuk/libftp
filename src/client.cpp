@@ -482,24 +482,33 @@ reply client::process_login(std::string_view username, std::string_view password
         reply = process_command(command, replies);
     }
 
+    if (reply.is_negative())
+    {
+        return reply;
+    }
+
     /* Set the SSL settings. */
-    if (ssl_context_ && reply.is_positive())
+    if (ssl_context_)
     {
         reply = process_command("PBSZ 0", replies);
 
-        if (reply.is_positive())
+        if (reply.is_negative())
         {
-            reply = process_command("PROT P", replies);
+            return reply;
+        }
+
+        reply = process_command("PROT P", replies);
+
+        if (reply.is_negative())
+        {
+            return reply;
         }
     }
 
     /* Set the configured transfer type. */
-    if (reply.is_positive())
-    {
-        command = make_type_command(transfer_type_);
+    command = make_type_command(transfer_type_);
 
-        reply = process_command(command, replies);
-    }
+    reply = process_command(command, replies);
 
     return reply;
 }
