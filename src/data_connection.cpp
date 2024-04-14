@@ -257,6 +257,12 @@ void data_connection::disconnect(bool graceful)
              * the socket.
              */
         }
+        else if (ec == boost::asio::error::eof)
+        {
+            /* Rationale:
+             * http://stackoverflow.com/questions/25587403/boost-asio-ssl-async-shutdown-always-finishes-with-an-error
+             */
+        }
         else if (ec)
         {
             throw ftp_exception(ec, "Cannot close data connection");
