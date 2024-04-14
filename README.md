@@ -54,11 +54,10 @@ reverse conversion.
 ## Features
 
 - Windows, Linux and macOS are supported.
-- The main command set from [RFC 959](doc/RFC959.txt) is implemented.
+- Supports FTP and FTP over SSL/TLS (FTPS).
+- Supports IPv4 and IPv6.
 - Supports active and passive transfer modes.
 - Supports ASCII and binary transfer types.
-- IPv4 and IPv6 support.
-- Supports FTP and FTP over SSL/TLS (FTPS).
 
 ## Examples
 
