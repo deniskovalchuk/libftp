@@ -7,7 +7,7 @@
 [![Actions Workflow Linux](https://github.com/deniskovalchuk/ftp-client/actions/workflows/linux.yml/badge.svg)](https://github.com/deniskovalchuk/ftp-client/actions/workflows/linux.yml)
 [![Actions Workflow macOS](https://github.com/deniskovalchuk/ftp-client/actions/workflows/macos.yml/badge.svg)](https://github.com/deniskovalchuk/ftp-client/actions/workflows/macos.yml)
 
-[![Conan Center](https://img.shields.io/conan/v/libftp)](https://conan.io/center/recipes/libftp)
+[![Conan Center](https://img.shields.io/conan/v/libftp?label=ConanCenter&color=blue)](https://conan.io/center/recipes/libftp)
 
 A cross-platform FTP client library based on [Boost.Asio](https://www.boost.org/doc/libs/1_84_0/doc/html/boost_asio.html).
 
