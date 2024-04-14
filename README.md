@@ -56,6 +56,7 @@ reverse conversion.
 - Supports active and passive transfer modes.
 - Supports ASCII and binary transfer types.
 - IPv4 and IPv6 support.
+- Supports FTP and FTP over SSL/TLS (FTPS).
 
 ## Examples
 
