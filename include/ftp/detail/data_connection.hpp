@@ -57,7 +57,7 @@ public:
 
     void set_ssl(boost::asio::ssl::context *ssl_context);
 
-    void handshake();
+    void ssl_handshake();
 
     void send(input_stream & stream, transfer_callback * transfer_cb);
 

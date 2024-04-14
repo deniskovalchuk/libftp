@@ -81,7 +81,7 @@ replies client::connect(std::string_view hostname,
         if (reply.is_positive())
         {
             control_connection_.set_ssl(ssl_context_.get());
-            control_connection_.handshake();
+            control_connection_.ssl_handshake();
         }
     }
 
@@ -684,7 +684,7 @@ data_connection_ptr client::process_epsv_command(std::string_view command, repli
     if (ssl_context_)
     {
         connection->set_ssl(ssl_context_.get());
-        connection->handshake();
+        connection->ssl_handshake();
     }
 
     /* The data connection is ready for data transfer. */
@@ -765,7 +765,7 @@ data_connection_ptr client::process_eprt_command(std::string_view command, repli
     if (ssl_context_)
     {
         connection->set_ssl(ssl_context_.get());
-        connection->handshake();
+        connection->ssl_handshake();
     }
 
     /* The data connection is ready for data transfer. */
@@ -836,7 +836,7 @@ data_connection_ptr client::process_pasv_command(std::string_view command, repli
     if (ssl_context_)
     {
         connection->set_ssl(ssl_context_.get());
-        connection->handshake();
+        connection->ssl_handshake();
     }
 
     /* The data connection is ready for data transfer. */
@@ -946,7 +946,7 @@ data_connection_ptr client::process_port_command(std::string_view command, repli
     if (ssl_context_)
     {
         connection->set_ssl(ssl_context_.get());
-        connection->handshake();
+        connection->ssl_handshake();
     }
 
     /* The data connection is ready for data transfer. */

@@ -51,7 +51,7 @@ public:
 
     [[nodiscard]] bool is_ssl() const;
 
-    void handshake();
+    void ssl_handshake();
 
     void send(std::string_view command);
 

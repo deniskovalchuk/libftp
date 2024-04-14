@@ -100,7 +100,7 @@ bool control_connection::is_ssl() const
     return socket_->has_ssl_support();
 }
 
-void control_connection::handshake()
+void control_connection::ssl_handshake()
 {
     boost::system::error_code ec;
 

@@ -140,7 +140,7 @@ void data_connection::set_ssl(boost::asio::ssl::context *ssl_context)
     }
 }
 
-void data_connection::handshake()
+void data_connection::ssl_handshake()
 {
     boost::system::error_code ec;
 
