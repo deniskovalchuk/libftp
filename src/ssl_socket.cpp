@@ -52,7 +52,7 @@ bool ssl_socket::has_ssl_support() const
     return true;
 }
 
-void ssl_socket::handshake(boost::asio::ssl::stream_base::handshake_type type, boost::system::error_code & ec)
+void ssl_socket::ssl_handshake(boost::asio::ssl::stream_base::handshake_type type, boost::system::error_code & ec)
 {
     socket_.handshake(type, ec);
 }

@@ -144,7 +144,7 @@ void data_connection::ssl_handshake()
 {
     boost::system::error_code ec;
 
-    socket_->handshake(boost::asio::ssl::stream_base::client, ec);
+    socket_->ssl_handshake(boost::asio::ssl::stream_base::client, ec);
 
     if (ec)
     {

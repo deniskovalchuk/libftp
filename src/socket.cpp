@@ -56,7 +56,7 @@ bool socket::has_ssl_support() const
     return false;
 }
 
-void socket::handshake(boost::asio::ssl::stream_base::handshake_type type, boost::system::error_code & ec)
+void socket::ssl_handshake(boost::asio::ssl::stream_base::handshake_type type, boost::system::error_code & ec)
 {
     /* Handshake makes sense only for SSL-sockets. */
 }
