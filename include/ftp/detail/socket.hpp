@@ -49,6 +49,8 @@ public:
 
     void ssl_handshake(boost::asio::ssl::stream_base::handshake_type type, boost::system::error_code & ec) override;
 
+    void ssl_shutdown(boost::system::error_code & ec) override;
+
     std::size_t write(const char *buf, std::size_t size, boost::system::error_code & ec) override;
 
     std::size_t write(std::string_view buf, boost::system::error_code & ec) override;

@@ -58,7 +58,12 @@ bool socket::has_ssl_support() const
 
 void socket::ssl_handshake(boost::asio::ssl::stream_base::handshake_type type, boost::system::error_code & ec)
 {
-    /* Handshake makes sense only for SSL-sockets. */
+    /* Make sense only for SSL-sockets. */
+}
+
+void socket::ssl_shutdown(boost::system::error_code & ec)
+{
+    /* Make sense only for SSL-sockets. */
 }
 
 std::size_t socket::write(const char *buf, std::size_t size, boost::system::error_code & ec)

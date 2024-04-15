@@ -57,6 +57,11 @@ void ssl_socket::ssl_handshake(boost::asio::ssl::stream_base::handshake_type typ
     socket_.handshake(type, ec);
 }
 
+void ssl_socket::ssl_shutdown(boost::system::error_code & ec)
+{
+    socket_.shutdown(ec);
+}
+
 std::size_t ssl_socket::write(const char *buf, std::size_t size, boost::system::error_code & ec)
 {
     return socket_base::write(socket_, buf, size, ec);
@@ -79,8 +84,7 @@ std::size_t ssl_socket::read_line(std::string & buf, std::size_t max_size, boost
 
 void ssl_socket::shutdown(boost::asio::ip::tcp::socket::shutdown_type type, boost::system::error_code & ec)
 {
-    /* Perform SSL shutdown, ignore the 'type' param. */
-    socket_.shutdown(ec);
+    socket_.lowest_layer().shutdown(type, ec);
 }
 
 void ssl_socket::close(boost::system::error_code & ec)

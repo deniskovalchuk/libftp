@@ -114,14 +114,9 @@ void control_connection::ssl_handshake()
 
 void control_connection::ssl_shutdown()
 {
-    if (socket_->has_ssl_support())
-    {
-        return;
-    }
-
     boost::system::error_code ec;
 
-    socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    socket_->ssl_shutdown(ec);
 
     if (ec)
     {
@@ -266,7 +261,14 @@ void control_connection::disconnect()
 {
     boost::system::error_code ec;
 
-    socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    if (socket_->has_ssl_support())
+    {
+        socket_->ssl_shutdown(ec);
+    }
+    else
+    {
+        socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+    }
 
     if (ec == boost::asio::error::not_connected)
     {
