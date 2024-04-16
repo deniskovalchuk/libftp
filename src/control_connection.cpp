@@ -183,26 +183,31 @@ reply control_connection::recv()
     {
         boost::system::error_code ec;
 
+        /* Shutdown the SSL layer. */
         if (socket_->has_ssl_support())
         {
             socket_->ssl_shutdown(ec);
+
+            if (ec == boost::asio::error::eof)
+            {
+                /* Rationale:
+                 * http://stackoverflow.com/questions/25587403/boost-asio-ssl-async-shutdown-always-finishes-with-an-error
+                 */
+            }
+            else if (ec)
+            {
+                throw ftp_exception(ec, "Cannot close control connection");
+            }
         }
-        else
-        {
-            socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-        }
+
+        /* Shutdown the TCP layer. */
+        socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 
         if (ec == boost::asio::error::not_connected)
         {
             /* Ignore 'not_connected' error. We could get ENOTCONN if a server side
              * has already closed the control connection. This suits us, just close
              * the socket.
-             */
-        }
-        else if (ec == boost::asio::error::eof)
-        {
-            /* Rationale:
-             * http://stackoverflow.com/questions/25587403/boost-asio-ssl-async-shutdown-always-finishes-with-an-error
              */
         }
         else if (ec)
@@ -288,26 +293,31 @@ void control_connection::disconnect()
 {
     boost::system::error_code ec;
 
+    /* Shutdown the SSL layer. */
     if (socket_->has_ssl_support())
     {
         socket_->ssl_shutdown(ec);
+
+        if (ec == boost::asio::error::eof)
+        {
+            /* Rationale:
+             * http://stackoverflow.com/questions/25587403/boost-asio-ssl-async-shutdown-always-finishes-with-an-error
+             */
+        }
+        else if (ec)
+        {
+            throw ftp_exception(ec, "Cannot close control connection");
+        }
     }
-    else
-    {
-        socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-    }
+
+    /* Shutdown the TCP layer. */
+    socket_->shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 
     if (ec == boost::asio::error::not_connected)
     {
         /* Ignore 'not_connected' error. We could get ENOTCONN if a server side
          * has already closed the control connection. This suits us, just close
          * the socket.
-         */
-    }
-    else if (ec == boost::asio::error::eof)
-    {
-        /* Rationale:
-         * http://stackoverflow.com/questions/25587403/boost-asio-ssl-async-shutdown-always-finishes-with-an-error
          */
     }
     else if (ec)
