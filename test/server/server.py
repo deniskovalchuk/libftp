@@ -37,7 +37,7 @@ def main():
     arg_parser.add_argument('--use-ssl', choices = ['yes', 'no'], default = 'no')
     args = arg_parser.parse_args()
 
-    # Add user with the following permissions:
+    # Add users with the following permissions:
     #   e - change directory (CWD, CDUP commands)
     #   l - list files (LIST, NLST, STAT, MLSD, MLST, SIZE commands)
     #   r - retrieve file from the server (RETR command)
