@@ -54,7 +54,7 @@ reverse conversion.
 ## Features
 
 - Windows, Linux and macOS are supported.
-- Supports FTP and FTP over SSL/TLS (FTPS).
+- Supports FTP and FTP over TLS/SSL (FTPS).
 - Supports IPv4 and IPv6.
 - Supports active and passive transfer modes.
 - Supports ASCII and binary transfer types.
