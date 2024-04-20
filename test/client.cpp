@@ -1106,7 +1106,7 @@ TEST_F(ssl_client, open_connection)
     ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
-    ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
+    ssl_context->set_verify_mode(ftp::ssl::verify_peer);
 
     ftp::client client(std::move(ssl_context));
 
@@ -1156,7 +1156,7 @@ TEST_F(ssl_client, login)
     ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
-    ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
+    ssl_context->set_verify_mode(ftp::ssl::verify_peer);
 
     ftp::client client(std::move(ssl_context));
 
@@ -1184,7 +1184,7 @@ TEST_F(ssl_client, unknown_certificate_authority)
     ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
 
     /* Do not specify certificate authorities. */
-    ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
+    ssl_context->set_verify_mode(ftp::ssl::verify_peer);
 
     ftp::client client(std::move(ssl_context));
 
@@ -1206,7 +1206,7 @@ TEST_F(ssl_client, short_verification_depth)
     ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
-    ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
+    ssl_context->set_verify_mode(ftp::ssl::verify_peer);
     ssl_context->set_verify_depth(0);
 
     ftp::client client(std::move(ssl_context));
@@ -1229,7 +1229,7 @@ TEST_F(ssl_client, no_certificate_verification)
     ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
 
     /* Do not specify certificate authorities, but use the "none" verification mode. */
-    ssl_context->set_verify_mode(boost::asio::ssl::verify_none);
+    ssl_context->set_verify_mode(ftp::ssl::verify_none);
 
     ftp::client client(std::move(ssl_context));
 
@@ -1286,7 +1286,7 @@ TEST_P(ssl_client_parameterized, get_file_list)
     ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
-    ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
+    ssl_context->set_verify_mode(ftp::ssl::verify_peer);
 
     ftp::client client(mode, type, std::move(ssl_context), rfc2428_support);
 
@@ -1329,7 +1329,7 @@ TEST_P(ssl_client_parameterized, upload_download_file)
     ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
-    ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
+    ssl_context->set_verify_mode(ftp::ssl::verify_peer);
 
     ftp::client client(mode, type, std::move(ssl_context), rfc2428_support);
 
@@ -1400,7 +1400,7 @@ TEST_P(ssl_client_with_transfer_mode, ssl_session_resumption)
     ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tlsv13_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
-    ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
+    ssl_context->set_verify_mode(ftp::ssl::verify_peer);
 
     /* Set SSL_SESS_CACHE_CLIENT to use a single SSL session for control and data connections. */
     SSL_CTX_set_session_cache_mode(ssl_context->native_handle(), SSL_SESS_CACHE_CLIENT);

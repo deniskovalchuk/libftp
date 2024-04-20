@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
          */
         ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tlsv13_client);
         ssl_context->set_default_verify_paths();
-        ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
+        ssl_context->set_verify_mode(ftp::ssl::verify_peer);
 
         /* Set SSL_SESS_CACHE_CLIENT to support SSL session resumption for data connections. */
         SSL_CTX_set_session_cache_mode(ssl_context->native_handle(), SSL_SESS_CACHE_CLIENT);
