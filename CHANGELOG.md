@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5.0
+
+### New
+
+- **Added support for FTP over TLS/SSL (FTPS).** See [RFC 2228](doc/RFC2228.txt) and [RFC 4217](doc/RFC4217.txt).
+- Minor improvements.
+
 ## v0.4.1
 
 ### Fixed
