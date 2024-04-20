@@ -124,6 +124,11 @@ void control_connection::ssl_shutdown()
     }
 }
 
+SSL_SESSION * control_connection::get_ssl_session()
+{
+    return socket_->get_ssl_session();
+}
+
 reply control_connection::recv()
 {
     std::string status_string;

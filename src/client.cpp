@@ -670,6 +670,25 @@ data_connection_ptr client::create_data_connection(std::string_view command, rep
     }
 }
 
+void client::ssl_handshake_data_connection(data_connection & connection, ssl::context & ssl_context)
+{
+    SSL_SESSION *ssl_session;
+
+    long cache_mode = SSL_CTX_get_session_cache_mode(ssl_context.native_handle());
+    if (cache_mode & SSL_SESS_CACHE_CLIENT)
+    {
+        /* Reuse the control connection SSL session. */
+        ssl_session = control_connection_.get_ssl_session();
+    }
+    else
+    {
+        ssl_session = nullptr;
+    }
+
+    connection.set_ssl(&ssl_context, ssl_session);
+    connection.ssl_handshake();
+}
+
 data_connection_ptr client::process_epsv_command(std::string_view command, replies & replies)
 {
     /* Process the EPSV command. */
@@ -708,8 +727,7 @@ data_connection_ptr client::process_epsv_command(std::string_view command, repli
 
     if (ssl_context_)
     {
-        connection->set_ssl(ssl_context_.get());
-        connection->ssl_handshake();
+        ssl_handshake_data_connection(*connection, *ssl_context_);
     }
 
     /* The data connection is ready for data transfer. */
@@ -789,8 +807,7 @@ data_connection_ptr client::process_eprt_command(std::string_view command, repli
 
     if (ssl_context_)
     {
-        connection->set_ssl(ssl_context_.get());
-        connection->ssl_handshake();
+        ssl_handshake_data_connection(*connection, *ssl_context_);
     }
 
     /* The data connection is ready for data transfer. */
@@ -860,8 +877,7 @@ data_connection_ptr client::process_pasv_command(std::string_view command, repli
 
     if (ssl_context_)
     {
-        connection->set_ssl(ssl_context_.get());
-        connection->ssl_handshake();
+        ssl_handshake_data_connection(*connection, *ssl_context_);
     }
 
     /* The data connection is ready for data transfer. */
@@ -970,8 +986,7 @@ data_connection_ptr client::process_port_command(std::string_view command, repli
 
     if (ssl_context_)
     {
-        connection->set_ssl(ssl_context_.get());
-        connection->ssl_handshake();
+        ssl_handshake_data_connection(*connection, *ssl_context_);
     }
 
     /* The data connection is ready for data transfer. */

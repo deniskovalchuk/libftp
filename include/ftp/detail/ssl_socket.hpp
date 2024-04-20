@@ -37,7 +37,9 @@ namespace ftp::detail
 class ssl_socket : public socket_base
 {
 public:
-    ssl_socket(boost::asio::ip::tcp::socket && socket, boost::asio::ssl::context & ssl_context);
+    ssl_socket(boost::asio::ip::tcp::socket && socket,
+               boost::asio::ssl::context & ssl_context,
+               SSL_SESSION *ssl_session = nullptr);
 
     void connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec) override;
 
@@ -50,6 +52,8 @@ public:
     void ssl_handshake(boost::asio::ssl::stream_base::handshake_type type, boost::system::error_code & ec) override;
 
     void ssl_shutdown(boost::system::error_code & ec) override;
+
+    SSL_SESSION * get_ssl_session() override;
 
     std::size_t write(const char *buf, std::size_t size, boost::system::error_code & ec) override;
 

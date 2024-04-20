@@ -162,6 +162,8 @@ private:
 
     detail::data_connection_ptr create_data_connection(std::string_view command, replies & replies);
 
+    void ssl_handshake_data_connection(detail::data_connection & connection, ssl::context & ssl_context);
+
     detail::data_connection_ptr process_epsv_command(std::string_view command, replies & replies);
 
     detail::data_connection_ptr process_eprt_command(std::string_view command, replies & replies);

@@ -55,7 +55,7 @@ public:
 
     void accept();
 
-    void set_ssl(boost::asio::ssl::context *ssl_context);
+    void set_ssl(boost::asio::ssl::context *ssl_context, SSL_SESSION *ssl_session = nullptr);
 
     void ssl_handshake();
 

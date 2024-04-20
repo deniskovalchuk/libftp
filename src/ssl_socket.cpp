@@ -28,9 +28,16 @@
 namespace ftp::detail
 {
 
-ssl_socket::ssl_socket(boost::asio::ip::tcp::socket && socket, boost::asio::ssl::context & ssl_context)
+ssl_socket::ssl_socket(boost::asio::ip::tcp::socket && socket,
+                       boost::asio::ssl::context & ssl_context,
+                       SSL_SESSION *ssl_session)
     : socket_(std::move(socket), ssl_context)
-{}
+{
+    if (ssl_session)
+    {
+        SSL_set_session(socket_.native_handle(), ssl_session);
+    }
+}
 
 void ssl_socket::connect(const boost::asio::ip::tcp::resolver::results_type & eps, boost::system::error_code & ec)
 {
@@ -60,6 +67,11 @@ void ssl_socket::ssl_handshake(boost::asio::ssl::stream_base::handshake_type typ
 void ssl_socket::ssl_shutdown(boost::system::error_code & ec)
 {
     socket_.shutdown(ec);
+}
+
+SSL_SESSION * ssl_socket::get_ssl_session()
+{
+    return SSL_get0_session(socket_.native_handle());
 }
 
 std::size_t ssl_socket::write(const char *buf, std::size_t size, boost::system::error_code & ec)

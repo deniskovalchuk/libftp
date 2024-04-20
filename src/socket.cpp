@@ -66,6 +66,12 @@ void socket::ssl_shutdown(boost::system::error_code & ec)
     /* Make sense only for SSL-sockets. */
 }
 
+SSL_SESSION * socket::get_ssl_session()
+{
+    /* Make sense only for SSL-sockets. */
+    return nullptr;
+}
+
 std::size_t socket::write(const char *buf, std::size_t size, boost::system::error_code & ec)
 {
     return socket_base::write(socket_, buf, size, ec);

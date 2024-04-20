@@ -126,13 +126,13 @@ void data_connection::accept()
     }
 }
 
-void data_connection::set_ssl(boost::asio::ssl::context *ssl_context)
+void data_connection::set_ssl(boost::asio::ssl::context *ssl_context, SSL_SESSION *ssl_session)
 {
     boost::asio::ip::tcp::socket raw = socket_->detach();
 
     if (ssl_context)
     {
-        socket_ = std::make_unique<ssl_socket>(std::move(raw), *ssl_context);
+        socket_ = std::make_unique<ssl_socket>(std::move(raw), *ssl_context, ssl_session);
     }
     else
     {

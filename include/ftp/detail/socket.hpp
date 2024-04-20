@@ -51,6 +51,8 @@ public:
 
     void ssl_shutdown(boost::system::error_code & ec) override;
 
+    SSL_SESSION * get_ssl_session() override;
+
     std::size_t write(const char *buf, std::size_t size, boost::system::error_code & ec) override;
 
     std::size_t write(std::string_view buf, boost::system::error_code & ec) override;

@@ -55,6 +55,8 @@ public:
 
     void ssl_shutdown();
 
+    SSL_SESSION * get_ssl_session();
+
     void send(std::string_view command);
 
     reply recv();

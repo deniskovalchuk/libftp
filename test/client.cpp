@@ -1386,4 +1386,44 @@ TEST_P(ssl_client_parameterized, upload_download_file)
     check_reply(client.disconnect(), "221 Goodbye.");
 }
 
+class ssl_client_with_transfer_mode : public ssl_client,
+                                      public testing::WithParamInterface<ftp::transfer_mode>
+{
+};
+
+INSTANTIATE_TEST_SUITE_P(all_modes, ssl_client_with_transfer_mode, testing::Values(ftp::transfer_mode::active,
+                                                                                   ftp::transfer_mode::passive));
+
+TEST_P(ssl_client_with_transfer_mode, ssl_session_resumption)
+{
+    ftp::transfer_mode mode = GetParam();
+    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tlsv13_client);
+    ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
+    ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
+    ssl_context->set_verify_mode(boost::asio::ssl::verify_peer);
+
+    /* Set SSL_SESS_CACHE_CLIENT to use a single SSL session for control and data connections. */
+    SSL_CTX_set_session_cache_mode(ssl_context->native_handle(), SSL_SESS_CACHE_CLIENT);
+
+    ftp::client client(mode, ftp::transfer_type::ascii, std::move(ssl_context));
+
+    for (int i = 0; i < 3; i++)
+    {
+        check_reply(client.connect("127.0.0.1", 2142, "user", "password"), CRLF("220 FTP server is ready.",
+                                                                                "234 AUTH TLS successful.",
+                                                                                "331 Username ok, send password.",
+                                                                                "230 Login successful.",
+                                                                                "200 PBSZ=0 successful.",
+                                                                                "200 Protection set to Private",
+                                                                                "200 Type set to: ASCII."));
+
+        for (int j = 0; j < 3; j++)
+        {
+            check_last_reply(client.get_file_list("."), "226 Transfer complete.");
+        }
+
+        check_reply(client.disconnect(), "221 Goodbye.");
+    }
+}
+
 } // namespace
