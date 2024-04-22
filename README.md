@@ -9,7 +9,7 @@
 
 [![Conan Center](https://img.shields.io/conan/v/libftp?label=ConanCenter&color=blue)](https://conan.io/center/recipes/libftp)
 
-A cross-platform FTP client library based on [Boost.Asio](https://www.boost.org/doc/libs/1_84_0/doc/html/boost_asio.html).
+A cross-platform FTP/FTPS client library based on [Boost.Asio](https://www.boost.org/doc/libs/1_84_0/doc/html/boost_asio.html).
 
 ## Table of contents
 
