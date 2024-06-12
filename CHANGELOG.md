@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.1
+
+### Fixed
+
+- Fixed compilation errors on g++ 13.2.1 and libstdc++ 6.0.32.
+
 ## v0.5.0
 
 ### New
