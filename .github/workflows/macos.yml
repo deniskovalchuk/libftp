@@ -17,6 +17,7 @@ jobs:
 
     - name: Get externals
       run: |
+        brew install python
         brew install boost
         pip3 install pyOpenSSL
 
