@@ -25,6 +25,7 @@
 #ifndef LIBFTP_UTILS_HPP
 #define LIBFTP_UTILS_HPP
 
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <string_view>
