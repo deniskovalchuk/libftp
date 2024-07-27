@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.0
+
+This is the first stable major release. There are no differences from v0.5.1.
+
 ## v0.5.1
 
 ### Fixed
