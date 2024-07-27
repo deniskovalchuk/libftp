@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(libftp
-        VERSION 0.5.1
+        VERSION 1.0.0
         DESCRIPTION "FTP client library"
         LANGUAGES CXX)
 
