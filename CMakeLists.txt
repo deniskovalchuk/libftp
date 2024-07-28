@@ -58,6 +58,7 @@ set(sources
         src/replies.cpp
         src/reply.cpp
         src/socket.cpp
+        src/ssl.cpp
         src/ssl_socket.cpp
         src/utils.cpp)
 

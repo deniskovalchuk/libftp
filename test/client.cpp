@@ -801,7 +801,7 @@ TEST_F(client, upload_unique_file)
 
 TEST_F(client, open_ssl_connection)
 {
-    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
+    ftp::ssl::context_ptr ssl_context = ftp::ssl::create_context(ftp::ssl::context::tls_client);
 
     ftp::client client(std::move(ssl_context));
 
@@ -1103,7 +1103,7 @@ class ssl_client : public client_base<2142, true>
 
 TEST_F(ssl_client, open_connection)
 {
-    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
+    ftp::ssl::context_ptr ssl_context = ftp::ssl::create_context(ftp::ssl::context::tls_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
     ssl_context->set_verify_mode(ftp::ssl::verify_peer);
@@ -1153,7 +1153,7 @@ TEST_F(ssl_client, login)
     GTEST_SKIP() << "pyftpdlib doesn't handle the 'REIN' command properly. "
                     "The control connection is not switched to non-SSL mode.";
 
-    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
+    ftp::ssl::context_ptr ssl_context = ftp::ssl::create_context(ftp::ssl::context::tls_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
     ssl_context->set_verify_mode(ftp::ssl::verify_peer);
@@ -1181,7 +1181,7 @@ TEST_F(ssl_client, login)
 
 TEST_F(ssl_client, unknown_certificate_authority)
 {
-    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
+    ftp::ssl::context_ptr ssl_context = ftp::ssl::create_context(ftp::ssl::context::tls_client);
 
     /* Do not specify certificate authorities. */
     ssl_context->set_verify_mode(ftp::ssl::verify_peer);
@@ -1203,7 +1203,7 @@ TEST_F(ssl_client, unknown_certificate_authority)
 
 TEST_F(ssl_client, short_verification_depth)
 {
-    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
+    ftp::ssl::context_ptr ssl_context = ftp::ssl::create_context(ftp::ssl::context::tls_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
     ssl_context->set_verify_mode(ftp::ssl::verify_peer);
@@ -1226,7 +1226,7 @@ TEST_F(ssl_client, short_verification_depth)
 
 TEST_F(ssl_client, no_certificate_verification)
 {
-    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
+    ftp::ssl::context_ptr ssl_context = ftp::ssl::create_context(ftp::ssl::context::tls_client);
 
     /* Do not specify certificate authorities, but use the "none" verification mode. */
     ssl_context->set_verify_mode(ftp::ssl::verify_none);
@@ -1283,7 +1283,7 @@ INSTANTIATE_TEST_SUITE_P(all_params, ssl_client_parameterized,
 TEST_P(ssl_client_parameterized, get_file_list)
 {
     auto [ mode, type, rfc2428_support ] = GetParam();
-    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
+    ftp::ssl::context_ptr ssl_context = ftp::ssl::create_context(ftp::ssl::context::tls_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
     ssl_context->set_verify_mode(ftp::ssl::verify_peer);
@@ -1326,7 +1326,7 @@ TEST_P(ssl_client_parameterized, get_file_list)
 TEST_P(ssl_client_parameterized, upload_download_file)
 {
     auto [ mode, type, rfc2428_support ] = GetParam();
-    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tls_client);
+    ftp::ssl::context_ptr ssl_context = ftp::ssl::create_context(ftp::ssl::context::tls_client);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
     ssl_context->set_verify_mode(ftp::ssl::verify_peer);
@@ -1397,13 +1397,11 @@ INSTANTIATE_TEST_SUITE_P(all_modes, ssl_client_with_transfer_mode, testing::Valu
 TEST_P(ssl_client_with_transfer_mode, ssl_session_resumption)
 {
     ftp::transfer_mode mode = GetParam();
-    ftp::ssl::context_ptr ssl_context = std::make_unique<ftp::ssl::context>(ftp::ssl::context::tlsv13_client);
+    /* Configure the SSL session resumption. */
+    ftp::ssl::context_ptr ssl_context = ftp::ssl::create_context(ftp::ssl::context::tlsv13_client, true);
     ssl_context->load_verify_file(ftp::test::server::get_root_ca_cert_path().string());
     ssl_context->load_verify_file(ftp::test::server::get_ca_cert_path().string());
     ssl_context->set_verify_mode(ftp::ssl::verify_peer);
-
-    /* Set SSL_SESS_CACHE_CLIENT to use a single SSL session for control and data connections. */
-    SSL_CTX_set_session_cache_mode(ssl_context->native_handle(), SSL_SESS_CACHE_CLIENT);
 
     ftp::client client(mode, ftp::transfer_type::ascii, std::move(ssl_context));
 

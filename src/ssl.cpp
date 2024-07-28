@@ -22,38 +22,21 @@
  * SOFTWARE.
  */
 
-#include <iostream>
-#include <ftp/client.hpp>
-#include "reply_handlers.hpp"
+#include <ftp/ssl.hpp>
 
-int main(int argc, char *argv[])
+namespace ftp::ssl
 {
-    try
+
+context_ptr create_context(context::method method, bool ssl_session_resumption)
+{
+    context_ptr ssl_context = std::make_unique<context>(method);
+
+    if (ssl_session_resumption)
     {
-        /* Learn more about ssl_context in the Boost.Asio documentation.
-         * https://live.boost.org/doc/libs/1_85_0/doc/html/boost_asio/overview/ssl.html
-         */
-        ftp::ssl::context_ptr ssl_context = ftp::ssl::create_context(ftp::ssl::context::tlsv13_client, true);
-        ssl_context->set_default_verify_paths();
-        ssl_context->set_verify_mode(ftp::ssl::verify_peer);
-
-        ftp::client client(std::move(ssl_context));
-
-        handle_reply(client.connect("test.rebex.net", 21, "demo", "password"));
-
-        ftp::file_list_reply reply = client.get_file_list();
-
-        handle_reply(reply);
-
-        std::cout << reply.get_file_list_str();
-
-        handle_reply(client.disconnect());
-
-        return EXIT_SUCCESS;
+        SSL_CTX_set_session_cache_mode(ssl_context->native_handle(), SSL_SESS_CACHE_CLIENT);
     }
-    catch (const std::exception & ex)
-    {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+
+    return ssl_context;
 }
+
+} // namespace ftp::ssl
