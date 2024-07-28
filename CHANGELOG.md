@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.0
+
+### New
+
+- Added `ftp::ssl::create_context()` function. It provides a new convenient way to create the `ftp::ssl::context_ptr` object.
+
 ## v1.0.0
 
 This is the first stable major release. There are no differences from v0.5.1.
