@@ -32,7 +32,7 @@ namespace ftp::ssl
 {
 
 using namespace boost::asio::ssl;
-using context_ptr = std::unique_ptr<boost::asio::ssl::context>;
+using context_ptr = std::unique_ptr<context>;
 
 /* ssl_session_resumption - Configures SSL session resumption. The SSL session
  * of control connection will be reused for data connections.
