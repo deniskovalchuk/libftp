@@ -24,6 +24,8 @@
 
 #include <iostream>
 #include <sstream>
+#include <memory>
+#include <boost/timer/progress_display.hpp>
 #include <ftp/client.hpp>
 #include <ftp/transfer_callback.hpp>
 #include <ftp/stream/istream_adapter.hpp>
@@ -32,41 +34,41 @@
 namespace
 {
 
+/* Display the progress in the following format:
+ *
+ *    0%   10   20   30   40   50   60   70   80   90   100%
+ *    |----|----|----|----|----|----|----|----|----|----|
+ *    **************************************
+ */
+
 class transfer_callback : public ftp::transfer_callback
 {
 public:
     explicit transfer_callback(std::size_t total_bytes)
         : total_bytes_(total_bytes)
-        , transferred_bytes_(0)
     {}
 
 private:
     void begin() override
     {
-        std::cout << "The file transfer has started:" << std::endl;
-
-        print_progress();
+        progress_ = std::make_unique<boost::timer::progress_display>(total_bytes_, std::cout);
     }
 
     void notify(std::size_t bytes_transferred) override
     {
-        transferred_bytes_ += bytes_transferred;
-
-        print_progress();
+        if (progress_)
+        {
+            *progress_ += bytes_transferred;
+        }
     }
 
     void end() override
     {
-        std::cout << "The file transfer is complete." << std::endl;
-    }
-
-    void print_progress() const
-    {
-        std::cout << transferred_bytes_ << " bytes out of " << total_bytes_ << " bytes have been transferred." << std::endl;
+        std::cout << std::endl;
     }
 
     std::size_t total_bytes_;
-    std::size_t transferred_bytes_;
+    std::unique_ptr<boost::timer::progress_display> progress_;
 };
 
 } // namespace
