@@ -287,6 +287,15 @@ file_size_reply client::get_file_size(std::string_view path)
     return file_size_reply(reply);
 }
 
+file_modified_time_reply client::get_file_modified_time(std::string_view path)
+{
+    std::string command = make_command("MDTM", path);
+
+    reply reply = process_command(command);
+
+    return file_modified_time_reply(reply);
+}
+
 reply client::get_status(const std::optional<std::string_view> & path)
 {
     std::string command = make_command("STAT", path);

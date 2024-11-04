@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Denis Kovalchuk
+ * Copyright (c) 2024 Denis Kovalchuk
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,35 +22,24 @@
  * SOFTWARE.
  */
 
-#ifndef LIBFTP_UTILS_HPP
-#define LIBFTP_UTILS_HPP
+#ifndef LIBFTP_DATETIME_HPP
+#define LIBFTP_DATETIME_HPP
 
 #include <cstdint>
-#include <string>
-#include <vector>
-#include <string_view>
-#include <boost/format.hpp>
 
-namespace ftp::detail::utils
+namespace ftp
 {
 
-template<typename ...Args>
-std::string format(const std::string & fmt, Args && ...args)
+struct datetime
 {
-    boost::format f(fmt);
-    f = (f % ... % std::forward<Args>(args));
-    return f.str();
-}
+    std::uint16_t year = {0};
+    std::uint8_t month = {0};
+    std::uint8_t day = {0};
+    std::uint8_t hour = {0};
+    std::uint8_t minute = {0};
+    std::uint8_t second = {0};
+    std::uint32_t fractions = {0};
+};
 
-std::vector<std::string> split_string(std::string_view str, char del);
-
-bool try_parse_uint8(std::string_view str, std::uint8_t & result);
-
-bool try_parse_uint16(std::string_view str, std::uint16_t & result);
-
-bool try_parse_uint32(std::string_view str, std::uint32_t & result);
-
-bool try_parse_uint64(std::string_view str, std::uint64_t & result);
-
-} // namespace ftp::detail::utils
-#endif //LIBFTP_UTILS_HPP
+} // namespace ftp
+#endif //LIBFTP_DATETIME_HPP

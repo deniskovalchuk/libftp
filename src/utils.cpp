@@ -57,6 +57,20 @@ std::vector<std::string> split_string(std::string_view str, char del)
     return result;
 }
 
+bool try_parse_uint8(std::string_view str, std::uint8_t & result)
+{
+    std::uint64_t value;
+
+    if (!try_parse_uint64(str, value))
+        return false;
+
+    if (value > std::numeric_limits<std::uint8_t>::max())
+        return false;
+
+    result = value;
+    return true;
+}
+
 bool try_parse_uint16(std::string_view str, std::uint16_t & result)
 {
     std::uint64_t value;
@@ -65,6 +79,20 @@ bool try_parse_uint16(std::string_view str, std::uint16_t & result)
         return false;
 
     if (value > std::numeric_limits<std::uint16_t>::max())
+        return false;
+
+    result = value;
+    return true;
+}
+
+bool try_parse_uint32(std::string_view str, std::uint32_t & result)
+{
+    std::uint64_t value;
+
+    if (!try_parse_uint64(str, value))
+        return false;
+
+    if (value > std::numeric_limits<std::uint32_t>::max())
         return false;
 
     result = value;

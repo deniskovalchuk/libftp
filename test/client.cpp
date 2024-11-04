@@ -811,6 +811,44 @@ TEST_F(client, open_ssl_connection)
     check_reply(client.disconnect(), "221 Goodbye.");
 }
 
+TEST_F(client, get_file_modified_time)
+{
+    ftp::client client;
+
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
+
+    check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
+                                                       "230 Login successful.",
+                                                       "200 Type set to: Binary."));
+
+    std::istringstream iss("content");
+    check_last_reply(client.upload_file(ftp::istream_adapter(iss), "file"), "226 Transfer complete.");
+
+    ftp::file_modified_time_reply reply = client.get_file_modified_time("file");
+    EXPECT_EQ(213, reply.get_code());
+    EXPECT_TRUE(reply.is_positive());
+    EXPECT_TRUE(reply.get_datetime().has_value());
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
+TEST_F(client, get_file_modified_time_nonexistent_file)
+{
+    ftp::client client;
+
+    check_reply(client.connect("127.0.0.1", 2121), "220 FTP server is ready.");
+
+    check_reply(client.login("user", "password"), CRLF("331 Username ok, send password.",
+                                                       "230 Login successful.",
+                                                       "200 Type set to: Binary."));
+
+    ftp::file_modified_time_reply reply = client.get_file_modified_time("nonexistent");
+    check_reply(reply, "550 /nonexistent is not retrievable");
+    EXPECT_FALSE(reply.get_datetime().has_value());
+
+    check_reply(client.disconnect(), "221 Goodbye.");
+}
+
 class client_with_transfer_mode : public client,
                                   public testing::WithParamInterface<ftp::transfer_mode>
 {

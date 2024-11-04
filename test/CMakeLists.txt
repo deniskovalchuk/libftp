@@ -18,6 +18,7 @@ set(sources
         ascii_ostream.cpp
         client.cpp
         file_list_reply.cpp
+        file_modified_time_reply.cpp
         file_size_reply.cpp
         net_utils.cpp
         replies.cpp

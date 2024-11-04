@@ -31,7 +31,9 @@ set(sources
         include/ftp/stream/ostream_adapter.hpp
         include/ftp/stream/output_stream.hpp
         include/ftp/client.hpp
+        include/ftp/datetime.hpp
         include/ftp/file_list_reply.hpp
+        include/ftp/file_modified_time_reply.hpp
         include/ftp/file_size_reply.hpp
         include/ftp/ftp.hpp
         include/ftp/ftp_exception.hpp
@@ -50,6 +52,7 @@ set(sources
         src/control_connection.cpp
         src/data_connection.cpp
         src/file_list_reply.cpp
+        src/file_modified_time_reply.cpp
         src/file_size_reply.cpp
         src/istream_adapter.cpp
         src/net_context.cpp

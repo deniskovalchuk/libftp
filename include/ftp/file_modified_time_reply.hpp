@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Denis Kovalchuk
+ * Copyright (c) 2024 Denis Kovalchuk
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,35 +22,30 @@
  * SOFTWARE.
  */
 
-#ifndef LIBFTP_UTILS_HPP
-#define LIBFTP_UTILS_HPP
+#ifndef LIBFTP_FILE_MODIFIED_TIME_REPLY_HPP
+#define LIBFTP_FILE_MODIFIED_TIME_REPLY_HPP
 
-#include <cstdint>
-#include <string>
-#include <vector>
-#include <string_view>
-#include <boost/format.hpp>
+#include <ftp/reply.hpp>
+#include <ftp/datetime.hpp>
+#include <optional>
 
-namespace ftp::detail::utils
+namespace ftp
 {
 
-template<typename ...Args>
-std::string format(const std::string & fmt, Args && ...args)
+class file_modified_time_reply : public reply
 {
-    boost::format f(fmt);
-    f = (f % ... % std::forward<Args>(args));
-    return f.str();
-}
+public:
+    file_modified_time_reply();
 
-std::vector<std::string> split_string(std::string_view str, char del);
+    explicit file_modified_time_reply(const reply & reply);
 
-bool try_parse_uint8(std::string_view str, std::uint8_t & result);
+    [[nodiscard]] const std::optional<datetime> & get_datetime() const;
 
-bool try_parse_uint16(std::string_view str, std::uint16_t & result);
+private:
+    static std::optional<datetime> parse_datetime(const reply & reply);
 
-bool try_parse_uint32(std::string_view str, std::uint32_t & result);
+    std::optional<datetime> datetime_;
+};
 
-bool try_parse_uint64(std::string_view str, std::uint64_t & result);
-
-} // namespace ftp::detail::utils
-#endif //LIBFTP_UTILS_HPP
+} // namespace ftp
+#endif //LIBFTP_FILE_MODIFIED_TIME_REPLY_HPP

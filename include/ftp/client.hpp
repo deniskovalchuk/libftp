@@ -27,6 +27,7 @@
 
 #include <ftp/observer.hpp>
 #include <ftp/file_list_reply.hpp>
+#include <ftp/file_modified_time_reply.hpp>
 #include <ftp/file_size_reply.hpp>
 #include <ftp/replies.hpp>
 #include <ftp/reply.hpp>
@@ -106,6 +107,8 @@ public:
     reply remove_directory(std::string_view path);
 
     file_size_reply get_file_size(std::string_view path);
+
+    file_modified_time_reply get_file_modified_time(std::string_view path);
 
     reply get_status(const std::optional<std::string_view> & path = std::nullopt);
 

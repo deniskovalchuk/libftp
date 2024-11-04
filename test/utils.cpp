@@ -55,6 +55,28 @@ TEST(utils, split_string)
                 ElementsAre("127", "0", "0", "1", "198", "65"));
 }
 
+TEST(utils, try_parse_uint8)
+{
+    std::uint8_t result;
+
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint8("", result));
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint8("abc", result));
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint8("123abc", result));
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint8("-1", result));
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint8("256", result));
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint8("1000", result));
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint8("99999", result));
+
+    EXPECT_TRUE(ftp::detail::utils::try_parse_uint8("0", result));
+    EXPECT_EQ(0, result);
+    EXPECT_TRUE(ftp::detail::utils::try_parse_uint8("21", result));
+    EXPECT_EQ(21, result);
+    EXPECT_TRUE(ftp::detail::utils::try_parse_uint8("101", result));
+    EXPECT_EQ(101, result);
+    EXPECT_TRUE(ftp::detail::utils::try_parse_uint8("255", result));
+    EXPECT_EQ(255, result);
+}
+
 TEST(utils, try_parse_uint16)
 {
     std::uint16_t result;
@@ -75,6 +97,26 @@ TEST(utils, try_parse_uint16)
     EXPECT_EQ(2121, result);
     EXPECT_TRUE(ftp::detail::utils::try_parse_uint16("65535", result));
     EXPECT_EQ(65535, result);
+}
+
+TEST(utils, try_parse_uint32)
+{
+    std::uint32_t result;
+
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint32("", result));
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint32("abc", result));
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint32("123abc", result));
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint32("-1", result));
+    EXPECT_FALSE(ftp::detail::utils::try_parse_uint32("4294967296", result));
+
+    EXPECT_TRUE(ftp::detail::utils::try_parse_uint32("0", result));
+    EXPECT_EQ(0, result);
+    EXPECT_TRUE(ftp::detail::utils::try_parse_uint32("47", result));
+    EXPECT_EQ(47, result);
+    EXPECT_TRUE(ftp::detail::utils::try_parse_uint32("123456789", result));
+    EXPECT_EQ(123456789, result);
+    EXPECT_TRUE(ftp::detail::utils::try_parse_uint32("4294967295", result));
+    EXPECT_EQ(4294967295, result);
 }
 
 TEST(utils, try_parse_uint64)
