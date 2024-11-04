@@ -25,6 +25,7 @@
 #include <iostream>
 #include <sstream>
 #include <ftp/client.hpp>
+#include <ftp/transfer_callback.hpp>
 #include <ftp/stream/istream_adapter.hpp>
 #include "reply_handlers.hpp"
 
