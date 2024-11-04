@@ -81,8 +81,8 @@ int main(int argc, char *argv[])
 
         handle_reply(client.connect("localhost", 2121, "user", "password"));
 
-        /* Prepare 32 KB for uploading. */
-        std::string data(32 * 1024, 'a');
+        /* Prepare 32 MB for uploading. */
+        std::string data(32 * 1024 * 1024, 'a');
         std::istringstream iss(data);
 
         transfer_callback transfer_cb(data.size());
