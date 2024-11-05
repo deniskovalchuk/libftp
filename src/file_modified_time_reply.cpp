@@ -77,6 +77,7 @@ std::optional<datetime> file_modified_time_reply::parse_datetime(const reply & r
 
     static const std::size_t min_time_val_size = 14;
     static const std::size_t fractions_pos = min_time_val_size + 1;
+
     std::string_view time_val = status_string.substr(4);
 
     if (time_val.size() < min_time_val_size)
