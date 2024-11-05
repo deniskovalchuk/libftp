@@ -53,6 +53,13 @@ std::optional<datetime> file_modified_time_reply::parse_datetime(const reply & r
         return std::nullopt;
     }
 
+    std::string_view status_string = reply.get_status_string();
+
+    if (status_string.size() < 5)
+    {
+        return std::nullopt;
+    }
+
     /* time-val = 14DIGIT [ "." 1*DIGIT ]
      *
      * The leading, mandatory, fourteen digits are to be interpreted as, in order from the leftmost,
@@ -67,13 +74,6 @@ std::optional<datetime> file_modified_time_reply::parse_datetime(const reply & r
      *
      * RFC 3659: https://datatracker.ietf.org/doc/html/rfc3659#section-2.3
      */
-
-    std::string_view status_string = reply.get_status_string();
-
-    if (status_string.size() < 5)
-    {
-        return std::nullopt;
-    }
 
     static const std::size_t min_time_val_size = 14;
     std::string_view time_val = status_string.substr(4);
