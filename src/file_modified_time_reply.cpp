@@ -115,6 +115,7 @@ std::optional<datetime> file_modified_time_reply::parse_datetime(const reply & r
         return std::nullopt;
     }
 
+    /* Are there any chars after the '.'? */
     if (time_val.size() > min_time_val_size + 1)
     {
         if (!utils::try_parse_uint32(time_val.substr(15), result.fractions))
