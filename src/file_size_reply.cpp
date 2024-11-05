@@ -55,6 +55,7 @@ std::optional<std::uint64_t> file_size_reply::parse_size(const reply & reply)
 
     std::string_view status_string = reply.get_status_string();
 
+    /* Code, space, and at least one character. */
     if (status_string.size() < 5)
     {
         return std::nullopt;

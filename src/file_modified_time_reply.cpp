@@ -55,6 +55,7 @@ std::optional<datetime> file_modified_time_reply::parse_datetime(const reply & r
 
     std::string_view status_string = reply.get_status_string();
 
+    /* Code, space, and at least one character. */
     if (status_string.size() < 5)
     {
         return std::nullopt;
