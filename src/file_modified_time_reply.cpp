@@ -76,6 +76,7 @@ std::optional<datetime> file_modified_time_reply::parse_datetime(const reply & r
      */
 
     static const std::size_t min_time_val_size = 14;
+    static const std::size_t fractions_pos = min_time_val_size + 1;
     std::string_view time_val = status_string.substr(4);
 
     if (time_val.size() < min_time_val_size)
@@ -116,9 +117,9 @@ std::optional<datetime> file_modified_time_reply::parse_datetime(const reply & r
     }
 
     /* Are there any chars after the '.'? */
-    if (time_val.size() > min_time_val_size + 1)
+    if (time_val.size() > fractions_pos)
     {
-        if (!utils::try_parse_uint32(time_val.substr(15), result.fractions))
+        if (!utils::try_parse_uint32(time_val.substr(fractions_pos), result.fractions))
         {
             return std::nullopt;
         }
