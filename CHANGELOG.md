@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.2.0
+
+### New
+- Added `ftp::client::get_file_modified_time()` method. See `MDTM` command in [RFC3659](doc/RFC3659.txt).
+- Minor improvements.
+
 ## v1.1.0
 
 ### New
