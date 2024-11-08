@@ -4,6 +4,8 @@ project(libftp
         DESCRIPTION "FTP client library"
         LANGUAGES CXX)
 
+include(GNUInstallDirs)
+
 string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" is_top_level)
 
 option(LIBFTP_BUILD_TEST "Build tests" ${is_top_level})
@@ -72,7 +74,12 @@ add_library(ftp::ftp ALIAS ftp)
 
 target_link_libraries(ftp PUBLIC Boost::boost)
 target_link_libraries(ftp PUBLIC OpenSSL::SSL)
-target_include_directories(ftp PUBLIC include)
+
+target_include_directories(ftp
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
 target_compile_features(ftp PUBLIC cxx_std_17)
 
 if (LIBFTP_BUILD_TEST)
@@ -88,7 +95,6 @@ if (LIBFTP_BUILD_CMDLINE_CLIENT)
     add_subdirectory(app/cmdline)
 endif()
 
-include(GNUInstallDirs)
 install(TARGETS ftp
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
