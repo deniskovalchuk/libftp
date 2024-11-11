@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.3.0
+
+### New
+- Supported library installation via `CMake`.
+- Minor improvements.
+
 ## v1.2.0
 
 ### New
