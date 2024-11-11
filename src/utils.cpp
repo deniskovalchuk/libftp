@@ -67,7 +67,7 @@ bool try_parse_uint8(std::string_view str, std::uint8_t & result)
     if (value > std::numeric_limits<std::uint8_t>::max())
         return false;
 
-    result = value;
+    result = static_cast<std::uint8_t>(value);
     return true;
 }
 
@@ -81,7 +81,7 @@ bool try_parse_uint16(std::string_view str, std::uint16_t & result)
     if (value > std::numeric_limits<std::uint16_t>::max())
         return false;
 
-    result = value;
+    result = static_cast<std::uint16_t>(value);
     return true;
 }
 
@@ -95,7 +95,7 @@ bool try_parse_uint32(std::string_view str, std::uint32_t & result)
     if (value > std::numeric_limits<std::uint32_t>::max())
         return false;
 
-    result = value;
+    result = static_cast<std::uint32_t>(value);
     return true;
 }
 
