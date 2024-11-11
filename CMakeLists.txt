@@ -96,8 +96,29 @@ if (LIBFTP_BUILD_CMDLINE_CLIENT)
 endif()
 
 install(TARGETS ftp
+        EXPORT ftp-targets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(DIRECTORY include/ftp
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT ftp-targets
+        FILE ftp-targets.cmake
+        NAMESPACE ftp::
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/ftp)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+        "ftp-config-version.cmake"
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY SameMajorVersion)
+
+configure_package_config_file(
+        "${CMAKE_CURRENT_LIST_DIR}/cmake/ftp-config.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/ftp-config.cmake"
+        INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/ftp)
+
+install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/ftp-config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/ftp-config-version.cmake"
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/ftp)

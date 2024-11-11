@@ -1,0 +1,9 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+include("${CMAKE_CURRENT_LIST_DIR}/ftp-targets.cmake")
+
+find_dependency(Boost 1.67.0 REQUIRED)
+find_dependency(OpenSSL REQUIRED)
+
+check_required_components(ftp)
