@@ -75,17 +75,17 @@ add_library(ftp::ftp ALIAS ftp)
 target_link_libraries(ftp PUBLIC Boost::boost)
 target_link_libraries(ftp PUBLIC OpenSSL::SSL)
 
-include(GenerateExportHeader)
-generate_export_header(ftp
-        BASE_NAME libftp
-        EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/ftp/export.hpp)
-
 target_include_directories(ftp
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 target_compile_features(ftp PUBLIC cxx_std_17)
+
+include(GenerateExportHeader)
+generate_export_header(ftp
+        BASE_NAME libftp
+        EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/ftp/export.hpp)
 
 if (LIBFTP_BUILD_TEST)
     enable_testing()
