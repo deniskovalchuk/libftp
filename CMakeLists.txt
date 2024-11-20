@@ -75,6 +75,10 @@ add_library(ftp::ftp ALIAS ftp)
 target_link_libraries(ftp PUBLIC Boost::boost)
 target_link_libraries(ftp PUBLIC OpenSSL::SSL)
 
+if (WIN32)
+    target_link_libraries(ftp PUBLIC ws2_32)
+endif()
+
 target_include_directories(ftp
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
