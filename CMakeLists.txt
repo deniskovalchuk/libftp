@@ -88,7 +88,6 @@ target_compile_features(ftp PUBLIC cxx_std_17)
 
 include(GenerateExportHeader)
 generate_export_header(ftp
-        BASE_NAME libftp
         EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/ftp/export.hpp)
 
 if (LIBFTP_BUILD_TEST)
