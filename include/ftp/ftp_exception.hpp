@@ -26,12 +26,13 @@
 #define LIBFTP_EXCEPTION_HPP
 
 #include <boost/system/error_code.hpp>
+#include <ftp/export.hpp>
 #include <ftp/detail/utils.hpp>
 
 namespace ftp
 {
 
-class ftp_exception : public std::exception
+class FTP_EXPORT ftp_exception : public std::exception
 {
 public:
     template<typename ...Args>

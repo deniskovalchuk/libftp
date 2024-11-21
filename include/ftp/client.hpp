@@ -25,6 +25,7 @@
 #ifndef LIBFTP_CLIENT_HPP
 #define LIBFTP_CLIENT_HPP
 
+#include <ftp/export.hpp>
 #include <ftp/observer.hpp>
 #include <ftp/file_list_reply.hpp>
 #include <ftp/file_modified_time_reply.hpp>
@@ -49,7 +50,7 @@
 namespace ftp
 {
 
-class client
+class FTP_EXPORT client
 {
 public:
     explicit client(transfer_mode mode = transfer_mode::passive,

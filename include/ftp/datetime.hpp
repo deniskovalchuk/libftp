@@ -25,12 +25,13 @@
 #ifndef LIBFTP_DATETIME_HPP
 #define LIBFTP_DATETIME_HPP
 
+#include <ftp/export.hpp>
 #include <cstdint>
 
 namespace ftp
 {
 
-struct datetime
+struct FTP_EXPORT datetime
 {
     std::uint16_t year = {0};
     std::uint8_t month = {0};

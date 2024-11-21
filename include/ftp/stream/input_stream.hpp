@@ -25,13 +25,14 @@
 #ifndef LIBFTP_INPUT_STREAM_HPP
 #define LIBFTP_INPUT_STREAM_HPP
 
+#include <ftp/export.hpp>
 #include <cstddef>
 #include <memory>
 
 namespace ftp
 {
 
-class input_stream
+class FTP_EXPORT input_stream
 {
 public:
     virtual std::size_t read(char *buf, std::size_t size) = 0;

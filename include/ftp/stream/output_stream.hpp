@@ -25,13 +25,14 @@
 #ifndef LIBFTP_OUTPUT_STREAM_HPP
 #define LIBFTP_OUTPUT_STREAM_HPP
 
+#include <ftp/export.hpp>
 #include <cstddef>
 #include <memory>
 
 namespace ftp
 {
 
-class output_stream
+class FTP_EXPORT output_stream
 {
 public:
     virtual void write(char *buf, std::size_t size) = 0;

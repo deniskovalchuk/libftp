@@ -25,12 +25,13 @@
 #ifndef LIBFTP_TRANSFER_CALLBACK_HPP
 #define LIBFTP_TRANSFER_CALLBACK_HPP
 
+#include <ftp/export.hpp>
 #include <cstddef>
 
 namespace ftp
 {
 
-class transfer_callback
+class FTP_EXPORT transfer_callback
 {
 public:
     virtual void begin() { }

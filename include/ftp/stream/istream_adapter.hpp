@@ -25,13 +25,14 @@
 #ifndef LIBFTP_ISTREAM_ADAPTER_HPP
 #define LIBFTP_ISTREAM_ADAPTER_HPP
 
+#include <ftp/export.hpp>
 #include <ftp/stream/input_stream.hpp>
 #include <istream>
 
 namespace ftp
 {
 
-class istream_adapter : public input_stream
+class FTP_EXPORT istream_adapter : public input_stream
 {
 public:
     explicit istream_adapter(std::istream & src);

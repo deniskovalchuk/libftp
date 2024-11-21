@@ -25,6 +25,7 @@
 #ifndef LIBFTP_REPLY_HPP
 #define LIBFTP_REPLY_HPP
 
+#include <ftp/export.hpp>
 #include <string>
 #include <string_view>
 #include <limits>
@@ -33,7 +34,7 @@
 namespace ftp
 {
 
-class reply
+class FTP_EXPORT reply
 {
 public:
     reply();

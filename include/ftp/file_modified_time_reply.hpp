@@ -25,6 +25,7 @@
 #ifndef LIBFTP_FILE_MODIFIED_TIME_REPLY_HPP
 #define LIBFTP_FILE_MODIFIED_TIME_REPLY_HPP
 
+#include <ftp/export.hpp>
 #include <ftp/reply.hpp>
 #include <ftp/datetime.hpp>
 #include <optional>
@@ -32,7 +33,7 @@
 namespace ftp
 {
 
-class file_modified_time_reply : public reply
+class FTP_EXPORT file_modified_time_reply : public reply
 {
 public:
     file_modified_time_reply();

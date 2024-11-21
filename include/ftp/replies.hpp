@@ -25,13 +25,14 @@
 #ifndef LIBFTP_REPLIES_HPP
 #define LIBFTP_REPLIES_HPP
 
+#include <ftp/export.hpp>
 #include <ftp/reply.hpp>
 #include <vector>
 
 namespace ftp
 {
 
-class replies
+class FTP_EXPORT replies
 {
 public:
     replies();

@@ -25,6 +25,7 @@
 #ifndef LIBFTP_FILE_SIZE_REPLY_HPP
 #define LIBFTP_FILE_SIZE_REPLY_HPP
 
+#include <ftp/export.hpp>
 #include <ftp/reply.hpp>
 #include <optional>
 #include <cstdint>
@@ -32,7 +33,7 @@
 namespace ftp
 {
 
-class file_size_reply : public reply
+class FTP_EXPORT file_size_reply : public reply
 {
 public:
     file_size_reply();

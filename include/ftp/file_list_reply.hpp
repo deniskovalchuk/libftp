@@ -25,6 +25,7 @@
 #ifndef LIBFTP_FILE_LIST_REPLY_HPP
 #define LIBFTP_FILE_LIST_REPLY_HPP
 
+#include <ftp/export.hpp>
 #include <ftp/replies.hpp>
 #include <string>
 #include <vector>
@@ -32,7 +33,7 @@
 namespace ftp
 {
 
-class file_list_reply : public replies
+class FTP_EXPORT file_list_reply : public replies
 {
 public:
     file_list_reply();

@@ -25,13 +25,14 @@
 #ifndef LIBFTP_OBSERVER_HPP
 #define LIBFTP_OBSERVER_HPP
 
+#include <ftp/export.hpp>
 #include <ftp/reply.hpp>
 #include <string_view>
 
 namespace ftp
 {
 
-class observer
+class FTP_EXPORT observer
 {
 public:
     virtual void on_connected(std::string_view hostname, std::uint16_t port) { };

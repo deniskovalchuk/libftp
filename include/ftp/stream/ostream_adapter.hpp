@@ -25,13 +25,14 @@
 #ifndef LIBFTP_OSTREAM_ADAPTER_HPP
 #define LIBFTP_OSTREAM_ADAPTER_HPP
 
+#include <ftp/export.hpp>
 #include <ftp/stream/output_stream.hpp>
 #include <ostream>
 
 namespace ftp
 {
 
-class ostream_adapter : public output_stream
+class FTP_EXPORT ostream_adapter : public output_stream
 {
 public:
     explicit ostream_adapter(std::ostream & dst);

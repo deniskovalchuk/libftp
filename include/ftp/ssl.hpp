@@ -25,6 +25,7 @@
 #ifndef LIBFTP_SSL_HPP
 #define LIBFTP_SSL_HPP
 
+#include <ftp/export.hpp>
 #include <boost/asio/ssl.hpp>
 #include <memory>
 
@@ -39,6 +40,7 @@ using context_ptr = std::unique_ptr<context>;
  * ssl_session_resumption - Configures the SSL session resumption. The SSL session of
  *                          control connection will be reused for data connections.
  */
+FTP_EXPORT
 context_ptr create_context(context::method method, bool ssl_session_resumption = false);
 
 } // namespace ftp::ssl
