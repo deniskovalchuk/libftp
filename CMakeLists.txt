@@ -73,7 +73,10 @@ if (MSVC)
     add_compile_options(
         # C4251: 'identifier' : class 'type' needs to have dll-interface to be
         #        used by clients of class 'type2'
-        /wd4251)
+        /wd4251
+        # C4275: non DLL-interface classkey 'identifier' used as base for
+        #        DLL-interface classkey 'identifier'
+        /wd4275)
 endif()
 
 add_library(ftp ${sources})
