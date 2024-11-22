@@ -25,9 +25,9 @@
 #ifndef LIBFTP_EXCEPTION_HPP
 #define LIBFTP_EXCEPTION_HPP
 
-#include <boost/system/error_code.hpp>
 #include <ftp/export.hpp>
 #include <ftp/detail/utils.hpp>
+#include <boost/system/error_code.hpp>
 
 namespace ftp
 {

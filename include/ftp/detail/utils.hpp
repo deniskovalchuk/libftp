@@ -26,11 +26,11 @@
 #define LIBFTP_UTILS_HPP
 
 #include <ftp/detail/export_internal.hpp>
+#include <boost/format.hpp>
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <string_view>
-#include <boost/format.hpp>
 
 namespace ftp::detail::utils
 {
