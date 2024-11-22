@@ -25,6 +25,7 @@
 #ifndef LIBFTP_UTILS_HPP
 #define LIBFTP_UTILS_HPP
 
+#include <ftp/detail/export_internal.hpp>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -42,14 +43,19 @@ std::string format(const std::string & fmt, Args && ...args)
     return f.str();
 }
 
+FTP_EXPORT_INTERNAL
 std::vector<std::string> split_string(std::string_view str, char del);
 
+FTP_EXPORT_INTERNAL
 bool try_parse_uint8(std::string_view str, std::uint8_t & result);
 
+FTP_EXPORT_INTERNAL
 bool try_parse_uint16(std::string_view str, std::uint16_t & result);
 
+FTP_EXPORT_INTERNAL
 bool try_parse_uint32(std::string_view str, std::uint32_t & result);
 
+FTP_EXPORT_INTERNAL
 bool try_parse_uint64(std::string_view str, std::uint64_t & result);
 
 } // namespace ftp::detail::utils

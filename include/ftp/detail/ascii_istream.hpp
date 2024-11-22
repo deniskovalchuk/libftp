@@ -25,13 +25,14 @@
 #ifndef LIBFTP_ASCII_ISTREAM_HPP
 #define LIBFTP_ASCII_ISTREAM_HPP
 
+#include <ftp/detail/export_internal.hpp>
 #include <ftp/stream/input_stream.hpp>
 #include <vector>
 
 namespace ftp::detail
 {
 
-class ascii_istream : public input_stream
+class FTP_EXPORT_INTERNAL ascii_istream : public input_stream
 {
 public:
     explicit ascii_istream(input_stream & src, std::size_t buf_size = 8192);

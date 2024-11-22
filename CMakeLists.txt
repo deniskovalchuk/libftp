@@ -22,6 +22,7 @@ set(sources
         include/ftp/detail/binary_ostream.hpp
         include/ftp/detail/control_connection.hpp
         include/ftp/detail/data_connection.hpp
+        include/ftp/detail/export_internal.hpp
         include/ftp/detail/net_context.hpp
         include/ftp/detail/net_utils.hpp
         include/ftp/detail/socket.hpp
@@ -102,6 +103,7 @@ generate_export_header(ftp
 
 if (LIBFTP_BUILD_TEST)
     enable_testing()
+    target_compile_definitions(ftp PRIVATE LIBFTP_FTP_EXPORT_INTERNAL)
     add_subdirectory(test)
 endif()
 

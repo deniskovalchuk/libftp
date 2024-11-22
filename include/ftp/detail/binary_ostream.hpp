@@ -25,12 +25,13 @@
 #ifndef LIBFTP_BINARY_OSTREAM_HPP
 #define LIBFTP_BINARY_OSTREAM_HPP
 
+#include <ftp/detail/export_internal.hpp>
 #include <ftp/stream/output_stream.hpp>
 
 namespace ftp::detail
 {
 
-class binary_ostream : public output_stream
+class FTP_EXPORT_INTERNAL binary_ostream : public output_stream
 {
 public:
     explicit binary_ostream(output_stream & dst);

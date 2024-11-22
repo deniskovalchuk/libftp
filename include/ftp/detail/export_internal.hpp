@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2023 Denis Kovalchuk
+ * Copyright (c) 2024 Denis Kovalchuk
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,18 +22,15 @@
  * SOFTWARE.
  */
 
-#ifndef LIBFTP_NET_UTILS_HPP
-#define LIBFTP_NET_UTILS_HPP
+#ifndef LIBFTP_EXPORT_INTERNAL_HPP
+#define LIBFTP_EXPORT_INTERNAL_HPP
 
-#include <ftp/detail/export_internal.hpp>
-#include <boost/asio/ip/address.hpp>
-#include <string>
+#include <ftp/export.hpp>
 
-namespace ftp::detail::net_utils
-{
+#ifdef LIBFTP_FTP_EXPORT_INTERNAL
+#  define FTP_EXPORT_INTERNAL FTP_EXPORT
+#else
+#  define FTP_EXPORT_INTERNAL
+#endif
 
-FTP_EXPORT_INTERNAL
-std::string address_to_string(const boost::asio::ip::address & address);
-
-} // namespace ftp::detail::net_utils
-#endif //LIBFTP_NET_UTILS_HPP
+#endif //LIBFTP_EXPORT_INTERNAL_HPP

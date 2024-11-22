@@ -25,13 +25,14 @@
 #ifndef LIBFTP_ASCII_OSTREAM_HPP
 #define LIBFTP_ASCII_OSTREAM_HPP
 
+#include <ftp/detail/export_internal.hpp>
 #include <ftp/stream/output_stream.hpp>
 #include <vector>
 
 namespace ftp::detail
 {
 
-class ascii_ostream : public output_stream
+class FTP_EXPORT_INTERNAL ascii_ostream : public output_stream
 {
 public:
     explicit ascii_ostream(output_stream & dst, std::size_t hint_size = 8192);

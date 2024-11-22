@@ -25,12 +25,13 @@
 #ifndef LIBFTP_BINARY_ISTREAM_HPP
 #define LIBFTP_BINARY_ISTREAM_HPP
 
+#include <ftp/detail/export_internal.hpp>
 #include <ftp/stream/input_stream.hpp>
 
 namespace ftp::detail
 {
 
-class binary_istream : public input_stream
+class FTP_EXPORT_INTERNAL binary_istream : public input_stream
 {
 public:
     explicit binary_istream(input_stream & src);
