@@ -36,7 +36,7 @@ ostream_adapter::ostream_adapter(std::ostream & dst)
 
 void ostream_adapter::write(char *buf, std::size_t size)
 {
-    if (!dst_.write(buf, size))
+    if (!dst_.write(buf, static_cast<std::streamsize>(size)))
     {
         throw ftp_exception("Cannot write stream.");
     }
