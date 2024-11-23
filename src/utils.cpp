@@ -104,7 +104,7 @@ bool try_parse_uint64(std::string_view str, std::uint64_t & result)
     if (str.empty())
         return false;
 
-    std::uint64_t max = std::numeric_limits<std::uint64_t>::max();
+    const std::uint64_t max = std::numeric_limits<std::uint64_t>::max();
     std::uint64_t value = 0;
 
     for (char ch : str)
