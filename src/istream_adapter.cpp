@@ -47,7 +47,7 @@ std::size_t istream_adapter::read(char *buf, std::size_t size)
         }
     }
 
-    return src_.gcount();
+    return static_cast<std::size_t>(src_.gcount());
 }
 
 } // namespace ftp
