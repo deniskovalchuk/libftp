@@ -112,6 +112,7 @@ if (LIBFTP_BUILD_EXAMPLE)
 endif()
 
 if (LIBFTP_BUILD_CMDLINE_CLIENT)
+    target_compile_definitions(ftp PRIVATE LIBFTP_FTP_EXPORT_INTERNAL)
     add_subdirectory(app/cmdline)
 endif()
 
