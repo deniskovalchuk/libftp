@@ -35,13 +35,13 @@ namespace ftp
 class FTP_EXPORT observer
 {
 public:
-    virtual void on_connected(std::string_view hostname, std::uint16_t port) { };
+    virtual void on_connected(std::string_view hostname, std::uint16_t port) { }
 
-    virtual void on_request(std::string_view command) { };
+    virtual void on_request(std::string_view command) { }
 
-    virtual void on_reply(const reply & reply) { };
+    virtual void on_reply(const reply & reply) { }
 
-    virtual void on_file_list(std::string_view file_list) { };
+    virtual void on_file_list(std::string_view file_list) { }
 
     virtual ~observer() = default;
 };
