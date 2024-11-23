@@ -80,8 +80,8 @@ std::string read_password(std::string_view greeting)
 
     return line;
 #else
-    struct termios old_settings = {0};
-    struct termios new_settings = {0};
+    struct termios old_settings = {};
+    struct termios new_settings = {};
 
     tcgetattr(STDIN_FILENO, &old_settings);
 
