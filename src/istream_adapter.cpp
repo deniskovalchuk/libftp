@@ -39,7 +39,7 @@ std::size_t istream_adapter::read(char *buf, std::size_t size)
     if (src_.eof())
         return 0;
 
-    if (!src_.read(buf, size))
+    if (!src_.read(buf, static_cast<std::streamsize>(size)))
     {
         if (!src_.eof())
         {
