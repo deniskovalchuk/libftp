@@ -102,7 +102,6 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(ftp
         PRIVATE
-            # Setup warning level.
             /W4
             # C4100: 'identifier' : unreferenced formal parameter
             /wd4100
