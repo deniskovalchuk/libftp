@@ -70,20 +70,6 @@ set(sources
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    add_compile_options(
-        # Setup warning level.
-        /W4
-        # C4100: 'identifier' : unreferenced formal parameter
-        /wd4100
-        # C4251: 'identifier' : class 'type' needs to have dll-interface to be
-        #        used by clients of class 'type2'
-        /wd4251
-        # C4275: non DLL-interface classkey 'identifier' used as base for
-        #        DLL-interface classkey 'identifier'
-        /wd4275)
-endif()
-
 add_library(ftp ${sources})
 add_library(ftp::ftp ALIAS ftp)
 
@@ -100,6 +86,21 @@ target_include_directories(ftp
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 target_compile_features(ftp PUBLIC cxx_std_17)
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    target_compile_options(ftp
+        PRIVATE
+            # Setup warning level.
+            /W4
+            # C4100: 'identifier' : unreferenced formal parameter
+            /wd4100
+            # C4251: 'identifier' : class 'type' needs to have dll-interface to be
+            #        used by clients of class 'type2'
+            /wd4251
+            # C4275: non DLL-interface classkey 'identifier' used as base for
+            #        DLL-interface classkey 'identifier'
+            /wd4275)
+endif()
 
 include(GenerateExportHeader)
 generate_export_header(ftp
