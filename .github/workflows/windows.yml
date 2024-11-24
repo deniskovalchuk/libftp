@@ -47,9 +47,10 @@ jobs:
       env:
         BOOST_ROOT: ${{runner.temp}}\boost_1_83_0
         Boost_INCLUDE_DIR: ${{runner.temp}}\boost_1_83_0\libs\headers
+      shell: powershell
       run: |
         mkdir -p build
-        cmake -S . -B build -DBoost_USE_STATIC_LIBS=ON
+        cmake -S . -B build -DBoost_USE_STATIC_LIBS=ON -DBoost_DIR="$env:BOOST_ROOT\stage\lib\cmake\Boost-1.83.0"
         cmake --build build --config Release
 
     - name: Test libftp
