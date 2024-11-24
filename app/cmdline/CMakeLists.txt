@@ -19,7 +19,11 @@ add_executable(cmdline
     src/utils.cpp
     src/utils.hpp)
 
-target_link_libraries(cmdline PRIVATE ftp::ftp Boost::boost)
+target_link_libraries(cmdline
+    PRIVATE
+        ftp::ftp
+        Boost::boost)
+
 target_compile_features(cmdline PRIVATE cxx_std_17)
 
 if (LIBFTP_BUILD_TEST)
