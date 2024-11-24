@@ -65,6 +65,32 @@ set(sources
     src/ssl_socket.cpp
     src/utils.cpp)
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wno-unused-parameter)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    add_compile_options(
+        -Weverything
+        -Wno-unused-parameter
+        -Wno-c++98-compat-pedantic
+        -Wno-padded
+        -Wno-weak-vtables)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    add_compile_options(
+        /W4
+        # C4100: 'identifier' : unreferenced formal parameter
+        /wd4100
+        # C4251: 'identifier' : class 'type' needs to have dll-interface to be
+        #        used by clients of class 'type2'
+        /wd4251
+        # C4275: non DLL-interface classkey 'identifier' used as base for
+        #        DLL-interface classkey 'identifier'
+        /wd4275)
+endif()
+
 add_library(ftp ${sources})
 add_library(ftp::ftp ALIAS ftp)
 
@@ -84,35 +110,6 @@ target_include_directories(ftp
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 target_compile_features(ftp PUBLIC cxx_std_17)
-
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(ftp
-        PRIVATE
-            -Wall
-            -Wextra
-            -Wpedantic
-            -Wno-unused-parameter)
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_compile_options(ftp
-        PRIVATE
-            -Weverything
-            -Wno-unused-parameter
-            -Wno-c++98-compat-pedantic
-            -Wno-padded
-            -Wno-weak-vtables)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(ftp
-        PRIVATE
-            /W4
-            # C4100: 'identifier' : unreferenced formal parameter
-            /wd4100
-            # C4251: 'identifier' : class 'type' needs to have dll-interface to be
-            #        used by clients of class 'type2'
-            /wd4251
-            # C4275: non DLL-interface classkey 'identifier' used as base for
-            #        DLL-interface classkey 'identifier'
-            /wd4275)
-endif()
 
 include(GenerateExportHeader)
 generate_export_header(ftp EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/ftp/export.hpp)
