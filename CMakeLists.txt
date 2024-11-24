@@ -70,7 +70,7 @@ set(sources
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
 
-if (MSVC)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_compile_options(
         # Setup warning level.
         /W4
