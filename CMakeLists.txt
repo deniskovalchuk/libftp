@@ -85,7 +85,13 @@ target_include_directories(ftp
 
 target_compile_features(ftp PUBLIC cxx_std_17)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(ftp
+        PRIVATE
+            -Wall
+            -Wextra
+            -Wpedantic)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(ftp
         PRIVATE
             -Weverything
