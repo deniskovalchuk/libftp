@@ -69,9 +69,9 @@ add_library(ftp ${sources})
 add_library(ftp::ftp ALIAS ftp)
 
 find_package(Boost 1.70.0 REQUIRED CONFIG)
-target_link_libraries(ftp PUBLIC Boost::boost)
-
 find_package(OpenSSL REQUIRED)
+
+target_link_libraries(ftp PUBLIC Boost::boost)
 target_link_libraries(ftp PUBLIC OpenSSL::SSL)
 
 if (WIN32)
