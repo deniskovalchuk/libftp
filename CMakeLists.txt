@@ -74,6 +74,8 @@ if (MSVC)
     add_compile_options(
         # Setup warning level.
         /W4
+        # C4100: 'identifier' : unreferenced formal parameter
+        /wd4100
         # C4251: 'identifier' : class 'type' needs to have dll-interface to be
         #        used by clients of class 'type2'
         /wd4251
