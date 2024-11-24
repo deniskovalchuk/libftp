@@ -114,7 +114,7 @@ target_link_libraries(application ftp::ftp)
 
 - A C++17-compliant compiler
 - CMake 3.14 or newer
-- Boost 1.70.0 or newer
+- Boost 1.70 or newer
 - OpenSSL
 - Python3 (only for tests)
 
