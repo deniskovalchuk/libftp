@@ -87,7 +87,15 @@ target_include_directories(ftp
 
 target_compile_features(ftp PUBLIC cxx_std_17)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(ftp
+        PRIVATE
+            -Weverything
+            -Wno-unused-parameter
+            -Wno-c++98-compat-pedantic
+            -Wno-padded
+            -Wno-weak-vtables)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(ftp
         PRIVATE
             # Setup warning level.
