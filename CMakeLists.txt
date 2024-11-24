@@ -90,7 +90,8 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         PRIVATE
             -Wall
             -Wextra
-            -Wpedantic)
+            -Wpedantic
+            -Wno-unused-parameter)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(ftp
         PRIVATE
