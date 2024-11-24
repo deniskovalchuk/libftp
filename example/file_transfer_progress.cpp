@@ -51,14 +51,16 @@ public:
 private:
     void begin() override
     {
-        progress_ = std::make_unique<boost::timer::progress_display>(total_bytes_, std::cout);
+        progress_ =
+            std::make_unique<boost::timer::progress_display>(static_cast<unsigned long>(total_bytes_),
+                                                             std::cout);
     }
 
     void notify(std::size_t bytes_transferred) override
     {
         if (progress_)
         {
-            *progress_ += bytes_transferred;
+            *progress_ += static_cast<unsigned long>(bytes_transferred);
         }
     }
 
