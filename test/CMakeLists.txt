@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(libftp-tests LANGUAGES CXX)
 
-find_package(Boost 1.70.0 COMPONENTS filesystem REQUIRED CONFIG)
-
 include(FetchContent)
 FetchContent_Declare(
     googletest
@@ -29,6 +27,8 @@ set(sources
     utils.cpp)
 
 add_executable(ftp_tests ${sources})
+
+find_package(Boost 1.70.0 COMPONENTS filesystem REQUIRED CONFIG)
 
 target_link_libraries(ftp_tests
     PRIVATE
