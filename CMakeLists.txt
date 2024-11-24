@@ -65,8 +65,6 @@ set(sources
     src/ssl_socket.cpp
     src/utils.cpp)
 
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
-
 add_library(ftp ${sources})
 add_library(ftp::ftp ALIAS ftp)
 

@@ -28,8 +28,6 @@ set(sources
     test_utils.hpp
     utils.cpp)
 
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
-
 add_executable(ftp_tests ${sources})
 
 target_link_libraries(ftp_tests
