@@ -12,9 +12,6 @@ option(LIBFTP_BUILD_TEST "Build tests" ${is_top_level})
 option(LIBFTP_BUILD_EXAMPLE "Build examples" ${is_top_level})
 option(LIBFTP_BUILD_CMDLINE_CLIENT "Build the command-line FTP client application" ${is_top_level})
 
-find_package(Boost 1.67.0 REQUIRED)
-find_package(OpenSSL REQUIRED)
-
 set(sources
     include/ftp/detail/ascii_istream.hpp
     include/ftp/detail/ascii_ostream.hpp
@@ -73,7 +70,10 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
 add_library(ftp ${sources})
 add_library(ftp::ftp ALIAS ftp)
 
+find_package(Boost 1.67.0 REQUIRED)
 target_link_libraries(ftp PUBLIC Boost::boost)
+
+find_package(OpenSSL REQUIRED)
 target_link_libraries(ftp PUBLIC OpenSSL::SSL)
 
 if (WIN32)
