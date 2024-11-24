@@ -16,57 +16,57 @@ find_package(Boost 1.67.0 REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 set(sources
-        include/ftp/detail/ascii_istream.hpp
-        include/ftp/detail/ascii_ostream.hpp
-        include/ftp/detail/binary_istream.hpp
-        include/ftp/detail/binary_ostream.hpp
-        include/ftp/detail/control_connection.hpp
-        include/ftp/detail/data_connection.hpp
-        include/ftp/detail/export_internal.hpp
-        include/ftp/detail/net_context.hpp
-        include/ftp/detail/net_utils.hpp
-        include/ftp/detail/socket.hpp
-        include/ftp/detail/socket_base.hpp
-        include/ftp/detail/ssl_socket.hpp
-        include/ftp/detail/utils.hpp
-        include/ftp/stream/input_stream.hpp
-        include/ftp/stream/istream_adapter.hpp
-        include/ftp/stream/ostream_adapter.hpp
-        include/ftp/stream/output_stream.hpp
-        include/ftp/client.hpp
-        include/ftp/datetime.hpp
-        include/ftp/file_list_reply.hpp
-        include/ftp/file_modified_time_reply.hpp
-        include/ftp/file_size_reply.hpp
-        include/ftp/ftp.hpp
-        include/ftp/ftp_exception.hpp
-        include/ftp/observer.hpp
-        include/ftp/replies.hpp
-        include/ftp/reply.hpp
-        include/ftp/ssl.hpp
-        include/ftp/transfer_callback.hpp
-        include/ftp/transfer_mode.hpp
-        include/ftp/transfer_type.hpp
-        src/ascii_istream.cpp
-        src/ascii_ostream.cpp
-        src/binary_istream.cpp
-        src/binary_ostream.cpp
-        src/client.cpp
-        src/control_connection.cpp
-        src/data_connection.cpp
-        src/file_list_reply.cpp
-        src/file_modified_time_reply.cpp
-        src/file_size_reply.cpp
-        src/istream_adapter.cpp
-        src/net_context.cpp
-        src/net_utils.cpp
-        src/ostream_adapter.cpp
-        src/replies.cpp
-        src/reply.cpp
-        src/socket.cpp
-        src/ssl.cpp
-        src/ssl_socket.cpp
-        src/utils.cpp)
+    include/ftp/detail/ascii_istream.hpp
+    include/ftp/detail/ascii_ostream.hpp
+    include/ftp/detail/binary_istream.hpp
+    include/ftp/detail/binary_ostream.hpp
+    include/ftp/detail/control_connection.hpp
+    include/ftp/detail/data_connection.hpp
+    include/ftp/detail/export_internal.hpp
+    include/ftp/detail/net_context.hpp
+    include/ftp/detail/net_utils.hpp
+    include/ftp/detail/socket.hpp
+    include/ftp/detail/socket_base.hpp
+    include/ftp/detail/ssl_socket.hpp
+    include/ftp/detail/utils.hpp
+    include/ftp/stream/input_stream.hpp
+    include/ftp/stream/istream_adapter.hpp
+    include/ftp/stream/ostream_adapter.hpp
+    include/ftp/stream/output_stream.hpp
+    include/ftp/client.hpp
+    include/ftp/datetime.hpp
+    include/ftp/file_list_reply.hpp
+    include/ftp/file_modified_time_reply.hpp
+    include/ftp/file_size_reply.hpp
+    include/ftp/ftp.hpp
+    include/ftp/ftp_exception.hpp
+    include/ftp/observer.hpp
+    include/ftp/replies.hpp
+    include/ftp/reply.hpp
+    include/ftp/ssl.hpp
+    include/ftp/transfer_callback.hpp
+    include/ftp/transfer_mode.hpp
+    include/ftp/transfer_type.hpp
+    src/ascii_istream.cpp
+    src/ascii_ostream.cpp
+    src/binary_istream.cpp
+    src/binary_ostream.cpp
+    src/client.cpp
+    src/control_connection.cpp
+    src/data_connection.cpp
+    src/file_list_reply.cpp
+    src/file_modified_time_reply.cpp
+    src/file_size_reply.cpp
+    src/istream_adapter.cpp
+    src/net_context.cpp
+    src/net_utils.cpp
+    src/ostream_adapter.cpp
+    src/replies.cpp
+    src/reply.cpp
+    src/socket.cpp
+    src/ssl.cpp
+    src/ssl_socket.cpp
+    src/utils.cpp)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
 
@@ -81,9 +81,9 @@ if (WIN32)
 endif()
 
 target_include_directories(ftp
-        PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 target_compile_features(ftp PUBLIC cxx_std_17)
 
@@ -111,8 +111,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 endif()
 
 include(GenerateExportHeader)
-generate_export_header(ftp
-        EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/ftp/export.hpp)
+generate_export_header(ftp EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/ftp/export.hpp)
 
 if (LIBFTP_BUILD_TEST)
     enable_testing()
@@ -143,16 +142,18 @@ install(EXPORT ftp-targets
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-        "ftp-config-version.cmake"
-        VERSION ${PROJECT_VERSION}
-        COMPATIBILITY SameMajorVersion)
+    "ftp-config-version.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion)
 
 configure_package_config_file(
-        "${CMAKE_CURRENT_LIST_DIR}/cmake/ftp-config.cmake.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/ftp-config.cmake"
-        INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/ftp)
+    "${CMAKE_CURRENT_LIST_DIR}/cmake/ftp-config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/ftp-config.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/ftp)
 
-install(FILES
+install(
+    FILES
         "${CMAKE_CURRENT_BINARY_DIR}/ftp-config.cmake"
         "${CMAKE_CURRENT_BINARY_DIR}/ftp-config-version.cmake"
-        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/ftp)
+    DESTINATION
+        ${CMAKE_INSTALL_DATAROOTDIR}/cmake/ftp)
