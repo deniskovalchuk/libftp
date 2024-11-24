@@ -68,7 +68,7 @@ set(sources
 add_library(ftp ${sources})
 add_library(ftp::ftp ALIAS ftp)
 
-find_package(Boost 1.67.0 REQUIRED)
+find_package(Boost 1.70.0 REQUIRED)
 target_link_libraries(ftp PUBLIC Boost::boost)
 
 find_package(OpenSSL REQUIRED)

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(libftp-tests LANGUAGES CXX)
 
-find_package(Boost 1.67.0 COMPONENTS filesystem REQUIRED)
+find_package(Boost 1.70.0 COMPONENTS filesystem REQUIRED)
 
 include(FetchContent)
 FetchContent_Declare(
