@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.4.0
+
+### Breaking changes
+
+- **Dropped support for Boost version < 1.70.0.**
+
+### New
+
+- **Added support for creating the shared library on Windows.**
+- Improvements in the build system.
+
 ## v1.3.0
 
 ### New
