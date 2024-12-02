@@ -72,6 +72,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         -Wpedantic
         -Wno-unused-parameter)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # Use 'MATCHES' to match all Clang-based compilers.
     add_compile_options(
         -Weverything
         -Wno-unused-parameter
