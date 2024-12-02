@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(libftp
         VERSION 1.3.0
-        DESCRIPTION "FTP client library"
+        DESCRIPTION "FTP/FTPS client library"
         LANGUAGES CXX)
 
 include(GNUInstallDirs)
