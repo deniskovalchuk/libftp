@@ -42,7 +42,7 @@ public:
     }
 
     template<typename ...Args>
-    ftp_exception(boost::system::error_code & ec, const std::string & fmt, Args && ...args)
+    ftp_exception(const boost::system::error_code & ec, const std::string & fmt, Args && ...args)
     {
         message_ = detail::utils::format(fmt, std::forward<Args>(args)...);
         message_.append(": ");
