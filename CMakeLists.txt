@@ -74,11 +74,10 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # Use 'MATCHES' to match all Clang-based compilers.
     add_compile_options(
-        -Weverything
-        -Wno-unused-parameter
-        -Wno-c++98-compat-pedantic
-        -Wno-padded
-        -Wno-weak-vtables)
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wno-unused-parameter)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_compile_options(
         /W4
