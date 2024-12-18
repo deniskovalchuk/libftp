@@ -30,16 +30,14 @@ namespace ftp::detail::net_utils
 
 std::string address_to_string(const boost::asio::ip::address & address)
 {
-    boost::system::error_code ec;
-
-    std::string string = address.to_string(ec);
-
-    if (ec)
+    try
+    {
+        return address.to_string();
+    }
+    catch (const boost::system::error_code & ec)
     {
         throw ftp_exception(ec, "Cannot get address string");
     }
-
-    return string;
 }
 
 } // namespace ftp::detail::net_utils
