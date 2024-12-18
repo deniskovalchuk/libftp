@@ -104,11 +104,11 @@ protected:
     }
 
 private:
-    static std::pair<boost::asio::buffers_iterator<boost::asio::const_buffers_1>, bool>
-    match_eol(boost::asio::buffers_iterator<boost::asio::const_buffers_1> begin,
-              boost::asio::buffers_iterator<boost::asio::const_buffers_1> end)
+    static std::pair<boost::asio::buffers_iterator<boost::asio::const_buffer>, bool>
+    match_eol(boost::asio::buffers_iterator<boost::asio::const_buffer> begin,
+              boost::asio::buffers_iterator<boost::asio::const_buffer> end)
     {
-        boost::asio::buffers_iterator<boost::asio::const_buffers_1> it = begin;
+        boost::asio::buffers_iterator<boost::asio::const_buffer> it = begin;
 
         while (it != end)
         {
