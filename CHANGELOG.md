@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.1
+
+### Fixed
+
+- Fixed compilation with Boost 1.87.0. 
+
 ## v1.4.0
 
 ### Breaking changes
