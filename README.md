@@ -102,7 +102,7 @@ include(FetchContent)
 FetchContent_Declare(
         libftp
         GIT_REPOSITORY https://github.com/deniskovalchuk/libftp.git
-        GIT_TAG        v1.4.0)
+        GIT_TAG        v1.4.1)
 FetchContent_MakeAvailable(libftp)
 
 add_executable(application main.cpp)
