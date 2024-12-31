@@ -31,7 +31,7 @@ built on a client-server model and uses separate connections for transferring co
 - **Control connection:** A persistent connection for exchanging commands and replies between the client and server.
 - **Data connection:** A temporary connection established solely for transferring files. It remains open only for the duration of the data transfer.
 
-### Transfer Modes
+### Transfer modes
 
 The transfer mode determines how the data connection is established.
 
@@ -48,7 +48,7 @@ the server will accept incoming data connections.
 This mode is useful in scenarios where the client is unable to accept incoming connections,
 such as when operating behind a firewall or NAT.
 
-### Transfer Types
+### Transfer types
 
 The transfer type determines how data is transferred. 
 
