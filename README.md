@@ -23,9 +23,9 @@ A cross-platform FTP/FTPS client library built on [Boost.Asio](https://www.boost
 
 ## Overview
 
-This library implements the File Transfer Protocol (FTP) and its secure variant, FTPS, providing a flexible solution
-for transferring files between clients and servers. Built on a client-server model, FTP employs two separate connections
-to manage commands and file transfers.
+This library implements the client-side functionality of the File Transfer Protocol (FTP) and its secure variant, FTPS,
+providing a flexible solution for transferring files between clients and servers. Built on a client-server model, FTP
+employs two separate connections to manage commands and file transfers.
 
 ### Connections
 
