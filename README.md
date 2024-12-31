@@ -10,7 +10,7 @@
 [![Conan](https://img.shields.io/conan/v/libftp?label=Conan&color=blue)](https://conan.io/center/recipes/libftp)
 [![Vcpkg](https://img.shields.io/vcpkg/v/deniskovalchuk-libftp?color=9370DB)](https://vcpkg.io/en/package/deniskovalchuk-libftp)
 
-A cross-platform FTP/FTPS client library based on [Boost.Asio](https://www.boost.org/doc/libs/1_86_0/doc/html/boost_asio.html).
+A cross-platform FTP/FTPS client library built on [Boost.Asio](https://www.boost.org/doc/libs/1_86_0/doc/html/boost_asio.html).
 
 ## Table of contents
 
