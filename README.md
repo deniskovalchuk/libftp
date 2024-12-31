@@ -28,10 +28,8 @@ built on a client-server model and uses separate connections for transferring co
 
 ### Connections
 
-- **Control connection** is a persistent connection used to transfer commands and replies between the client and the
-server.
-- **Data connection** is a temporary connection used to transfer files. The connection is only open for the duration of
-the data transfer.
+- **Control connection:** A persistent connection for exchanging commands and replies between the client and server.
+- **Data connection:** A temporary connection established solely for transferring files. It remains open only for the duration of the data transfer.
 
 ### Transfer modes
 
