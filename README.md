@@ -35,11 +35,12 @@ built on a client-server model and uses separate connections for transferring co
 
 The transfer mode determines how the data connection is established.
 
-- In **active mode**, the client uses the control connection to send the server the IP address and port number on which
-the client accepts incoming data connections. The server then uses this information to open a data connection.
-- In **passive mode**, the client uses the control connection to request from the server the IP address and port number
-on which the server accepts incoming data connections. The client then uses this information to open a data connection.
-This mode can be used in situations where the client cannot accept incoming connections (firewall, NAT).
+- **Active mode:** The client uses the control connection to send the server its own IP address and a port number where
+it will accept incoming data connections. The server uses this information to initiate and open a data connection to the client.
+- **Passive mode:** The client uses the control connection to request the server's IP address and a port number where
+the server will accept incoming data connections. The client then uses this information to initiate and open a data
+connection to the server. This mode is useful in scenarios where the client is unable to accept incoming connections,
+such as when operating behind a firewall or NAT.
 
 ### Transfer Types
 
