@@ -23,8 +23,9 @@ A cross-platform FTP/FTPS client library built on [Boost.Asio](https://www.boost
 
 ## Overview
 
-FTP (File Transfer Protocol) is a standard network protocol used to transfer files between a client and a server. FTP is
-built on a client-server model and uses separate connections for transferring commands and files.
+This library implements the File Transfer Protocol (FTP) and its secure variant, FTPS, providing a flexible solution
+for transferring files between clients and servers. Built on a client-server model, FTP employs two separate connections
+to manage commands and file transfers.
 
 ### Connections
 
