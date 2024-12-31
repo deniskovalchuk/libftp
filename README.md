@@ -24,10 +24,11 @@ A cross-platform FTP/FTPS client library built on [Boost.Asio](https://www.boost
 ## Overview
 
 This library implements the client-side functionality of the File Transfer Protocol (FTP), providing a flexible solution
-for transferring files between clients and servers. Built on a client-server model, FTP employs two separate connections
-to manage commands and file transfers.
+for transferring files between clients and servers.
 
 ### Connections
+
+FTP employs two separate connections to manage commands and file transfers.
 
 - **Control connection:** A persistent connection for exchanging commands and replies between the client and server.
 - **Data connection:** A temporary connection established solely for transferring files. It remains open only for the duration of the data transfer.
