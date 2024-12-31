@@ -52,10 +52,16 @@ such as when operating behind a firewall or NAT.
 
 The transfer type determines how data is transferred. 
 
-- **ASCII type** can be used to transfer ASCII files between systems with different newline representations. In this
-case, the sending side converts the newlines from system style to `CRLF` style, and the receiving side performs the
+#### ASCII type
+
+- The sender converts newline characters from system style to `CRLF` style, and the receiver performs the
 reverse conversion.
-- **Binary type** is used to transfer files byte by byte. This transfer type is used by default.
+- Suitable for transferring text files between systems with different newline conventions.
+
+#### Binary type
+
+- Transfers files byte by byte without modifications.
+- Ideal for binary files, including images, videos, and archives.
 
 ## Features
 
