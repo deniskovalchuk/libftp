@@ -62,4 +62,3 @@ jobs:
     - name: Test cmdline
       working-directory: ${{github.workspace}}\build\app\cmdline\test\Release
       run: .\cmdline_tests.exe
-      
