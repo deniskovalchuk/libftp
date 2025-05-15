@@ -29,7 +29,7 @@ jobs:
       run: |
         # Download Boost.
         Invoke-WebRequest `
-            -Uri "https://boostorg.jfrog.io/artifactory/main/release/1.83.0/source/boost_1_83_0.7z" `
+            -Uri "https://archives.boost.io/release/1.88.0/source/boost_1_88_0.7z" `
             -OutFile boost.7z
         # Extract.
         7z x boost.7z
