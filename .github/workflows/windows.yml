@@ -19,7 +19,7 @@ jobs:
       id: cache-externals
       uses: actions/cache@v3
       with:
-        path: ${{runner.temp}}\boost_1_83_0
+        path: ${{runner.temp}}\boost_1_88_0
         key: cache-externals
 
     - name: Get externals
@@ -34,7 +34,7 @@ jobs:
         # Extract.
         7z x boost.7z
         # Build.
-        cd boost_1_83_0
+        cd boost_1_88_0
         .\bootstrap
         .\b2 link=static
 
@@ -45,12 +45,12 @@ jobs:
 
     - name: Build
       env:
-        BOOST_ROOT: ${{runner.temp}}\boost_1_83_0
-        Boost_INCLUDE_DIR: ${{runner.temp}}\boost_1_83_0\libs\headers
+        BOOST_ROOT: ${{runner.temp}}\boost_1_88_0
+        Boost_INCLUDE_DIR: ${{runner.temp}}\boost_1_88_0\libs\headers
       shell: powershell
       run: |
         mkdir -p build
-        cmake -S . -B build -DBoost_USE_STATIC_LIBS=ON -DBoost_DIR="$env:BOOST_ROOT\stage\lib\cmake\Boost-1.83.0"
+        cmake -S . -B build -DBoost_USE_STATIC_LIBS=ON -DBoost_DIR="$env:BOOST_ROOT\stage\lib\cmake\Boost-1.88.0"
         cmake --build build --config Release
 
     - name: Test libftp
@@ -62,3 +62,4 @@ jobs:
     - name: Test cmdline
       working-directory: ${{github.workspace}}\build\app\cmdline\test\Release
       run: .\cmdline_tests.exe
+      
