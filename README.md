@@ -23,15 +23,15 @@ A cross-platform FTP/FTPS client library built on [Boost.Asio](https://www.boost
 
 ## Overview
 
-This library implements the client-side functionality of the File Transfer Protocol (FTP), providing a flexible solution
-for transferring files between clients and servers.
+This library provides client-side functionality for the File Transfer Protocol (FTP), offering
+a flexible solution for transferring files between a client and a server.
 
 ### Connections
 
-FTP employs two separate connections to manage commands and file transfers.
+FTP employs two separate connections:
 
-- **Control connection:** A persistent connection for exchanging commands and replies between the client and server.
-- **Data connection:** A temporary connection established solely for transferring files. It remains open only for the duration of the data transfer.
+- **Control connection:** A persistent connection used to exchange commands and replies between the client and the server.
+- **Data connection:** A temporary connection established solely for transferring files. It remains open only for the duration of the transfer.
 
 ### Transfer modes
 
@@ -40,14 +40,14 @@ The transfer mode determines how the data connection is established.
 #### Active mode
 
 - The client uses the control connection to send the server its own IP address and a port number where
-it will accept incoming data connections.
-- The server uses this information to initiate and open a data connection to the client.
+it will accept an incoming data connection.
+- The server then uses this information to initiate and open the data connection to the client.
 
 #### Passive mode
 
 - The client uses the control connection to request the server's IP address and a port number where
-the server will accept incoming data connections.
-- The client then uses this information to initiate and open a data connection to the server.
+the server will accept an incoming data connection.
+- The client then uses this information to initiate and open the data connection to the server.
 
 This mode is useful in scenarios where the client is unable to accept incoming connections,
 such as when operating behind a firewall or NAT.
