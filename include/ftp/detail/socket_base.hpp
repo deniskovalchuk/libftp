@@ -104,17 +104,11 @@ protected:
     }
 
 private:
-/* Boost >= 1.87.0 */
-#if BOOST_VERSION >= 108700
-    using buffers_iterator = boost::asio::buffers_iterator<boost::asio::const_buffer>;
-#else
-    using buffers_iterator = boost::asio::buffers_iterator<boost::asio::const_buffers_1>;
-#endif
-
-    static std::pair<buffers_iterator, bool>
-    match_eol(buffers_iterator begin, buffers_iterator end)
+    static std::pair<boost::asio::buffers_iterator<boost::asio::const_buffer>, bool>
+    match_eol(boost::asio::buffers_iterator<boost::asio::const_buffer> begin,
+              boost::asio::buffers_iterator<boost::asio::const_buffer> end)
     {
-        buffers_iterator it = begin;
+        boost::asio::buffers_iterator<boost::asio::const_buffer> it = begin;
 
         while (it != end)
         {
