@@ -29,6 +29,9 @@
 #include <cstdint>
 #include <stdexcept>
 #include <boost/process.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/readable_pipe.hpp>
+#include <boost/asio/read_until.hpp>
 
 namespace ftp::test
 {
@@ -40,10 +43,10 @@ public:
     {
         std::filesystem::path server_script_path = get_server_script_path();
 
-        boost::filesystem::path python_path = boost::process::search_path("python3");
+        boost::filesystem::path python_path = boost::process::environment::find_executable("python3");
         if (python_path.empty())
         {
-            python_path = boost::process::search_path("python");
+            python_path = boost::process::environment::find_executable("python");
             if (python_path.empty())
             {
                 throw std::runtime_error("Python is not found.");
@@ -63,16 +66,26 @@ public:
         }
 
         /* Usage: python server.py root_directory port [--use-ssl {yes,no}] */
-        boost::process::ipstream output;
-        process_ = boost::process::child(python_path, server_script_path.string(),
-                                         root_directory, std::to_string(port), use_ssl_arg,
-                                         boost::process::std_out > boost::process::null,
-                                         boost::process::std_err > output);
+        boost::asio::readable_pipe output(io_context_);
+        process_ = std::make_unique<boost::process::process>(io_context_, python_path,
+                                                             std::vector<std::string>
+                                                             {
+                                                               server_script_path.string(),
+                                                               root_directory,
+                                                               std::to_string(port),
+                                                               use_ssl_arg
+                                                             },
+                                                             boost::process::process_stdio
+                                                             {
+                                                                 { /* in to default */ },
+                                                                 { /* out to default */ },
+                                                                 output
+                                                             });
 
-        while (process_.running())
+        while (process_->running())
         {
             std::string line;
-            std::getline(output, line);
+            boost::asio::read_until(output, boost::asio::dynamic_buffer(line), '\n');
 
             if (line.find("starting FTP server") != std::string::npos ||
                 line.find("starting FTP+SSL server") != std::string::npos)
@@ -84,12 +97,22 @@ public:
 
     [[nodiscard]] bool running()
     {
-        return process_.running();
+        if (process_)
+        {
+            return process_->running();
+        }
+        else
+        {
+            return false;
+        }
     }
 
     void stop()
     {
-        process_.terminate();
+        if (process_)
+        {
+            process_->terminate();
+        }
     }
 
     static std::filesystem::path get_root_ca_cert_path()
@@ -123,7 +146,8 @@ private:
         return { path };
     }
 
-    boost::process::child process_;
+    boost::asio::io_context io_context_;
+    std::unique_ptr<boost::process::process> process_;
 };
 
 } // namespace ftp::test
