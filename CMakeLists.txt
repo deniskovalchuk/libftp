@@ -94,7 +94,7 @@ endif()
 add_library(ftp ${sources})
 add_library(ftp::ftp ALIAS ftp)
 
-find_package(Boost 1.70.0 REQUIRED CONFIG)
+find_package(Boost 1.88.0 REQUIRED CONFIG)
 find_package(OpenSSL REQUIRED)
 
 target_link_libraries(ftp PUBLIC Boost::boost)

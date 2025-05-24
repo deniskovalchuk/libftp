@@ -28,13 +28,14 @@ set(sources
 
 add_executable(ftp_tests ${sources})
 
-find_package(Boost 1.70.0 COMPONENTS filesystem REQUIRED CONFIG)
+find_package(Boost 1.88.0 COMPONENTS filesystem process REQUIRED CONFIG)
 
 target_link_libraries(ftp_tests
     PRIVATE
         ftp::ftp
         Boost::boost
         Boost::filesystem
+        Boost::process
         GTest::gtest_main
         GTest::gmock_main)
 
