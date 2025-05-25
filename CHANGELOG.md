@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.5.0
+
+### Breaking changes
+
+- **Dropped support for Boost version < 1.88.0.**
+
 ## v1.4.1
 
 ### Fixed
