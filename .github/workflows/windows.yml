@@ -22,7 +22,7 @@ jobs:
         path: ${{runner.temp}}\boost_1_88_0
         key: cache-boost
 
-    - name: Install pyOpenSSL
+    - name: Get pyOpenSSL
       working-directory: ${{runner.temp}}
       shell: powershell
       run: pip3 install pyOpenSSL
