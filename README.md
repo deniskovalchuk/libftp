@@ -132,7 +132,7 @@ target_link_libraries(application ftp::ftp)
 - CMake 3.14 or newer
 - Boost 1.88 or newer
 - OpenSSL
-- Python3 (only for tests)
+- Python3, pyOpenSSL (only for tests)
 
 ### Windows
 
