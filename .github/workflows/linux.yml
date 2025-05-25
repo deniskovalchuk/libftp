@@ -43,10 +43,10 @@ jobs:
         Boost_INCLUDE_DIR: ${{runner.temp}}/boost_1_88_0/libs/headers
       run: |
         mkdir -p build/release
-        cmake -S . -B build/release `
-              -DCMAKE_BUILD_TYPE=Release `
-              -DCMAKE_CXX_COMPILER=g++-10 `
-              -DBoost_USE_STATIC_LIBS=ON `
+        cmake -S . -B build/release \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_CXX_COMPILER=g++-10 \
+              -DBoost_USE_STATIC_LIBS=ON \
               -DBoost_DIR="$BOOST_ROOT/stage/lib/cmake/Boost-1.88.0"
         cmake --build build/release
 
