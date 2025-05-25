@@ -26,7 +26,7 @@ jobs:
       run: sudo apt-get install g++-10
 
     - name: Get pyOpenSSL
-      run: pyOpenSSL
+      run: pip3 install pyOpenSSL
 
     - name: Get Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
