@@ -19,7 +19,7 @@ jobs:
       id: cache-boost
       uses: actions/cache@v3
       with:
-        path: ${{runner.temp}}/boost_1_88_0
+        path: ${{runner.temp}}/boost_1_92_0
         key: cache-boost
 
     - name: Get GCC
@@ -33,25 +33,25 @@ jobs:
       working-directory: ${{runner.temp}}
       run: |
         # Download Boost.
-        wget https://archives.boost.io/release/1.88.0/source/boost_1_88_0.tar.gz
+        wget https://archives.boost.io/release/1.92.0/source/boost_1_92_0.tar.gz
         # Extract.
-        tar -xvzf boost_1_88_0.tar.gz
+        tar -xvzf boost_1_92_0.tar.gz
         # Build.
-        cd boost_1_88_0
+        cd boost_1_92_0
         ./bootstrap.sh
         ./b2 link=static
 
     - name: Build
       env:
-        BOOST_ROOT: ${{runner.temp}}/boost_1_88_0
-        Boost_INCLUDE_DIR: ${{runner.temp}}/boost_1_88_0/libs/headers
+        BOOST_ROOT: ${{runner.temp}}/boost_1_92_0
+        Boost_INCLUDE_DIR: ${{runner.temp}}/boost_1_92_0/libs/headers
       run: |
         mkdir -p build/release
         cmake -S . -B build/release \
               -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_CXX_COMPILER=g++-10 \
               -DBoost_USE_STATIC_LIBS=ON \
-              -DBoost_DIR="$BOOST_ROOT/stage/lib/cmake/Boost-1.88.0"
+              -DBoost_DIR="$BOOST_ROOT/stage/lib/cmake/Boost-1.92.0"
         cmake --build build/release
 
     - name: Test libftp
