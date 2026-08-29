@@ -19,7 +19,7 @@ jobs:
       id: cache-boost
       uses: actions/cache@v3
       with:
-        path: ${{runner.temp}}\boost_1_88_0
+        path: ${{runner.temp}}\boost_1_90_0
         key: cache-boost
 
     - name: Get pyOpenSSL
@@ -34,23 +34,23 @@ jobs:
       run: |
         # Download Boost.
         Invoke-WebRequest `
-            -Uri "https://archives.boost.io/release/1.88.0/source/boost_1_88_0.7z" `
+            -Uri "https://archives.boost.io/release/1.90.0/source/boost_1_90_0.7z" `
             -OutFile boost.7z
         # Extract.
         7z x boost.7z
         # Build.
-        cd boost_1_88_0
+        cd boost_1_90_0
         .\bootstrap
         .\b2 link=static
 
     - name: Build
       env:
-        BOOST_ROOT: ${{runner.temp}}\boost_1_88_0
-        Boost_INCLUDE_DIR: ${{runner.temp}}\boost_1_88_0\libs\headers
+        BOOST_ROOT: ${{runner.temp}}\boost_1_90_0
+        Boost_INCLUDE_DIR: ${{runner.temp}}\boost_1_90_0\libs\headers
       shell: powershell
       run: |
         mkdir -p build
-        cmake -S . -B build -DBoost_USE_STATIC_LIBS=ON -DBoost_DIR="$env:BOOST_ROOT\stage\lib\cmake\Boost-1.88.0"
+        cmake -S . -B build -DBoost_USE_STATIC_LIBS=ON -DBoost_DIR="$env:BOOST_ROOT\stage\lib\cmake\Boost-1.90.0"
         cmake --build build --config Release
 
     - name: Test libftp
